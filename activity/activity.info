@@ -1,0 +1,8 @@
+[Activity]
+name = Story
+activity_version = 1
+license = GPLv3
+bundle_id = org.sugarlabs.StoryActivity
+exec = sugar-activity StoryActivity.StoryActivity
+icon = activity-story
+show_launcher = yes
