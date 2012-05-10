@@ -87,7 +87,7 @@ class StoryActivity(activity.Activity):
     def _setup_toolbars(self, have_toolbox):
         """ Setup the toolbars. """
 
-        self.max_participants = 4
+        self.max_participants = 9
 
         if have_toolbox:
             toolbox = ToolbarBox()
