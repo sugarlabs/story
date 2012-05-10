@@ -49,9 +49,7 @@ class Game():
         self._colors.append(colors[1])
 
         self._canvas.set_flags(gtk.CAN_FOCUS)
-        self._canvas.add_events(gtk.gdk.BUTTON_PRESS_MASK)
         self._canvas.connect("expose-event", self._expose_cb)
-        self._canvas.connect("button-press-event", self._button_press_cb)
 
         self._width = gtk.gdk.screen_width()
         self._height = gtk.gdk.screen_height() - (GRID_CELL_SIZE * 1.5)
@@ -69,6 +67,7 @@ class Game():
         # Generate the sprites we'll need...
         self._sprites = Sprites(self._canvas)
         self._dots = []
+        yoffset = int(self._space / 2.)
         for y in range(3):
             for x in range(3):
                 xoffset = int((self._width - 3 * self._dot_size - \
@@ -76,45 +75,52 @@ class Game():
                 self._dots.append(
                     Sprite(self._sprites,
                            xoffset + x * (self._dot_size + self._space),
-                           y * (self._dot_size + self._space),
+                           y * (self._dot_size + self._space) + yoffset,
                            self._new_dot_surface(color=self._colors[0])))
                 self._dots[-1].type = -1  # No image
-                self._dots[-1].set_label_attributes(40)
-
-        self._all_clear()
+                self._dots[-1].set_label_attributes(72)
 
     def _all_clear(self):
         ''' Things to reinitialize when starting up a new game. '''
+        if self._timeout_id is not None:
+            gobject.source_remove(self._timeout_id)
+
         for dot in self._dots:
             if dot.type != -1:
                 dot.type = -1
                 dot.set_shape(self._new_dot_surface(
                         self._colors[abs(dot.type)]))
-            dot.set_label('')
-        self._stop_timer()
+            dot.set_label('?')
+        self._dance_counter = 0
+        self._dance_step()
+
+    def _dance_step(self):
+        ''' Short animation before loading new game '''
+        for dot in self._dots:
+            dot.set_shape(self._new_dot_surface(
+                    self._colors[int(uniform(0, 3))]))
+        self._dance_counter += 1
+        if self._dance_counter < 10:
+            self._timeout_id = gobject.timeout_add(500, self._dance_step)
+        else:
+            self._new_game()
 
     def new_game(self):
         ''' Start a new game. '''
         self._all_clear()
 
-        # Fill in a few dots to start
+    def _new_game(self):
+        ''' Select pictures at random '''
         for i in range(3 * 3):
-            n = int(uniform(0, len(self._dots)))
-            while True:
-                if self._dots[n].type == -1:
-                    self._dots[n].type = int(uniform(0, len(self._PATHS)))
-                    _logger.debug(self._dots[n].type)
-                    self._dots[n].set_shape(self._new_dot_surface(
-                            image=self._dots[n].type))
-                    break
-                else:
-                    n = int(uniform(0, len(self._dots)))
+            self._dots[i].set_label('')
+            self._dots[i].type = int(uniform(0, len(self._PATHS)))
+            _logger.debug(self._dots[i].type)
+            self._dots[i].set_shape(self._new_dot_surface(
+                    image=self._dots[i].type))
 
         if self.we_are_sharing:
             _logger.debug('sending a new game')
             self._parent.send_new_game()
-
-        self._start_timer()
 
     def restore_game(self, dot_list):
         ''' Restore a game from the Journal or share '''
@@ -131,142 +137,9 @@ class Game():
             dot_list.append(dot.type)
         return dot_list
 
-    def _set_label(self, string):
-        ''' Set the label in the toolbar or the window frame. '''
-        self._parent.status.set_label(string)
-
-    def _neighbors(self, spr):
-        ''' Return the list of surrounding dots '''
-        neighbors = []
-        x, y = self._dot_to_grid(self._dots.index(spr))
-        if x > 0 and y > 0:
-            neighbors.append(self._dots[self._grid_to_dot((x - 1, y - 1))])
-        if x > 0:
-            neighbors.append(self._dots[self._grid_to_dot((x - 1, y))])
-        if x > 0 and y < 3 - 1:
-            neighbors.append(self._dots[self._grid_to_dot((x - 1, y + 1))])
-        if y > 0:
-            neighbors.append(self._dots[self._grid_to_dot((x, y - 1))])
-        if y < 3 - 1:
-            neighbors.append(self._dots[self._grid_to_dot((x, y + 1))])
-        if x < 3 - 1 and y > 0:
-            neighbors.append(self._dots[self._grid_to_dot((x + 1, y - 1))])
-        if x < 3 - 1:
-            neighbors.append(self._dots[self._grid_to_dot((x + 1, y))])
-        if x < 3 - 1 and y < 3 - 1:
-            neighbors.append(self._dots[self._grid_to_dot((x + 1, y + 1))])
-        return neighbors
-
-    def _count(self, count_type, spr):
-        ''' Count the number of surrounding dots of type count_type '''
-        counter = 0
-        for dot in self._neighbors(spr):
-            if dot.type in count_type:
-                counter += 1
-        return counter
-
-    def _floodfill(self, old_type, spr):
-        if spr.type not in old_type:
-            return
-
-        spr.type = 0
-        spr.set_shape(self._new_dot_surface(color=self._colors[spr.type]))
-        if self.we_are_sharing:
-            _logger.debug('sending a click to the share')
-            self._parent.send_dot_click(self._dots.index(spr), spr.type)
-
-        counter = self._count([2, 4], spr)
-        if counter > 0:
-            spr.set_label(str(counter))
-        else:
-            spr.set_label('')
-            for dot in self._neighbors(spr):
-                self._floodfill(old_type, dot)
-
-    def _button_press_cb(self, win, event):
-        win.grab_focus()
-        x, y = map(int, event.get_coords())
-
-        spr = self._sprites.find_sprite((x, y), inverse=True)
-        if spr == None:
-            return
-
-        if event.button > 1:  # right click
-            if spr.type != 0:
-                self._flip_the_cookie(spr)
-            return True
-        else:
-            if spr.type != 0:
-                red, green, blue, alpha = spr.get_pixel((x, y))
-                _logger.debug('red %d' % (red))
-                if red > 40 and red < 240:  # clicked the cookie
-                    self._flip_the_cookie(spr)
-                    return True
-
-        if spr.type in [2, 4]:
-            spr.set_shape(self._new_dot_surface(color=self._colors[0]))
-            self._frown()
-            return True
-            
-        if spr.type is not None:
-            self._floodfill([1, 3], spr)
-            self._test_game_over()
-
-        return True
-
-    def _flip_the_cookie(self, spr):
-        if spr.type in [1, 2]:
-            spr.set_shape(self._new_dot_surface(color=self._colors[2]))
-            spr.type += 2
-        else:  # elif spr.type in [3, 4]:
-            spr.set_shape(self._new_dot_surface(color=self._colors[1]))
-            spr.type -= 2
-        self._test_game_over()
-
-    def remote_button_press(self, dot, color):
-        ''' Receive a button press from a sharer '''
-        self._dots[dot].type = color
-        self._dots[dot].set_shape(self._new_dot_surface(
-                color=self._colors[color]))
-
     def set_sharing(self, share=True):
         _logger.debug('enabling sharing')
         self.we_are_sharing = share
-
-    def _counter(self):
-        ''' Display of seconds since start_time. '''
-        self._set_label(str(
-                int(gobject.get_current_time() - self._start_time)))
-        self._timeout_id = gobject.timeout_add(1000, self._counter)
-
-    def _start_timer(self):
-        ''' Start/reset the timer '''
-        self._start_time = gobject.get_current_time()
-        self._timeout_id = None
-        self._counter()
-
-    def _stop_timer(self):
-        if self._timeout_id is not None:
-            gobject.source_remove(self._timeout_id)
-
-    def _smile(self):
-        for dot in self._dots:
-            if dot.type == 0:
-                dot.set_label(':)')
-
-    def _frown(self):
-        for dot in self._dots:
-            if dot.type == 0:
-                dot.set_label(':(')
-
-    def _test_game_over(self):
-        ''' Check to see if game is over '''
-        for dot in self._dots:
-            if dot.type == 1 or dot.type == 2:
-                return False
-        self._smile()
-        self._stop_timer()
-        return True
 
     def _grid_to_dot(self, pos):
         ''' calculate the dot index from a column and row in the grid '''
@@ -300,6 +173,8 @@ class Game():
                 os.path.join(self._path, self._PATHS[image]),
                 self._svg_width, self._svg_height)
         else:
+            if color in self._dot_cache:
+                return self._dot_cache[color]
             self._stroke = color
             self._fill = color
             self._svg_width = self._dot_size
@@ -318,25 +193,9 @@ class Game():
         context.set_source_pixbuf(pixbuf, 0, 0)
         context.rectangle(0, 0, self._svg_width, self._svg_height)
         context.fill()
-        # self._dot_cache[color] = surface
+        if image is None:
+            self._dot_cache[color] = surface
         return surface
-
-    def _line(self, vertical=True):
-        ''' Generate a center line '''
-        if vertical:
-            self._svg_width = 3
-            self._svg_height = self._height
-            return svg_str_to_pixbuf(
-                self._header() + \
-                self._rect(3, self._height, 0, 0) + \
-                self._footer())
-        else:
-            self._svg_width = self._width
-            self._svg_height = 3
-            return svg_str_to_pixbuf(
-                self._header() + \
-                self._rect(self._width, 3, 0, 0) + \
-                self._footer())
 
     def _header(self):
         return '<svg\n' + 'xmlns:svg="http://www.w3.org/2000/svg"\n' + \
