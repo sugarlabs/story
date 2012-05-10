@@ -113,8 +113,8 @@ class StoryActivity(activity.Activity):
             self.toolbar = games_toolbar
 
         self._new_game_button_h = button_factory(
-            'new-game', self.toolbar, self._new_game_cb,
-            tooltip=_('Start a new game.'))
+            'view-refresh', self.toolbar, self._new_game_cb,
+            tooltip=_('Load new images.'))
 
         self.status = label_factory(self.toolbar, '')
 
