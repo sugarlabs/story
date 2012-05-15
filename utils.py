@@ -9,7 +9,7 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-
+import subprocess
 from StringIO import StringIO
 try:
     OLD_SUGAR_SYSTEM = False
@@ -51,3 +51,11 @@ def json_dump(data):
         _io = StringIO()
         jdump(data, _io)
         return _io.getvalue()
+
+
+def play_audio_from_file(file_path):
+    """ Audio media """
+    command_line = ['gst-launch', 'filesrc', 'location=' + file_path,
+                    '! oggdemux', '! vorbisdec', '! audioconvert',
+                    '! alsasink']
+    subprocess.call(command_line)

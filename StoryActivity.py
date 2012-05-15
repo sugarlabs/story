@@ -30,7 +30,8 @@ if _have_toolbox:
 from sugar.graphics.alert import NotifyAlert
 
 from toolbar_utils import button_factory, label_factory, separator_factory
-from utils import json_load, json_dump
+from utils import json_load, json_dump, play_audio_from_file
+from grecord import Grecord
 
 import telepathy
 import dbus
@@ -68,6 +69,9 @@ class StoryActivity(activity.Activity):
             self.colors = profile.get_color().to_string().split(',')
         else:
             self.colors = ['#A0FFA0', '#FF8080']
+
+        self._recording = False
+        self._grecord = None
 
         self._setup_toolbars(_have_toolbox)
         self._setup_dispatch_table()
@@ -121,11 +125,21 @@ class StoryActivity(activity.Activity):
             'view-refresh', self.toolbar, self._new_game_cb,
             tooltip=_('Load new images.'))
 
+        separator_factory(self.toolbar)
+
         self.save_as_image = button_factory(
             'image-saveoff', self.toolbar, self.do_save_as_image_cb,
             tooltip=_('Save as image'))
 
-        self.status = label_factory(self.toolbar, '')
+        separator_factory(self.toolbar)
+
+        self._record_button = button_factory(
+            'media-record', self.toolbar,
+            self._record_cb, tooltip=_('Start recording'))
+
+        self._playback_button = button_factory(
+            'media-playback-start-insensitive',  self.toolbar,
+            self._playback_recording_cb, tooltip=_('Nothing to play'))
 
         if _have_toolbox:
             separator_factory(toolbox.toolbar, True, False)
@@ -174,6 +188,53 @@ class StoryActivity(activity.Activity):
         dsobject.destroy()
         os.remove(file_path)
         self._notify_successful_save(title=_('Save as image'))
+
+    def _record_cb(self, button=None):
+        ''' Start/stop audio recording '''
+        if self._grecord is None:
+            _logger.debug('setting up grecord')
+            self._grecord = Grecord(self)
+        if self._recording:  # Was recording, so stop (and save?)
+            _logger.debug('recording...True. Preparing to save.')
+            self._grecord.stop_recording_audio()
+            self._recording = False
+            self._record_button.set_icon('media-record')
+            self._record_button.set_tooltip(_('Start recording'))
+            self._playback_button.set_icon('media-playback-start')
+            self._playback_button.set_tooltip(_('Play recording'))
+            # Autosave if there was not already a recording
+            self._save_recording()
+            self._notify_successful_save(title=_('Save recording'))
+        else:  # Wasn't recording, so start
+            _logger.debug('recording...False. Start recording.')
+            self._grecord.record_audio()
+            self._recording = True
+            self._record_button.set_icon('media-recording')
+            self._record_button.set_tooltip(_('Stop recording'))
+
+    def _playback_recording_cb(self, button=None):
+        ''' Play back current recording '''
+        _logger.debug('Playback current recording from output.ogg...')
+        play_audio_from_file(os.path.join(activity.get_activity_root(),
+                                 'instance', 'output.ogg'))
+        return
+
+    def _save_recording(self, button=None):
+        if os.path.exists(os.path.join(activity.get_activity_root(),
+                                       'instance', 'output.ogg')):
+            _logger.debug('Saving recording to Journal...')
+            dsobject = datastore.create()
+            dsobject.metadata['title'] = _('audio note for %s') % \
+                (self.metadata['title'])
+            dsobject.metadata['icon-color'] = profile.get_color().to_string()
+            dsobject.metadata['mime_type'] = 'audio/ogg'
+            dsobject.set_file_path(os.path.join(activity.get_activity_root(),
+                                                'instance', 'output.ogg'))
+            datastore.write(dsobject)
+            dsobject.destroy()
+        else:
+            _logger.debug('Nothing to save...')
+        return
 
     def _notify_successful_save(self, title='', msg=''):
         ''' Notify user when saves are completed '''
