@@ -11,6 +11,8 @@
 
 
 import gtk
+import gobject
+import subprocess
 import cairo
 import os
 
@@ -202,9 +204,14 @@ class StoryActivity(activity.Activity):
             self._record_button.set_tooltip(_('Start recording'))
             self._playback_button.set_icon('media-playback-start')
             self._playback_button.set_tooltip(_('Play recording'))
-            # Autosave if there was not already a recording
-            self._save_recording()
             self._notify_successful_save(title=_('Save recording'))
+            # FIXME: Pause for conversion to ogg to complete
+            # file size should be not be 0
+            gobject.timeout_add(
+                3000, subprocess.call,
+                ['ls', '-l', os.path.join(activity.get_activity_root(),
+                                          'instance')])
+            gobject.timeout_add(5000, self._save_recording)
         else:  # Wasn't recording, so start
             _logger.debug('recording...False. Start recording.')
             self._grecord.record_audio()
@@ -228,6 +235,9 @@ class StoryActivity(activity.Activity):
                 (self.metadata['title'])
             dsobject.metadata['icon-color'] = profile.get_color().to_string()
             dsobject.metadata['mime_type'] = 'audio/ogg'
+            _logger.debug('setting file path to %s' % (
+                    os.path.join(activity.get_activity_root(),
+                                 'instance', 'output.ogg')))
             dsobject.set_file_path(os.path.join(activity.get_activity_root(),
                                                 'instance', 'output.ogg'))
             datastore.write(dsobject)
