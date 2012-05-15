@@ -1,3 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="100.0px" height="100px" viewBox="0 0 102 102" enable-background="new 0 0 102 102" xml:space="preserve">
-<path d="M101,51l-34.657-7.632l13.645-21.356L58.631,35.656L51,1l-7.632,34.656L22.012,22.012l13.644,21.356L1,51l34.656,7.631  L22.012,79.987l21.356-13.645L51,101l7.631-34.657l21.356,13.645L66.343,58.631L101,51L101,51z M72.942,29.058L72.942,29.058  l-8.829,13.819l-4.09-0.901L72.942,29.058L72.942,29.058z M29.057,29.057l13.82,8.829l-0.901,4.09L29.057,29.057L29.057,29.057z   M29.058,72.942l8.828-13.82l4.09,0.901L29.058,72.942L29.058,72.942z M58.225,58.225L58.225,58.225L51,51v40.029l-7.225-32.805  L51,51H10.971l32.804-7.225L51,51V10.971l7.225,32.804L51,51h40.029 M72.943,72.943l-13.821-8.83l0.901-4.09L72.943,72.943  L72.943,72.943z"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="100"
+   height="100"
+   viewBox="0 0 102 102"
+   id="Layer_1"
+   xml:space="preserve"><metadata
+   id="metadata21216"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+   id="defs21214" />
+<path
+   d="M 101,51 66.343,43.368 79.988,22.012 58.631,35.656 51,1 43.368,35.656 22.012,22.012 35.656,43.368 1,51 35.656,58.631 22.012,79.987 43.368,66.342 51,101 58.631,66.343 79.987,79.988 66.343,58.631 101,51 l 0,0 z m -28.058,-21.942 0,0 -8.829,13.819 -4.09,-0.901 12.919,-12.918 0,0 z m -43.885,-0.001 13.82,8.829 -0.901,4.09 -12.919,-12.919 0,0 z m 0.001,43.885 8.828,-13.82 4.09,0.901 -12.918,12.919 0,0 z m 29.167,-14.717 0,0 L 51,51 V 91.029 L 43.775,58.224 51,51 H 10.971 L 43.775,43.775 51,51 V 10.971 L 58.225,43.775 51,51 h 40.029 m -18.086,21.943 -13.821,-8.83 0.901,-4.09 12.92,12.92 0,0 z"
+   id="path21210"
+   style="fill:#000000;fill-opacity:1" />
 </svg>

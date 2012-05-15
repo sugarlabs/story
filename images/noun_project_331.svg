@@ -1,12 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="100px" height="91px" viewBox="0 0 100 91" enable-background="new 0 0 100 91" xml:space="preserve">
-<path d="M85.152,20H86c1.657,0,3-1.343,3-3s-1.343-3-3-3H53.274L53,3c0-1.657-1.343-3-3-3s-3,1.343-3,3l-0.274,11H14
-	c-1.657,0-3,1.343-3,3s1.343,3,3,3h0.848L0,63c0,0,0,10,18,10s18-10,18-10L21.152,20h25.425l-0.053,2.116
-	C44.998,23.204,44,24.983,44,27c0,1.909,0.895,3.607,2.285,4.706l-1.232,49.458C26.015,82.437,26,91,26,91h48
-	c0,0-0.016-8.563-19.053-9.837l-1.232-49.458C55.104,30.606,56,28.909,56,27c0-2.016-0.998-3.796-2.523-4.884L53.424,20h25.424
-	L64,63c0,0,0,10,18,10s18-10,18-10L85.152,20z M16,29.082V63H4.453L16,29.082z M20,63V29.082L31.547,63H20z M84,29.082L95.547,63H84
-	V29.082z M80,29.082V63H68.453L80,29.082z"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="100"
+   height="100"
+   viewBox="0 0 100 100"
+   id="Layer_1"
+   xml:space="preserve"><metadata
+   id="metadata9762"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+   id="defs9760" />
+<path
+   d="M 85.152,29 H 86 c 1.657,0 3,-1.343 3,-3 0,-1.657 -1.343,-3 -3,-3 H 53.274 L 53,12 c 0,-1.657 -1.343,-3 -3,-3 -1.657,0 -3,1.343 -3,3 L 46.726,23 H 14 c -1.657,0 -3,1.343 -3,3 0,1.657 1.343,3 3,3 h 0.848 L 0,72 C 0,72 0,82 18,82 36,82 36,72 36,72 L 21.152,29 h 25.425 l -0.053,2.116 C 44.998,32.204 44,33.983 44,36 c 0,1.909 0.895,3.607 2.285,4.706 L 45.053,90.164 C 26.015,91.437 26,100 26,100 h 48 c 0,0 -0.016,-8.563 -19.053,-9.837 L 53.715,40.705 C 55.104,39.606 56,37.909 56,36 56,33.984 55.002,32.204 53.477,31.116 L 53.424,29 H 78.848 L 64,72 c 0,0 0,10 18,10 18,0 18,-10 18,-10 L 85.152,29 z M 16,38.082 V 72 H 4.453 L 16,38.082 z M 20,72 V 38.082 L 31.547,72 H 20 z M 84,38.082 95.547,72 H 84 V 38.082 z m -4,0 V 72 H 68.453 L 80,38.082 z"
+   id="path9756"
+   style="fill:#000000;fill-opacity:1" />
 </svg>
