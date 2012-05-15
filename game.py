@@ -33,7 +33,7 @@ from sprites import Sprites, Sprite
 
 
 DOT_SIZE = 40
-COLORS = ['#000000', '#ff0000', '#907000', '#009000', '#0000ff', '#9000a0']
+COLORS = ['#000000', '#a00000', '#907000', '#009000', '#0000ff', '#9000a0']
 
 
 class Game():
