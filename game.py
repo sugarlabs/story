@@ -29,10 +29,11 @@ try:
 except ImportError:
     GRID_CELL_SIZE = 0
 
-DOT_SIZE = 40
-
-
 from sprites import Sprites, Sprite
+
+
+DOT_SIZE = 40
+COLORS = ['#000000', '#ff0000', '#907000', '#009000', '#0000ff', '#9000a0']
 
 
 class Game():
@@ -54,6 +55,7 @@ class Game():
         self._width = gtk.gdk.screen_width()
         self._height = gtk.gdk.screen_height() - (GRID_CELL_SIZE * 1.5)
         self._scale = self._height / (3 * DOT_SIZE * 1.2)
+        self._scale /= 1.5
         self._dot_size = int(DOT_SIZE * self._scale)
         self._space = int(self._dot_size / 5.)
         self.we_are_sharing = False
@@ -67,7 +69,7 @@ class Game():
         # Generate the sprites we'll need...
         self._sprites = Sprites(self._canvas)
         self._dots = []
-        yoffset = int(self._space / 2.)
+        yoffset = self._space * 2  # int(self._space / 2.)
         for y in range(3):
             for x in range(3):
                 xoffset = int((self._width - 3 * self._dot_size - \
@@ -165,13 +167,42 @@ class Game():
     def _destroy_cb(self, win, event):
         gtk.main_quit()
 
+    def export(self):
+        ''' Write dot to cairo surface. '''
+        w = h = 4 * self._space + 3 * self._dot_size
+        png_surface = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
+        cr = cairo.Context(png_surface)
+        cr.set_source_rgb(192, 192, 192)
+        cr.rectangle(0, 0, w, h)
+        cr.fill()
+        for i in range(9):
+            y = self._space + int(i / 3.) * (self._dot_size + self._space)
+            x = self._space + (i % 3) * (self._dot_size + self._space)
+            cr.save()
+            cr = gtk.gdk.CairoContext(cr)
+            cr.set_source_surface(self._dots[i].cached_surfaces[0], x, y)
+            cr.rectangle(x, y, self._dot_size, self._dot_size)
+            cr.fill()
+            cr.restore()
+        return png_surface
+
     def _new_dot_surface(self, color='#000000', image=None):
         ''' generate a dot of a color color '''
         self._dot_cache = {}
         if image is not None:
+            color = COLORS[int(uniform(0, 6))]
+            fd = open(os.path.join(self._path, self._PATHS[image]), 'r')
+            svg_string = ''
+            for line in fd:
+                svg_string += line.replace('#000000', color)
+            fd.close()
+            pixbuf = svg_str_to_pixbuf(svg_string, w=self._dot_size,
+                                       h = self._dot_size)
+            '''
             pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
                 os.path.join(self._path, self._PATHS[image]),
-                self._svg_width, self._svg_height)
+                self._dot_size, self._dot_size)
+            '''
         else:
             if color in self._dot_cache:
                 return self._dot_cache[color]
@@ -224,10 +255,11 @@ class Game():
         return '</svg>\n'
 
 
-def svg_str_to_pixbuf(svg_string):
-    """ Load pixbuf from SVG string """
-    pl = gtk.gdk.PixbufLoader('svg')
+def svg_str_to_pixbuf(svg_string, w=None, h=None):
+    ''' Load pixbuf from SVG string '''
+    pl = gtk.gdk.PixbufLoader('svg') 
+    if w is not None:
+        pl.set_size(w, h)
     pl.write(svg_string)
     pl.close()
-    pixbuf = pl.get_pixbuf()
-    return pixbuf
+    return pl.get_pixbuf()

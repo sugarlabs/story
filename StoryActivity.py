@@ -11,9 +11,12 @@
 
 
 import gtk
+import cairo
+import os
 
 from sugar.activity import activity
 from sugar import profile
+from sugar.datastore import datastore
 try:
     from sugar.graphics.toolbarbox import ToolbarBox
     _have_toolbox = True
@@ -23,6 +26,8 @@ except ImportError:
 if _have_toolbox:
     from sugar.activity.widgets import ActivityToolbarButton
     from sugar.activity.widgets import StopButton
+
+from sugar.graphics.alert import NotifyAlert
 
 from toolbar_utils import button_factory, label_factory, separator_factory
 from utils import json_load, json_dump
@@ -116,6 +121,10 @@ class StoryActivity(activity.Activity):
             'view-refresh', self.toolbar, self._new_game_cb,
             tooltip=_('Load new images.'))
 
+        self.save_as_image = button_factory(
+            'image-saveoff', self.toolbar, self.do_save_as_image_cb,
+            tooltip=_('Save as image'))
+
         self.status = label_factory(self.toolbar, '')
 
         if _have_toolbox:
@@ -147,6 +156,37 @@ class StoryActivity(activity.Activity):
         for dot in dots:
             dot_list.append(int(dot))
         self._game.restore_game(dot_list)
+
+    def do_save_as_image_cb(self, button):
+        """ Grab the current canvas and save it to the Journal. """
+        file_path = os.path.join(activity.get_activity_root(),
+                                 'instance', 'story.png')
+        png_surface = self._game.export()
+        png_surface.write_to_png(file_path)
+
+        dsobject = datastore.create()
+        dsobject.metadata['title'] = "%s %s" % \
+            (self.metadata['title'], _("image"))
+        dsobject.metadata['icon-color'] = profile.get_color().to_string()
+        dsobject.metadata['mime_type'] = 'image/png'
+        dsobject.set_file_path(file_path)
+        datastore.write(dsobject)
+        dsobject.destroy()
+        os.remove(file_path)
+        self._notify_successful_save(title=_('Save as image'))
+
+    def _notify_successful_save(self, title='', msg=''):
+        ''' Notify user when saves are completed '''
+
+        def _notification_alert_response_cb(alert, response_id, self):
+            self.remove_alert(alert)
+
+        alert = NotifyAlert()
+        alert.props.title = title
+        alert.connect('response', _notification_alert_response_cb, self)
+        alert.props.msg = msg
+        self.add_alert(alert)
+        alert.show()
 
     # Collaboration-related methods
 
