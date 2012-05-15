@@ -169,7 +169,7 @@ class Game():
 
     def export(self):
         ''' Write dot to cairo surface. '''
-        w = h = 4 * self._space + 3 * self._dot_size
+        w = h = int(4 * self._space + 3 * self._dot_size)
         png_surface = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
         cr = cairo.Context(png_surface)
         cr.set_source_rgb(192, 192, 192)
