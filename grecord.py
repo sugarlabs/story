@@ -147,9 +147,6 @@ class Grecord:
                                                  audioline)
         audioline.set_state(gst.STATE_PLAYING)
 
-    def blockedCb(self, x, y, z):
-        pass
-
     def record_audio(self):
         # we should be able to add the audiobin on the fly, but unfortunately
         # this results in several seconds of silence being added at the start
