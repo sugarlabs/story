@@ -1,5 +1,5 @@
 #Copyright (c) 2008, Media Modifications Ltd.
-#Copyright (c) 2011, Walter Bender
+#Copyright (c) 2011-12, Walter Bender
 
 #Permission is hereby granted, free of charge, to any person obtaining a copy
 #of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,9 @@ import time
 
 import gtk
 import gst
+
+import logging
+_logger = logging.getLogger("portfolio-activity")
 
 import gobject
 gobject.threads_init()
@@ -62,16 +65,16 @@ class Grecord:
 
         srccaps = gst.Caps("audio/x-raw-int,rate=16000,channels=1,depth=16")
 
-        # guarantee perfect stream, important for A/V sync
+        # Guarantee perfect stream, important for A/V sync
         rate = gst.element_factory_make("audiorate")
 
-        # without a buffer here, gstreamer struggles at the start of the
+        # Without a buffer here, gstreamer struggles at the start of the
         # recording and then the A/V sync is bad for the whole video
         # (possibly a gstreamer/ALSA bug -- even if it gets caught up, it
-        # should be able to resync without problem)
+        # should be able to resync without problem).
         queue = gst.element_factory_make("queue", "audioqueue")
-        queue.set_property("leaky", True) # prefer fresh data
-        queue.set_property("max-size-time", 5000000000) # 5 seconds
+        queue.set_property("leaky", True)  # prefer fresh data
+        queue.set_property("max-size-time", 5000000000)  # 5 seconds
         queue.set_property("max-size-buffers", 500)
         queue.connect("overrun", self._log_queue_overrun)
 
@@ -79,8 +82,8 @@ class Grecord:
 
         sink = gst.element_factory_make("filesink", "absink")
         sink.set_property("location",
-                          os.path.join(self._activity.get_activity_root(),
-                                       'instance', 'output.wav'))
+            os.path.join(self._activity.get_activity_root(),
+                         'instance', 'output.wav'))
 
         self._audiobin = gst.Bin("audiobin")
         self._audiobin.add(src, rate, queue, enc, sink)
@@ -92,7 +95,7 @@ class Grecord:
         cbuffers = queue.get_property("current-level-buffers")
         cbytes = queue.get_property("current-level-bytes")
         ctime = queue.get_property("current-level-time")
- 
+
     def play(self):
         if self._get_state() == gst.STATE_PLAYING:
             return
@@ -127,28 +130,57 @@ class Grecord:
                                   'instance', 'output.wav')
         if not os.path.exists(audio_path) or os.path.getsize(audio_path) <= 0:
             # FIXME: inform model of failure?
+            _logger.error('output.wav does not exist or is empty')
             return
 
-        line = 'filesrc location=' + audio_path + ' name=audioFilesrc ! wavparse name=audioWavparse ! audioconvert name=audioAudioconvert ! vorbisenc name=audioVorbisenc ! oggmux name=audioOggmux ! filesink name=audioFilesink'
-        audioline = gst.parse_launch(line)
+        line = 'filesrc location=' + audio_path + ' name=audioFilesrc ! \
+wavparse name=audioWavparse ! audioconvert name=audioAudioconvert ! \
+vorbisenc name=audioVorbisenc ! oggmux name=audioOggmux ! \
+filesink name=audioFilesink'
+        self._audioline = gst.parse_launch(line)
 
-        vorbis_enc = audioline.get_by_name('audioVorbisenc')
+        vorbis_enc = self._audioline.get_by_name('audioVorbisenc')
 
-        audioFilesink = audioline.get_by_name('audioFilesink')
+        audioFilesink = self._audioline.get_by_name('audioFilesink')
         audioOggFilepath = os.path.join(self._activity.get_activity_root(),
-                         'instance', 'output.ogg')
+                                        'instance', 'output.ogg')
         audioFilesink.set_property("location", audioOggFilepath)
 
-        audioBus = audioline.get_bus()
+        audioBus = self._audioline.get_bus()
         audioBus.add_signal_watch()
         self._audio_transcode_handler = audioBus.connect(
-            'message', self._onMuxedAudioMessageCb, audioline)
+            'message', self._onMuxedAudioMessageCb, self._audioline)
         self._transcode_id = gobject.timeout_add(200, self._transcodeUpdateCb,
-                                                 audioline)
-        audioline.set_state(gst.STATE_PLAYING)
+                                                 self._audioline)
+        self._audiopos = 0
+        self._audioline.set_state(gst.STATE_PLAYING)
+
+    def transcoding_complete(self):
+        # The EOS message is sometimes either not sent or not received.
+        # So if the position in the stream is not advancing, assume EOS.
+        if self._transcode_id is None:
+            _logger.debug('EOS.... transcoding finished')
+            return True
+        else:
+            position, duration = self._query_position(self._audioline)
+            # _logger.debug('position: %s, duration: %s' % (str(position),
+            #                                               str(duration)))
+            if position == duration:
+                _logger.debug('We are done, even though we did not see EOS')
+                self._clean_up_transcoding_pipeline(self._audioline)
+                return True
+            elif position == self._audiopos:
+                _logger.debug('No progess, so assume we are done')
+                self._clean_up_transcoding_pipeline(self._audioline)
+                return True
+            self._audiopos = position
+            return False
+
+    def blockedCb(self, x, y, z):
+        pass
 
     def record_audio(self):
-        # we should be able to add the audiobin on the fly, but unfortunately
+        # We should be able to add the audiobin on the fly, but unfortunately
         # this results in several seconds of silence being added at the start
         # of the recording. So we stop the whole pipeline while adjusting it.
         # SL#2040
@@ -160,7 +192,7 @@ class Grecord:
         position, duration = self._query_position(pipe)
         if position != gst.CLOCK_TIME_NONE:
             value = position * 100.0 / duration
-            value = value/100.0
+            value = value / 100.0
         return True
 
     def _query_position(self, pipe):
@@ -177,9 +209,13 @@ class Grecord:
         return (position, duration)
 
     def _onMuxedAudioMessageCb(self, bus, message, pipe):
+        # _logger.debug(message.type)
         if message.type != gst.MESSAGE_EOS:
             return True
+        self._clean_up_transcoding_pipeline(pipe)
+        return False
 
+    def _clean_up_transcoding_pipeline(self, pipe):
         gobject.source_remove(self._audio_transcode_handler)
         self._audio_transcode_handler = None
         gobject.source_remove(self._transcode_id)
@@ -190,10 +226,8 @@ class Grecord:
 
         wavFilepath = os.path.join(self._activity.get_activity_root(),
                                    'instance', 'output.wav')
-        oggFilepath = os.path.join(self._activity.get_activity_root(),
-                                   'instance', 'output.ogg')
-        os.remove( wavFilepath )
-        return False
+        os.remove(wavFilepath)
+        return
 
     def _bus_message_handler(self, bus, message):
         t = message.type
@@ -208,4 +242,3 @@ class Grecord:
             # left on the resource.gstfilesink.c" err, debug =
             # message.parse_error()
             pass
-
