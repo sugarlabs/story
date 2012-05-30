@@ -1,3 +1,12 @@
+4
+
+ENHANCEMENTS:
+* New translations
+* Save images to Journal whenever saving an audio recording
+
+BUG_FIX:
+* More robust detection of EOS for audio recording
+
 3
 
 BUG_FIX:

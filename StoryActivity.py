@@ -29,7 +29,7 @@ if _have_toolbox:
     from sugar.activity.widgets import ActivityToolbarButton
     from sugar.activity.widgets import StopButton
 
-from sugar.graphics.alert import NotifyAlert
+from sugar.graphics.alert import Alert
 
 from toolbar_utils import button_factory, label_factory, separator_factory
 from utils import json_load, json_dump, play_audio_from_file
@@ -74,6 +74,7 @@ class StoryActivity(activity.Activity):
 
         self._recording = False
         self._grecord = None
+        self._alert = None
 
         self._setup_toolbars(_have_toolbox)
         self._setup_dispatch_table()
@@ -130,7 +131,7 @@ class StoryActivity(activity.Activity):
         separator_factory(self.toolbar)
 
         self.save_as_image = button_factory(
-            'image-saveoff', self.toolbar, self.do_save_as_image_cb,
+            'image-saveoff', self.toolbar, self._do_save_as_image_cb,
             tooltip=_('Save as image'))
 
         separator_factory(self.toolbar)
@@ -173,8 +174,9 @@ class StoryActivity(activity.Activity):
             dot_list.append(int(dot))
         self._game.restore_game(dot_list)
 
-    def do_save_as_image_cb(self, button):
+    def _do_save_as_image_cb(self, button=None):
         """ Grab the current canvas and save it to the Journal. """
+        self._notify_successful_save(title=_('Save as image'))
         file_path = os.path.join(activity.get_activity_root(),
                                  'instance', 'story.png')
         png_surface = self._game.export()
@@ -189,7 +191,9 @@ class StoryActivity(activity.Activity):
         datastore.write(dsobject)
         dsobject.destroy()
         os.remove(file_path)
-        self._notify_successful_save(title=_('Save as image'))
+        if self._alert is not None:
+            self.remove_alert(self._alert)
+            self._alert = None
 
     def _record_cb(self, button=None):
         ''' Start/stop audio recording '''
@@ -205,19 +209,21 @@ class StoryActivity(activity.Activity):
             self._playback_button.set_icon('media-playback-start')
             self._playback_button.set_tooltip(_('Play recording'))
             self._notify_successful_save(title=_('Save recording'))
-            # FIXME: Pause for conversion to ogg to complete
-            # file size should be not be 0
-            gobject.timeout_add(
-                3000, subprocess.call,
-                ['ls', '-l', os.path.join(activity.get_activity_root(),
-                                          'instance')])
-            gobject.timeout_add(5000, self._save_recording)
+            gobject.timeout_add(100, self._wait_for_transcoding_to_finish)
         else:  # Wasn't recording, so start
             _logger.debug('recording...False. Start recording.')
             self._grecord.record_audio()
             self._recording = True
             self._record_button.set_icon('media-recording')
             self._record_button.set_tooltip(_('Stop recording'))
+
+    def _wait_for_transcoding_to_finish(self, button=None):
+        while not self._grecord.transcoding_complete():
+            time.sleep(1)
+        if self._alert is not None:
+            self.remove_alert(self._alert)
+            self._alert = None
+        self._save_recording()
 
     def _playback_recording_cb(self, button=None):
         ''' Play back current recording '''
@@ -226,7 +232,7 @@ class StoryActivity(activity.Activity):
                                  'instance', 'output.ogg'))
         return
 
-    def _save_recording(self, button=None):
+    def _save_recording(self):
         if os.path.exists(os.path.join(activity.get_activity_root(),
                                        'instance', 'output.ogg')):
             _logger.debug('Saving recording to Journal...')
@@ -242,22 +248,19 @@ class StoryActivity(activity.Activity):
                                                 'instance', 'output.ogg'))
             datastore.write(dsobject)
             dsobject.destroy()
+            # Always save an image with the recording.
+            self._do_save_as_image_cb()
         else:
             _logger.debug('Nothing to save...')
         return
 
     def _notify_successful_save(self, title='', msg=''):
         ''' Notify user when saves are completed '''
-
-        def _notification_alert_response_cb(alert, response_id, self):
-            self.remove_alert(alert)
-
-        alert = NotifyAlert()
-        alert.props.title = title
-        alert.connect('response', _notification_alert_response_cb, self)
-        alert.props.msg = msg
-        self.add_alert(alert)
-        alert.show()
+        self._alert = Alert()
+        self._alert.props.title = title
+        self._alert.props.msg = msg
+        self.add_alert(self._alert)
+        self._alert.show()
 
     # Collaboration-related methods
 
