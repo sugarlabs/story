@@ -15,6 +15,7 @@ import gobject
 import subprocess
 import cairo
 import os
+import time
 
 from sugar.activity import activity
 from sugar import profile
