@@ -1,5 +1,11 @@
-4
+5
+ENHANCEMENTS:
+* New translations
 
+BUG_FIX:
+* Add missing import that broke audio recording
+
+4
 ENHANCEMENTS:
 * New translations
 * Save images to Journal whenever saving an audio recording
