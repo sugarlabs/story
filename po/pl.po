@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-09 16:52-0400\n"
-"PO-Revision-Date: 2012-05-28 15:32+0200\n"
-"Last-Translator: Marcin <ulinski.marcin@gmail.com>\n"
+"POT-Creation-Date: 2012-05-27 00:34-0400\n"
+"PO-Revision-Date: 2012-09-12 20:25+0200\n"
+"Last-Translator: Kamila <kamilafilipowska@yahoo.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -22,10 +22,44 @@ msgstr ""
 msgid "Story"
 msgstr "Opowieść"
 
-#: StoryActivity.py:110
+#: StoryActivity.py:121
 msgid "Game"
 msgstr "Gra"
 
-#: StoryActivity.py:117
+#: StoryActivity.py:128
 msgid "Load new images."
 msgstr "Załaduj nowe obrazki."
+
+#: StoryActivity.py:134 StoryActivity.py:192
+msgid "Save as image"
+msgstr "Zapisz jako obrazek"
+
+#: StoryActivity.py:140 StoryActivity.py:204
+msgid "Start recording"
+msgstr "Zacznij nagrywanie"
+
+#: StoryActivity.py:144
+msgid "Nothing to play"
+msgstr "Brak nagrań"
+
+#: StoryActivity.py:185
+msgid "image"
+msgstr "obrazek"
+
+#: StoryActivity.py:206
+msgid "Play recording"
+msgstr "Odtwórz nagranie"
+
+#: StoryActivity.py:207
+msgid "Save recording"
+msgstr "Zapisz nagranie"
+
+#: StoryActivity.py:220
+msgid "Stop recording"
+msgstr "Zatrzymaj nagrywanie"
+
+#: StoryActivity.py:234
+#, python-format
+#, python-format, fuzzy
+msgid "audio note for %s"
+msgstr "notatka dźwiękowa dla %s"
