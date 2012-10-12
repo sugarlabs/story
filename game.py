@@ -179,7 +179,7 @@ class Game():
             y = self._space + int(i / 3.) * (self._dot_size + self._space)
             x = self._space + (i % 3) * (self._dot_size + self._space)
             cr.save()
-            cr = Gdk.CairoContext(cr)
+            cr = cairo.CairoContext(cr)
             cr.set_source_surface(self._dots[i].cached_surfaces[0], x, y)
             cr.rectangle(x, y, self._dot_size, self._dot_size)
             cr.fill()
@@ -220,7 +220,7 @@ class Game():
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                                      self._svg_width, self._svg_height)
         context = cairo.Context(surface)
-        context = Gdk.CairoContext(context)
+        context = cairo.Context(context)
         context.set_source_pixbuf(pixbuf, 0, 0)
         context.rectangle(0, 0, self._svg_width, self._svg_height)
         context.fill()
