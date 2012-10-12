@@ -83,8 +83,8 @@ class StoryActivity(activity.Activity):
 
         # Create a canvas
         canvas = Gtk.DrawingArea()
-        canvas.set_size_request(Gdk.Screen.width(), \
-                                Gdk.Screen.height())
+        canvas.set_size_request(Gdk.screen_width(), \
+                                Gdk.screen_height())
         self.set_canvas(canvas)
         canvas.show()
         self.show_all()

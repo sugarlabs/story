@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-27 00:34-0400\n"
-"PO-Revision-Date: 2012-08-03 07:39+0200\n"
+"POT-Creation-Date: 2012-05-09 16:52-0400\n"
+"PO-Revision-Date: 2012-05-28 08:35+0200\n"
 "Last-Translator: Chris <cjl@laptop.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: hy\n"
@@ -19,45 +19,12 @@ msgstr ""
 
 #: activity/activity.info:2
 msgid "Story"
-msgstr "Պատմություն"
+msgstr ""
 
-#: StoryActivity.py:121
+#: StoryActivity.py:110
 msgid "Game"
 msgstr "Խաղ"
 
-#: StoryActivity.py:128
+#: StoryActivity.py:117
 msgid "Load new images."
-msgstr "Բեռնել նոր պատկերներ"
-
-#: StoryActivity.py:134 StoryActivity.py:192
-msgid "Save as image"
-msgstr "Պահպանել որպես պատկեր"
-
-#: StoryActivity.py:140 StoryActivity.py:204
-msgid "Start recording"
-msgstr "Սկսել ձայնագրումը"
-
-#: StoryActivity.py:144
-msgid "Nothing to play"
-msgstr "Նվագարկելու ոչինչ չկա"
-
-#: StoryActivity.py:185
-msgid "image"
-msgstr "պատկեր"
-
-#: StoryActivity.py:206
-msgid "Play recording"
-msgstr "Նվագարկել ձայնագրումը"
-
-#: StoryActivity.py:207
-msgid "Save recording"
-msgstr "Պահպանել ձայնագրումը"
-
-#: StoryActivity.py:220
-msgid "Stop recording"
-msgstr "Դադարեցնել ձայնագրումը"
-
-#: StoryActivity.py:234
-#, python-format
-msgid "audio note for %s"
-msgstr "աուդիո նոտա %s համար"
+msgstr ""

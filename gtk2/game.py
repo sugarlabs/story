@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #Copyright (c) 2012 Walter Bender
-# Port to GTK3:
-# Ignacio Rodriguez <ignaciorodriguez@sugarlabs.org>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,7 +10,9 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-from gi.repository import Gdk,GdkPixbuf,Gtk,GObject
+
+import gtk
+import gobject
 import cairo
 import os
 import glob
@@ -24,7 +24,7 @@ import logging
 _logger = logging.getLogger('search-activity')
 
 try:
-    from sugar3.graphics import style
+    from sugar.graphics import style
     GRID_CELL_SIZE = style.GRID_CELL_SIZE
 except ImportError:
     GRID_CELL_SIZE = 0
@@ -49,11 +49,11 @@ class Game():
         self._colors.append(colors[0])
         self._colors.append(colors[1])
 
-       # self._canvas.set_flags(Gtk.CAN_FOCUS)
-       # self._canvas.connect("expose-event", self._expose_cb)
+        self._canvas.set_flags(gtk.CAN_FOCUS)
+        self._canvas.connect("expose-event", self._expose_cb)
 
-        self._width = Gdk.Screen.width()
-        self._height = Gdk.Screen.height() - (GRID_CELL_SIZE * 1.5)
+        self._width = gtk.gdk.screen_width()
+        self._height = gtk.gdk.screen_height() - (GRID_CELL_SIZE * 1.5)
         self._scale = self._height / (3 * DOT_SIZE * 1.2)
         self._scale /= 1.5
         self._dot_size = int(DOT_SIZE * self._scale)
@@ -165,7 +165,7 @@ class Game():
         self._sprites.redraw_sprites(cr=cr)
 
     def _destroy_cb(self, win, event):
-        Gtk.main_quit()
+        gtk.main_quit()
 
     def export(self):
         ''' Write dot to cairo surface. '''
@@ -179,7 +179,7 @@ class Game():
             y = self._space + int(i / 3.) * (self._dot_size + self._space)
             x = self._space + (i % 3) * (self._dot_size + self._space)
             cr.save()
-            cr = Gdk.CairoContext(cr)
+            cr = gtk.gdk.CairoContext(cr)
             cr.set_source_surface(self._dots[i].cached_surfaces[0], x, y)
             cr.rectangle(x, y, self._dot_size, self._dot_size)
             cr.fill()
@@ -199,7 +199,7 @@ class Game():
             pixbuf = svg_str_to_pixbuf(svg_string, w=self._dot_size,
                                        h = self._dot_size)
             '''
-            pixbuf = Gdk.pixbuf_new_from_file_at_size(
+            pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
                 os.path.join(self._path, self._PATHS[image]),
                 self._dot_size, self._dot_size)
             '''
@@ -220,7 +220,7 @@ class Game():
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                                      self._svg_width, self._svg_height)
         context = cairo.Context(surface)
-        context = Gdk.CairoContext(context)
+        context = gtk.gdk.CairoContext(context)
         context.set_source_pixbuf(pixbuf, 0, 0)
         context.rectangle(0, 0, self._svg_width, self._svg_height)
         context.fill()
@@ -257,8 +257,7 @@ class Game():
 
 def svg_str_to_pixbuf(svg_string, w=None, h=None):
     ''' Load pixbuf from SVG string '''
-     # Admito que fue la parte mas dificil..
-    pl = GdkPixbuf.PixbufLoader.new_with_type('svg') 
+    pl = gtk.gdk.PixbufLoader('svg') 
     if w is not None:
         pl.set_size(w, h)
     pl.write(svg_string)

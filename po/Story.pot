@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-09 16:52-0400\n"
+"POT-Creation-Date: 2012-05-15 09:32-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,10 +21,43 @@ msgstr ""
 msgid "Story"
 msgstr ""
 
-#: StoryActivity.py:110
+#: StoryActivity.py:119
 msgid "Game"
 msgstr ""
 
-#: StoryActivity.py:117
+#: StoryActivity.py:126
 msgid "Load new images."
+msgstr ""
+
+#: StoryActivity.py:132 StoryActivity.py:190
+msgid "Save as image"
+msgstr ""
+
+#: StoryActivity.py:138 StoryActivity.py:202
+msgid "Start recording"
+msgstr ""
+
+#: StoryActivity.py:142
+msgid "Nothing to play"
+msgstr ""
+
+#: StoryActivity.py:183
+msgid "image"
+msgstr ""
+
+#: StoryActivity.py:204
+msgid "Play recording"
+msgstr ""
+
+#: StoryActivity.py:207
+msgid "Save recording"
+msgstr ""
+
+#: StoryActivity.py:213
+msgid "Stop recording"
+msgstr ""
+
+#: StoryActivity.py:227
+#, python-format
+msgid "audio note for %s"
 msgstr ""

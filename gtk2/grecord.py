@@ -22,14 +22,14 @@
 import os
 import time
 
-from gi.repository import Gtk
+import gtk
 import gst
 
 import logging
 _logger = logging.getLogger("portfolio-activity")
 
-from gi.repository import GObject
-GObject.threads_init()
+import gobject
+gobject.threads_init()
 
 
 class Grecord:
@@ -150,7 +150,7 @@ filesink name=audioFilesink'
         audioBus.add_signal_watch()
         self._audio_transcode_handler = audioBus.connect(
             'message', self._onMuxedAudioMessageCb, self._audioline)
-        self._transcode_id = GObject.timeout_add(200, self._transcodeUpdateCb,
+        self._transcode_id = gobject.timeout_add(200, self._transcodeUpdateCb,
                                                  self._audioline)
         self._audiopos = 0
         self._audioline.set_state(gst.STATE_PLAYING)
@@ -216,9 +216,9 @@ filesink name=audioFilesink'
         return False
 
     def _clean_up_transcoding_pipeline(self, pipe):
-        GObject.source_remove(self._audio_transcode_handler)
+        gobject.source_remove(self._audio_transcode_handler)
         self._audio_transcode_handler = None
-        GObject.source_remove(self._transcode_id)
+        gobject.source_remove(self._transcode_id)
         self._transcode_id = None
         pipe.set_state(gst.STATE_NULL)
         pipe.get_bus().remove_signal_watch()
