@@ -1,61 +1,27 @@
-#Copyright (c) 2011 Walter Bender
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
-# (at your option) any later version.
-#
-# You should have received a copy of the GNU General Public License
-# along with this library; if not, write to the Free Software
-# Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
-
-import subprocess
-from StringIO import StringIO
-try:
-    OLD_SUGAR_SYSTEM = False
-    import json
-    json.dumps
-    from json import load as jload
-    from json import dump as jdump
-except (ImportError, AttributeError):
-    try:
-        import simplejson as json
-        from simplejson import load as jload
-        from simplejson import dump as jdump
-    except:
-        OLD_SUGAR_SYSTEM = True
-
-
-def json_load(text):
-    """ Load JSON data using what ever resources are available. """
-    if OLD_SUGAR_SYSTEM is True:
-        listdata = json.read(text)
-    else:
-        # strip out leading and trailing whitespace, nulls, and newlines
-        io = StringIO(text)
-        try:
-            listdata = jload(io)
-        except ValueError:
-            # assume that text is ascii list
-            listdata = text.split()
-            for i, value in enumerate(listdata):
-                listdata[i] = int(value)
-    return listdata
-
-
-def json_dump(data):
-    """ Save data using available JSON tools. """
-    if OLD_SUGAR_SYSTEM is True:
-        return json.write(data)
-    else:
-        _io = StringIO()
-        jdump(data, _io)
-        return _io.getvalue()
-
-
-def play_audio_from_file(file_path):
-    """ Audio media """
-    command_line = ['gst-launch', 'filesrc', 'location=' + file_path,
-                    '! oggdemux', '! vorbisdec', '! audioconvert',
-                    '! alsasink']
-    subprocess.call(command_line)
+5sg31DHV+k5BUR1dr/MHzZbtvvWygbryso9uv+VGTFxksnbPRd2lF
+i1fessNulxYf4z+fuZtzLa+JW2JuZTzp1wCPf+b5vP1euNaMTPQn2oeYhhga/3reqKqmOs4u
+SXWnQ7R+mZ6B9m+rxv5VB//vfl/cAA2MtH69RPt3H9g/+HnYygKk8R9K9HDjym+2KvMKNWf9
+2uEgJ331yry8R/cbuiPC3HV/7ef/07+PG7YKXEN7D7bG2wkDPtSmpsYSDiAC1tXVHo+UqxOH
+i7ZcvTTtrLGx/k8+PDKwQeVk+3MRncbfx85Q64rsHES5P/usaqBlk2hL8z7Dx3OO65CWE7qk
+os3gmK6+5t+8F4reZ9TF+Xt726mAELl53py0OE1NdWYzwffF4g+Lnd8STEOCXDSxE3PudNn+
+mmW2c7JXqVCCrPHENleS2GRLDlsnKOy1i9dcymYZSC+1dCz5SFtAbZbWICullMhySQVyXs2S
+3Aak75qpE3noGUFuu4dAAeJCHvrFkL7YXNKub0aWT1Qkm2S1YEMG6hW81nEcmxEl/Gd//auS
+5X/2cb79fri+ULuDWg1sp3PMjCVdXQSKSQlerHWtWVOSk3zZeE9RtBod5aU/vyUt1s3NRgnf
+A3/+3OnK7dghedUzZ2RGbYLfL10D7HAl17KXNOzV786pF+SzzQwn/tzmNBE6KjbOBqq/lgT9
+3msjryD3pykLzFpmdWpTzUe16JkH9XoDom2Yc/xXf+FzwzIzmOjmx9WJyrR2yqi1yJkEHae/
+9wuP+fesufAEZ8um/TqvqzeYHozJETprQGGAn433JWcGd8qcY3rDLSf0aAAe6NHroy1u3Gvw
+OGmK0Bfvx9/zJRCxFao26p8uWWqxNL3CNjYwxsaMa82WGaNo/j3v+e/8HS1tjfGR6QL7yrWm
+7QUtpo3+kTyTzYeyVlx6OP3R2XtFzysbw0Px+v2zjwnXvXOYZaBtjuSQTY4Esc6eQPgZ4yj/
+GumRnAZ+yVjBjGtAwGJLL+e7VnyoL3p0XVs4fFXbhqFVXdLgkSsAyvQEJzNgzDO3aNIflkle
+eMSSG1CUXNaxJpuVdckSiKOn1cwJdkWeBaW+uRORfiXDxYPzc8UiW99A4lB0asvnMdl3PovN
+vvo6oeDNk7icR5EOTn/db/G4sCCaJDWJsXPnWVhItRSXBn20cv2WL7btvXRrw46D1dl5zvL/
+BRqxf/a9fTf+5mQFW507VdlePCVc9Hue53/0uHhCjio/XqaTw2XJ/5b38vSxU73wsOzlqc8z
+6A0fOVG1W0xPObhz1JrWO7d+0jONuvOqkdz8so5c7i6lO+8nUAt2ee129bJRQ7Dy3wmyYGxx
+C+W7idLkL9imS99hmf00jXvsnLH4s/Pj2FtnSr4R5U0cSW9gz0OA5rdck//6n8EFF5rMt47J
+5bv/PZugsqr8+//ORTt2wfFYlYDCwLU2lXH352m7egs0rEVm8oASjceiAxc1101PyOIY/UMd
+CK6NiWz9br0HU5earopIsxU6uFuq/VRbT8C3mHT6WOV6EMeKAckfTEzw+03cXCUQ2jlYceV8
+RHYq5kbGMCLi/2wNiPfSBFqXYUm2gpw6QU7FSv5STFSQqz72ZWNtLr19c27Nqc6K9Vs3FtTk
+5QTyykoinKZXx3rg8ft62KvOyAgLyHJ24ZZEBdqV5ofa40Pp4mKjWJgfbI1txswMPwsrK1Op
+PbsKF+6+7D0y57ieGJIP6Hpok7kn9cjMwzqDc5YFVzQ3JgZ5egiVx9YmgyoY6U7IywnhHdlf
+vAppXhA47VpX5OTU1iR4mUA347c8lLi5tcxKiegDPcGXPbPEOy66DSctUqSw8LDNlSKw6dI2
+2eMp62wJsbO/elWbodX64yqm1GlVDiB6tgT

@@ -67,7 +67,7 @@ class StoryActivity(activity.Activity):
             _logger.error(str(e))
 
         self.path = activity.get_bundle_path()
-
+	print self.path
         self.nick = profile.get_nick_name()
         if profile.get_color() is not None:
             self.colors = profile.get_color().to_string().split(',')
@@ -206,17 +206,17 @@ class StoryActivity(activity.Activity):
             _logger.debug('recording...True. Preparing to save.')
             self._grecord.stop_recording_audio()
             self._recording = False
-            self._record_button.set_icon('media-record')
+            self._record_button.set_icon_name('media-record')
             self._record_button.set_tooltip(_('Start recording'))
-            self._playback_button.set_icon('media-playback-start')
+            self._playback_button.set_icon_name('media-playback-start')
             self._playback_button.set_tooltip(_('Play recording'))
             self._notify_successful_save(title=_('Save recording'))
-            gobject.timeout_add(100, self._wait_for_transcoding_to_finish)
+            GObject.timeout_add(100, self._wait_for_transcoding_to_finish)
         else:  # Wasn't recording, so start
             _logger.debug('recording...False. Start recording.')
             self._grecord.record_audio()
             self._recording = True
-            self._record_button.set_icon('media-recording')
+            self._record_button.set_icon_name('media-recording')
             self._record_button.set_tooltip(_('Stop recording'))
 
     def _wait_for_transcoding_to_finish(self, button=None):
