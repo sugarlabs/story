@@ -2,7 +2,7 @@
 #Copyright (c) 2012 Walter Bender
 # Port to GTK3:
 # Ignacio Rodriguez <ignaciorodriguez@sugarlabs.org>
-# No aparecen las imagenes >(
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
@@ -12,7 +12,7 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-from gi.repository import Gdk,GdkPixbuf,Gtk,GObject
+from gi.repository import Gdk, GdkPixbuf, Gtk, GObject
 import cairo
 import os
 import glob
@@ -49,9 +49,7 @@ class Game():
         self._colors.append(colors[0])
         self._colors.append(colors[1])
 
-       # self._canvas.set_flags(Gtk.CAN_FOCUS)
-       # self._canvas.connect("expose-event", self._expose_cb)
-        self._canvas.connect("draw", self.__draw_cb)
+        self._canvas.connect('draw', self.__draw_cb)
 
         self._width = Gdk.Screen.width()
         self._height = Gdk.Screen.height() - (GRID_CELL_SIZE * 1.5)
@@ -66,6 +64,7 @@ class Game():
 
         # Find the image files
         self._PATHS = glob.glob(os.path.join(self._path, 'images', '*.svg'))
+
         # Generate the sprites we'll need...
         self._sprites = Sprites(self._canvas)
         self._dots = []
@@ -95,9 +94,7 @@ class Game():
             dot.set_label('?')
         self._dance_counter = 0
         self._dance_step()
-    def __draw_cb(self,canvas,cr):
-	self._sprites.redraw_sprites(cr=cr)
-	print ' Drawed!! '
+
     def _dance_step(self):
         ''' Short animation before loading new game '''
         for dot in self._dots:
@@ -121,11 +118,11 @@ class Game():
             _logger.debug(self._dots[i].type)
             self._dots[i].set_shape(self._new_dot_surface(
                     image=self._dots[i].type))
-	    print ' New Game! '
+
         if self.we_are_sharing:
             _logger.debug('sending a new game')
             self._parent.send_new_game()
-	
+
     def restore_game(self, dot_list):
         ''' Restore a game from the Journal or share '''
         for i, dot in enumerate(dot_list):
@@ -153,17 +150,28 @@ class Game():
         ''' calculate the grid column and row for a dot '''
         return [dot % 3, int(dot / 3)]
 
-    def _expose_cb(self, win, event):
+    def __draw_cb(self, canvas, cr):
+        self._sprites.redraw_sprites(cr=cr)
+
+    def __expose_cb(self, win, event):
+        ''' Callback to handle window expose events '''
         self.do_expose_event(event)
-	return True
+        return True
+
+    # Handle the expose-event by drawing
     def do_expose_event(self, event):
+
+        # Create the cairo context
         cr = self._canvas.window.cairo_create()
+
+        # Restrict Cairo to the exposed area; avoid extra work
         cr.rectangle(event.area.x, event.area.y,
                 event.area.width, event.area.height)
         cr.clip()
+
         # Refresh sprite list
-	if cr is not None:
-		self._sprites.redraw_sprites(cr=cr)
+        if cr is not None:
+            self._sprites.redraw_sprites(cr=cr)
 
     def _destroy_cb(self, win, event):
         Gtk.main_quit()
@@ -180,8 +188,7 @@ class Game():
             y = self._space + int(i / 3.) * (self._dot_size + self._space)
             x = self._space + (i % 3) * (self._dot_size + self._space)
             cr.save()
-            cr = cairo.Context(cr) # Walter.. This a confused part >(
-            cr.set_source_surface(self._dots[i].cached_surfaces[0], x, y)
+            cr.set_source_surface(self._dots[i].images[0], x, y)
             cr.rectangle(x, y, self._dot_size, self._dot_size)
             cr.fill()
             cr.restore()
@@ -199,11 +206,6 @@ class Game():
             fd.close()
             pixbuf = svg_str_to_pixbuf(svg_string, w=self._dot_size,
                                        h = self._dot_size)
-            '''
-            pixbuf = Gdk.pixbuf_new_from_file_at_size(
-                os.path.join(self._path, self._PATHS[image]),
-                self._dot_size, self._dot_size)
-            '''
         else:
             if color in self._dot_cache:
                 return self._dot_cache[color]
@@ -218,14 +220,13 @@ class Game():
                     self._circle(self._dot_size / 2., self._dot_size / 2.,
                                  self._dot_size / 2.) + \
                     self._footer())
+
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                                      self._svg_width, self._svg_height)
         context = cairo.Context(surface)
-        #context = cairo.Context(context)
-        Gdk.cairo_set_source_pixbuf(context,pixbuf,0,0)
-	#context.set_source_pixbuf(pixbuf, 0, 0)
-        #context.rectangle(0, 0, self._svg_width, self._svg_height)
-        #context.fill()
+        Gdk.cairo_set_source_pixbuf(context, pixbuf, 0, 0)
+        context.rectangle(0, 0, self._svg_width, self._svg_height)
+        context.fill()
         if image is None:
             self._dot_cache[color] = surface
         return surface
@@ -265,5 +266,4 @@ def svg_str_to_pixbuf(svg_string, w=None, h=None):
         pl.set_size(w, h)
     pl.write(svg_string)
     pl.close()
-    print pl.get_pixbuf()
     return pl.get_pixbuf()
