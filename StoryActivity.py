@@ -10,27 +10,28 @@
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 
-import gtk
-import gobject
+from gi.repository import Gdk
+from gi.repository import Gtk
+from gi.repository import GObject
 import subprocess
 import cairo
 import os
 import time
 
-from sugar.activity import activity
-from sugar import profile
-from sugar.datastore import datastore
-try:
-    from sugar.graphics.toolbarbox import ToolbarBox
+from sugar3.activity import activity
+from sugar3 import profile
+from sugar3.datastore import datastore
+try: # Intente , siempre da TRUE, En Sugar 3 ya esta..
+    from sugar3.graphics.toolbarbox import ToolbarBox
     _have_toolbox = True
-except ImportError:
+except ImportError: # Si hay error
     _have_toolbox = False
 
 if _have_toolbox:
-    from sugar.activity.widgets import ActivityToolbarButton
-    from sugar.activity.widgets import StopButton
+    from sugar3.activity.widgets import ActivityToolbarButton
+    from sugar3.activity.widgets import StopButton
 
-from sugar.graphics.alert import Alert
+from sugar3.graphics.alert import Alert
 
 from toolbar_utils import button_factory, label_factory, separator_factory
 from utils import json_load, json_dump, play_audio_from_file
@@ -40,8 +41,8 @@ import telepathy
 import dbus
 from dbus.service import signal
 from dbus.gobject_service import ExportedGObject
-from sugar.presence import presenceservice
-from sugar.presence.tubeconn import TubeConnection
+from sugar3.presence import presenceservice
+from sugar3.presence.tubeconn import TubeConnection
 
 from gettext import gettext as _
 
@@ -66,7 +67,7 @@ class StoryActivity(activity.Activity):
             _logger.error(str(e))
 
         self.path = activity.get_bundle_path()
-
+	print self.path
         self.nick = profile.get_nick_name()
         if profile.get_color() is not None:
             self.colors = profile.get_color().to_string().split(',')
@@ -81,9 +82,9 @@ class StoryActivity(activity.Activity):
         self._setup_dispatch_table()
 
         # Create a canvas
-        canvas = gtk.DrawingArea()
-        canvas.set_size_request(gtk.gdk.screen_width(), \
-                                gtk.gdk.screen_height())
+        canvas = Gtk.DrawingArea()
+        canvas.set_size_request(Gdk.Screen.width(), \
+                                Gdk.Screen.height())
         self.set_canvas(canvas)
         canvas.show()
         self.show_all()
@@ -117,7 +118,7 @@ class StoryActivity(activity.Activity):
 
         else:
             # Use pre-0.86 toolbar design
-            games_toolbar = gtk.Toolbar()
+            games_toolbar = Gtk.Toolbar()
             toolbox = activity.ActivityToolbox(self)
             self.set_toolbox(toolbox)
             toolbox.add_toolbar(_('Game'), games_toolbar)
@@ -205,17 +206,17 @@ class StoryActivity(activity.Activity):
             _logger.debug('recording...True. Preparing to save.')
             self._grecord.stop_recording_audio()
             self._recording = False
-            self._record_button.set_icon('media-record')
+            self._record_button.set_icon_name('media-record')
             self._record_button.set_tooltip(_('Start recording'))
-            self._playback_button.set_icon('media-playback-start')
+            self._playback_button.set_icon_name('media-playback-start')
             self._playback_button.set_tooltip(_('Play recording'))
             self._notify_successful_save(title=_('Save recording'))
-            gobject.timeout_add(100, self._wait_for_transcoding_to_finish)
+            GObject.timeout_add(100, self._wait_for_transcoding_to_finish)
         else:  # Wasn't recording, so start
             _logger.debug('recording...False. Start recording.')
             self._grecord.record_audio()
             self._recording = True
-            self._record_button.set_icon('media-recording')
+            self._record_button.set_icon_name('media-recording')
             self._record_button.set_tooltip(_('Stop recording'))
 
     def _wait_for_transcoding_to_finish(self, button=None):

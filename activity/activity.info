@@ -1,8 +1,9 @@
 [Activity]
 name = Story
-activity_version = 5
+activity_version = 9
 license = GPLv3
 bundle_id = org.sugarlabs.StoryActivity
 exec = sugar-activity StoryActivity.StoryActivity
 icon = activity-story
 show_launcher = yes
+summary = prompts learner to tell a story by displaying images at random
