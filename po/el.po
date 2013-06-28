@@ -59,6 +59,6 @@ msgstr "Διακοπή εγγραφής"
 
 #: StoryActivity.py:234
 #, python-format
-#, python-format, 
+#, python-format,
 msgid "audio note for %s"
 msgstr "ηχητική σημειώση για %s"

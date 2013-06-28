@@ -58,6 +58,7 @@ msgid "Stop recording"
 msgstr "ka kuba' an ts'at'baxtalab"
 
 #: StoryActivity.py:234
+#, python-format
 #, python-format, fuzzy
 msgid "audio note for %s"
 msgstr "dhúchadh ots'omtalab %s"
