@@ -21,15 +21,9 @@ import time
 from sugar3.activity import activity
 from sugar3 import profile
 from sugar3.datastore import datastore
-try: # Intente , siempre da TRUE, En Sugar 3 ya esta..
-    from sugar3.graphics.toolbarbox import ToolbarBox
-    _have_toolbox = True
-except ImportError: # Si hay error
-    _have_toolbox = False
-
-if _have_toolbox:
-    from sugar3.activity.widgets import ActivityToolbarButton
-    from sugar3.activity.widgets import StopButton
+from sugar3.graphics.toolbarbox import ToolbarBox
+from sugar3.activity.widgets import ActivityToolbarButton
+from sugar3.activity.widgets import StopButton
 
 from sugar3.graphics.alert import Alert
 
@@ -57,10 +51,10 @@ IFACE = SERVICE
 
 
 class StoryActivity(activity.Activity):
-    """ Storytelling game """
+    ''' Storytelling game '''
 
     def __init__(self, handle):
-        """ Initialize the toolbars and the game board """
+        ''' Initialize the toolbars and the game board '''
         try:
             super(StoryActivity, self).__init__(handle)
         except dbus.exceptions.DBusException, e:
@@ -78,13 +72,12 @@ class StoryActivity(activity.Activity):
         self._grecord = None
         self._alert = None
 
-        self._setup_toolbars(_have_toolbox)
+        self._setup_toolbars()
         self._setup_dispatch_table()
 
         # Create a canvas
         canvas = Gtk.DrawingArea()
-        canvas.set_size_request(Gdk.Screen.width(), \
-                                Gdk.Screen.height())
+        canvas.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
         self.set_canvas(canvas)
         canvas.show()
         self.show_all()
@@ -98,33 +91,22 @@ class StoryActivity(activity.Activity):
         else:
             self._game.new_game()
 
-    def _setup_toolbars(self, have_toolbox):
-        """ Setup the toolbars. """
+    def _setup_toolbars(self):
+        ''' Setup the toolbars. '''
 
-        self.max_participants = 9
+        self.max_participants = 4
 
-        if have_toolbox:
-            toolbox = ToolbarBox()
+        toolbox = ToolbarBox()
 
-            # Activity toolbar
-            activity_button = ActivityToolbarButton(self)
+        # Activity toolbar
+        activity_button = ActivityToolbarButton(self)
 
-            toolbox.toolbar.insert(activity_button, 0)
-            activity_button.show()
+        toolbox.toolbar.insert(activity_button, 0)
+        activity_button.show()
 
-            self.set_toolbar_box(toolbox)
-            toolbox.show()
-            self.toolbar = toolbox.toolbar
-
-        else:
-            # Use pre-0.86 toolbar design
-            games_toolbar = Gtk.Toolbar()
-            toolbox = activity.ActivityToolbox(self)
-            self.set_toolbox(toolbox)
-            toolbox.add_toolbar(_('Game'), games_toolbar)
-            toolbox.show()
-            toolbox.set_current_toolbar(1)
-            self.toolbar = games_toolbar
+        self.set_toolbar_box(toolbox)
+        toolbox.show()
+        self.toolbar = toolbox.toolbar
 
         self._new_game_button_h = button_factory(
             'view-refresh', self.toolbar, self._new_game_cb,
@@ -146,21 +128,19 @@ class StoryActivity(activity.Activity):
             'media-playback-start-insensitive',  self.toolbar,
             self._playback_recording_cb, tooltip=_('Nothing to play'))
 
-        if _have_toolbox:
-            separator_factory(toolbox.toolbar, True, False)
+        separator_factory(toolbox.toolbar, True, False)
 
-        if _have_toolbox:
-            stop_button = StopButton(self)
-            stop_button.props.accelerator = '<Ctrl>q'
-            toolbox.toolbar.insert(stop_button, -1)
-            stop_button.show()
+        stop_button = StopButton(self)
+        stop_button.props.accelerator = '<Ctrl>q'
+        toolbox.toolbar.insert(stop_button, -1)
+        stop_button.show()
 
     def _new_game_cb(self, button=None):
         ''' Start a new game. '''
         self._game.new_game()
 
     def write_file(self, file_path):
-        """ Write the grid status to the Journal """
+        ''' Write the grid status to the Journal '''
         dot_list = self._game.save_game()
         self.metadata['dotlist'] = ''
         for dot in dot_list:
@@ -169,7 +149,7 @@ class StoryActivity(activity.Activity):
                 self.metadata['dotlist'] += ' '
 
     def _restore(self):
-        """ Restore the game state from metadata """
+        ''' Restore the game state from metadata '''
         dot_list = []
         dots = self.metadata['dotlist'].split()
         for dot in dots:
@@ -177,7 +157,7 @@ class StoryActivity(activity.Activity):
         self._game.restore_game(dot_list)
 
     def _do_save_as_image_cb(self, button=None):
-        """ Grab the current canvas and save it to the Journal. """
+        ''' Grab the current canvas and save it to the Journal. '''
         self._notify_successful_save(title=_('Save as image'))
         file_path = os.path.join(activity.get_activity_root(),
                                  'instance', 'story.png')
@@ -185,8 +165,8 @@ class StoryActivity(activity.Activity):
         png_surface.write_to_png(file_path)
 
         dsobject = datastore.create()
-        dsobject.metadata['title'] = "%s %s" % \
-            (self.metadata['title'], _("image"))
+        dsobject.metadata['title'] = '%s %s' % \
+            (self.metadata['title'], _('image'))
         dsobject.metadata['icon-color'] = profile.get_color().to_string()
         dsobject.metadata['mime_type'] = 'image/png'
         dsobject.set_file_path(file_path)
@@ -267,29 +247,29 @@ class StoryActivity(activity.Activity):
     # Collaboration-related methods
 
     def _setup_presence_service(self):
-        """ Setup the Presence Service. """
+        ''' Setup the Presence Service. '''
         self.pservice = presenceservice.get_instance()
         self.initiating = None  # sharing (True) or joining (False)
 
         owner = self.pservice.get_owner()
         self.owner = owner
-        self._share = ""
+        self._share = ''
         self.connect('shared', self._shared_cb)
         self.connect('joined', self._joined_cb)
 
     def _shared_cb(self, activity):
-        """ Either set up initial share..."""
+        ''' Either set up initial share...'''
         self._new_tube_common(True)
 
     def _joined_cb(self, activity):
-        """ ...or join an exisiting share. """
+        ''' ...or join an exisiting share. '''
         self._new_tube_common(False)
 
     def _new_tube_common(self, sharer):
-        """ Joining and sharing are mostly the same... """
+        ''' Joining and sharing are mostly the same... '''
         if self._shared_activity is None:
-            _logger.debug("Error: Failed to share or join activity ... \
-                _shared_activity is null in _shared_cb()")
+            _logger.debug('Error: Failed to share or join activity ... \
+                _shared_activity is null in _shared_cb()')
             return
 
         self.initiating = sharer
@@ -314,16 +294,16 @@ class StoryActivity(activity.Activity):
         self._game.set_sharing(True)
 
     def _list_tubes_reply_cb(self, tubes):
-        """ Reply to a list request. """
+        ''' Reply to a list request. '''
         for tube_info in tubes:
             self._new_tube_cb(*tube_info)
 
     def _list_tubes_error_cb(self, e):
-        """ Log errors. """
+        ''' Log errors. '''
         _logger.debug('Error: ListTubes() failed: %s' % (e))
 
     def _new_tube_cb(self, id, initiator, type, service, params, state):
-        """ Create a new tube. """
+        ''' Create a new tube. '''
         _logger.debug('New tube: ID=%d initator=%d type=%d service=%s \
 params=%r state=%d' % (id, initiator, type, service, params, state))
 
@@ -376,13 +356,13 @@ params=%r state=%d' % (id, initiator, type, service, params, state))
         self._game.remote_button_press(dot, color)
 
     def send_event(self, entry):
-        """ Send event through the tube. """
+        ''' Send event through the tube. '''
         if hasattr(self, 'chattube') and self.chattube is not None:
             self.chattube.SendText(entry)
 
 
 class ChatTube(ExportedGObject):
-    """ Class for setting up tube for sharing """
+    ''' Class for setting up tube for sharing '''
 
     def __init__(self, tube, is_initiator, stack_received_cb):
         super(ChatTube, self).__init__(tube, PATH)
