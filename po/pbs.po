@@ -1,0 +1,63 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-05-27 00:34-0400\n"
+"PO-Revision-Date: 2014-03-25 22:13+0200\n"
+"Last-Translator: xavier <proyecto.olpc@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: pbs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.0.5\n"
+
+#: activity/activity.info:2
+msgid "Story"
+msgstr "Manamjang"
+
+#: StoryActivity.py:121
+msgid "Game"
+msgstr "namjeng"
+
+#: StoryActivity.py:128
+msgid "Load new images."
+msgstr "Mavejep viñkjiu xikji'ik"
+
+#: StoryActivity.py:134 StoryActivity.py:192
+msgid "Save as image"
+msgstr "Makjat nkjaí xikji'ik"
+
+#: StoryActivity.py:140 StoryActivity.py:204
+msgid "Start recording"
+msgstr "Mapup maka'ant"
+
+#: StoryActivity.py:144
+msgid "Nothing to play"
+msgstr "nip limi kad-er masás"
+
+#: StoryActivity.py:185
+msgid "image"
+msgstr "kutau"
+
+#: StoryActivity.py:206
+msgid "Play recording"
+msgstr "Malei ne maka'an"
+
+#: StoryActivity.py:207
+msgid "Save recording"
+msgstr "Makjat ne maka'an"
+
+#: StoryActivity.py:220
+msgid "Stop recording"
+msgstr "Mama'aí maka'an"
+
+#: StoryActivity.py:234
+#, python-format
+msgid "audio note for %s"
+msgstr "Vateí maka'an ne %s"
