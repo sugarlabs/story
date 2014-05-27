@@ -7,10 +7,10 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-05-27 00:34-0400\n"
-"PO-Revision-Date: 2013-12-14 17:58+0200\n"
-"Last-Translator: Eduardo H. <hoboprimate@gmail.com>\n"
+"PO-Revision-Date: 2014-03-25 22:13+0200\n"
+"Last-Translator: xavier <proyecto.olpc@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: pt\n"
+"Language: pbs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,45 +19,45 @@ msgstr ""
 
 #: activity/activity.info:2
 msgid "Story"
-msgstr "Estória"
+msgstr "Manamjang"
 
 #: StoryActivity.py:121
 msgid "Game"
-msgstr "Jogo"
+msgstr "namjeng"
 
 #: StoryActivity.py:128
 msgid "Load new images."
-msgstr "Carregar novas imagens."
+msgstr "Mavejep viñkjiu xikji'ik"
 
 #: StoryActivity.py:134 StoryActivity.py:192
 msgid "Save as image"
-msgstr "Guardar como imagem"
+msgstr "Makjat nkjaí xikji'ik"
 
 #: StoryActivity.py:140 StoryActivity.py:204
 msgid "Start recording"
-msgstr "Iniciar gravação"
+msgstr "Mapup maka'ant"
 
 #: StoryActivity.py:144
 msgid "Nothing to play"
-msgstr "Nada a tocar"
+msgstr "nip limi kad-er masás"
 
 #: StoryActivity.py:185
 msgid "image"
-msgstr "imagem"
+msgstr "kutau"
 
 #: StoryActivity.py:206
 msgid "Play recording"
-msgstr "Tocar gravação"
+msgstr "Malei ne maka'an"
 
 #: StoryActivity.py:207
 msgid "Save recording"
-msgstr "Guardar gravação"
+msgstr "Makjat ne maka'an"
 
 #: StoryActivity.py:220
 msgid "Stop recording"
-msgstr "Parar gravação"
+msgstr "Mama'aí maka'an"
 
 #: StoryActivity.py:234
 #, python-format
 msgid "audio note for %s"
-msgstr "nota de som para %s"
+msgstr "Vateí maka'an ne %s"
