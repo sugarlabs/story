@@ -222,7 +222,7 @@ class Game():
             else:
                 word = self._art4apps.get_words()[image]
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-                    self._art4apps.get_image_filename_by_word(word),
+                    self._art4apps.get_image_filename(word),
                     self._dot_size, self._dot_size)
         else:
             if color in self._dot_cache:
