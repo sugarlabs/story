@@ -29,6 +29,13 @@ try:
 except ImportError:
     GRID_CELL_SIZE = 0
 
+USE_ART4APPS = False
+try:
+    from art4apps import Art4Apps
+    USE_ART4APPS = True
+except ImportError:
+    pass
+
 from sprites import Sprites, Sprite
 
 
@@ -81,6 +88,11 @@ class Game():
                 self._dots[-1].type = -1  # No image
                 self._dots[-1].set_label_attributes(72)
 
+        self.number_of_images = len(self._PATHS)
+        if USE_ART4APPS:
+            self._art4apps = Art4Apps()
+            self.number_of_images = len(self._art4apps.get_words())
+
     def _all_clear(self):
         ''' Things to reinitialize when starting up a new game. '''
         if self._timeout_id is not None:
@@ -114,7 +126,7 @@ class Game():
         ''' Select pictures at random '''
         for i in range(3 * 3):
             self._dots[i].set_label('')
-            self._dots[i].type = int(uniform(0, len(self._PATHS)))
+            self._dots[i].type = int(uniform(0, self.number_of_images))
             _logger.debug(self._dots[i].type)
             self._dots[i].set_shape(self._new_dot_surface(
                     image=self._dots[i].type))
@@ -198,14 +210,20 @@ class Game():
         ''' generate a dot of a color color '''
         self._dot_cache = {}
         if image is not None:
-            color = COLORS[int(uniform(0, 6))]
-            fd = open(os.path.join(self._path, self._PATHS[image]), 'r')
-            svg_string = ''
-            for line in fd:
-                svg_string += line.replace('#000000', color)
-            fd.close()
-            pixbuf = svg_str_to_pixbuf(svg_string, w=self._dot_size,
-                                       h = self._dot_size)
+            if not USE_ART4APPS:
+                color = COLORS[int(uniform(0, 6))]
+                fd = open(os.path.join(self._path, self._PATHS[image]), 'r')
+                svg_string = ''
+                for line in fd:
+                    svg_string += line.replace('#000000', color)
+                fd.close()
+                pixbuf = svg_str_to_pixbuf(svg_string, w=self._dot_size,
+                                           h = self._dot_size)
+            else:
+                word = self._art4apps.get_words()[image]
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
+                    self._art4apps.get_image_filename_by_word(word),
+                    self._dot_size, self._dot_size)
         else:
             if color in self._dot_cache:
                 return self._dot_cache[color]
