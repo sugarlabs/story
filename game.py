@@ -74,12 +74,20 @@ class Game():
 
         # Generate the sprites we'll need...
         self._sprites = Sprites(self._canvas)
+
+        size = max(Gdk.Screen.width(), Gdk.Screen.height())
+        self._my_canvas = Sprite(
+            self._sprites, 0, 0, svg_str_to_pixbuf(genblank(
+                size, size, ('#FFFFFF', '#FFFFFF'))))
+        self._my_canvas.set_layer(-1)
+        self._my_canvas.type = 'background'
+
         self._dots = []
         yoffset = self._space * 2  # int(self._space / 2.)
         for y in range(3):
             for x in range(3):
                 xoffset = int((self._width - 3 * self._dot_size - \
-                                   2 * self._space) / 2.)
+                               2 * self._space) / 2.)
                 self._dots.append(
                     Sprite(self._sprites,
                            xoffset + x * (self._dot_size + self._space),
@@ -102,7 +110,7 @@ class Game():
             if dot.type != -1:
                 dot.type = -1
                 dot.set_shape(self._new_dot_surface(
-                        self._colors[abs(dot.type)]))
+                    self._colors[abs(dot.type)]))
             dot.set_label('?')
         self._dance_counter = 0
         self._dance_step()
@@ -111,7 +119,7 @@ class Game():
         ''' Short animation before loading new game '''
         for dot in self._dots:
             dot.set_shape(self._new_dot_surface(
-                    self._colors[int(uniform(0, 3))]))
+                self._colors[int(uniform(0, 3))]))
         self._dance_counter += 1
         if self._dance_counter < 10:
             self._timeout_id = GObject.timeout_add(500, self._dance_step)
@@ -129,7 +137,7 @@ class Game():
             self._dots[i].type = int(uniform(0, self.number_of_images))
             _logger.debug(self._dots[i].type)
             self._dots[i].set_shape(self._new_dot_surface(
-                    image=self._dots[i].type))
+                image=self._dots[i].type))
 
         if self.we_are_sharing:
             _logger.debug('sending a new game')
@@ -140,7 +148,7 @@ class Game():
         for i, dot in enumerate(dot_list):
             self._dots[i].type = dot
             self._dots[i].set_shape(self._new_dot_surface(
-                    image=self._dots[i].type))
+                image=self._dots[i].type))
 
     def save_game(self):
         ''' Return dot list for saving to Journal or
@@ -172,13 +180,12 @@ class Game():
 
     # Handle the expose-event by drawing
     def do_expose_event(self, event):
-
         # Create the cairo context
         cr = self._canvas.window.cairo_create()
 
         # Restrict Cairo to the exposed area; avoid extra work
         cr.rectangle(event.area.x, event.area.y,
-                event.area.width, event.area.height)
+                     event.area.width, event.area.height)
         cr.clip()
 
         # Refresh sprite list
@@ -235,9 +242,9 @@ class Game():
             i = self._colors.index(color)
             pixbuf = svg_str_to_pixbuf(
                 self._header() + \
-                    self._circle(self._dot_size / 2., self._dot_size / 2.,
-                                 self._dot_size / 2.) + \
-                    self._footer())
+                self._circle(self._dot_size / 2., self._dot_size / 2.,
+                             self._dot_size / 2.) + \
+                self._footer())
 
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                                      self._svg_width, self._svg_height)
@@ -274,6 +281,81 @@ class Game():
 
     def _footer(self):
         return '</svg>\n'
+
+
+def genblank(w, h, colors, stroke_width=1.0):
+    svg = SVG()
+    svg.set_colors(colors)
+    svg.set_stroke_width(stroke_width)
+    svg_string = svg.header(w, h)
+    svg_string += svg.footer()
+    return svg_string
+
+
+class SVG:
+    ''' SVG generators '''
+
+    def __init__(self):
+        self._scale = 1
+        self._stroke_width = 1
+        self._fill = '#FFFFFF'
+        self._stroke = '#FFFFFF'
+
+    def _svg_style(self, extras=""):
+        return "%s%s%s%s%s%f%s%s%s" % ("style=\"fill:", self._fill, ";stroke:",
+                                       self._stroke, ";stroke-width:",
+                                       self._stroke_width, ";", extras,
+                                       "\" />\n")
+
+    def _svg_rect(self, w, h, rx, ry, x, y):
+        svg_string = "       <rect\n"
+        svg_string += "          width=\"%f\"\n" % (w)
+        svg_string += "          height=\"%f\"\n" % (h)
+        svg_string += "          rx=\"%f\"\n" % (rx)
+        svg_string += "          ry=\"%f\"\n" % (ry)
+        svg_string += "          x=\"%f\"\n" % (x)
+        svg_string += "          y=\"%f\"\n" % (y)
+        self.set_stroke_width(self._stroke_width)
+        svg_string += self._svg_style()
+        return svg_string
+
+    def _background(self, w=80, h=60, scale=1):
+        return self._svg_rect((w - 0.5) * scale, (h - 0.5) * scale,
+                              1, 1, 0.25, 0.25)
+
+    def header(self, w=80, h=60, scale=1, background=True):
+        svg_string = "<?xml version=\"1.0\" encoding=\"UTF-8\""
+        svg_string += " standalone=\"no\"?>\n"
+        svg_string += "<!-- Created with Emacs -->\n"
+        svg_string += "<svg\n"
+        svg_string += "   xmlns:svg=\"http://www.w3.org/2000/svg\"\n"
+        svg_string += "   xmlns=\"http://www.w3.org/2000/svg\"\n"
+        svg_string += "   version=\"1.0\"\n"
+        svg_string += "%s%f%s" % ("   width=\"", scale * w * self._scale,
+                                  "\"\n")
+        svg_string += "%s%f%s" % ("   height=\"", scale * h * self._scale,
+                                  "\">\n")
+        svg_string += "%s%f%s%f%s" % ("<g\n       transform=\"matrix(",
+                                      self._scale, ",0,0,", self._scale,
+                                      ",0,0)\">\n")
+        if background:
+            svg_string += self._background(w, h, scale)
+        return svg_string
+
+    def footer(self):
+        svg_string = "</g>\n"
+        svg_string += "</svg>\n"
+        return svg_string
+
+    def set_scale(self, scale=1.0):
+        self._scale = scale
+
+    def set_colors(self, colors):
+        self._stroke = colors[0]
+        self._fill = colors[1]
+
+    def set_stroke_width(self, stroke_width=1.0):
+        self._stroke_width = stroke_width
 
 
 def svg_str_to_pixbuf(svg_string, w=None, h=None):
