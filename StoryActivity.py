@@ -61,7 +61,8 @@ class StoryActivity(activity.Activity):
             _logger.error(str(e))
 
         self.path = activity.get_bundle_path()
-	print self.path
+        self.datapath = os.path.join(activity.get_activity_root(), 'instance')
+
         self.nick = profile.get_nick_name()
         if profile.get_color() is not None:
             self.colors = profile.get_color().to_string().split(',')
@@ -159,8 +160,7 @@ class StoryActivity(activity.Activity):
     def _do_save_as_image_cb(self, button=None):
         ''' Grab the current canvas and save it to the Journal. '''
         self._notify_successful_save(title=_('Save as image'))
-        file_path = os.path.join(activity.get_activity_root(),
-                                 'instance', 'story.png')
+        file_path = os.path.join(self.datapath, 'story.png')
         png_surface = self._game.export()
         png_surface.write_to_png(file_path)
 
@@ -210,13 +210,11 @@ class StoryActivity(activity.Activity):
     def _playback_recording_cb(self, button=None):
         ''' Play back current recording '''
         _logger.debug('Playback current recording from output.ogg...')
-        play_audio_from_file(os.path.join(activity.get_activity_root(),
-                                 'instance', 'output.ogg'))
+        play_audio_from_file(os.path.join(self.datapath, 'output.ogg'))
         return
 
     def _save_recording(self):
-        if os.path.exists(os.path.join(activity.get_activity_root(),
-                                       'instance', 'output.ogg')):
+        if os.path.exists(os.path.join(self.datapath, 'output.ogg')):
             _logger.debug('Saving recording to Journal...')
             dsobject = datastore.create()
             dsobject.metadata['title'] = _('audio note for %s') % \
@@ -224,10 +222,8 @@ class StoryActivity(activity.Activity):
             dsobject.metadata['icon-color'] = profile.get_color().to_string()
             dsobject.metadata['mime_type'] = 'audio/ogg'
             _logger.debug('setting file path to %s' % (
-                    os.path.join(activity.get_activity_root(),
-                                 'instance', 'output.ogg')))
-            dsobject.set_file_path(os.path.join(activity.get_activity_root(),
-                                                'instance', 'output.ogg'))
+                    os.path.join(self.datapath, 'output.ogg')))
+            dsobject.set_file_path(os.path.join(self.datapath, 'output.ogg'))
             datastore.write(dsobject)
             dsobject.destroy()
             # Always save an image with the recording.
