@@ -1,5 +1,8 @@
 13
 
+ENHANCEMENT:
+* Add "linear" mode: images displayed in sequence
+
 BUG_FIX:
 * Add missing PATH for setting up collaboration chattube
 
