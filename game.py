@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#Copyright (c) 2012 Walter Bender
+#Copyright (c) 2012-14 Walter Bender
 # Port to GTK3:
 # Ignacio Rodriguez <ignaciorodriguez@sugarlabs.org>
 
@@ -18,16 +18,10 @@ import os
 import glob
 from random import uniform
 
-from gettext import gettext as _
-
 import logging
 _logger = logging.getLogger('search-activity')
 
-try:
-    from sugar3.graphics import style
-    GRID_CELL_SIZE = style.GRID_CELL_SIZE
-except ImportError:
-    GRID_CELL_SIZE = 0
+from sugar3.graphics import style
 
 USE_ART4APPS = False
 try:
@@ -45,21 +39,26 @@ COLORS = ['#000000', '#a00000', '#907000', '#009000', '#0000ff', '#9000a0']
 
 class Game():
 
-    def __init__(self, canvas, parent=None, path=None,
+    def __init__(self, canvas, parent=None, path=None, root=None, mode='array',
                  colors=['#A0FFA0', '#FF8080']):
         self._canvas = canvas
         self._parent = parent
         self._parent.show_all()
         self._path = path
+        self._root = root
+        self._mode = mode
+        self._current_image = 0
 
         self._colors = ['#FFFFFF']
         self._colors.append(colors[0])
         self._colors.append(colors[1])
 
+        self._canvas.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
         self._canvas.connect('draw', self.__draw_cb)
+        self._canvas.connect('button-press-event', self._button_press_cb)
 
         self._width = Gdk.Screen.width()
-        self._height = Gdk.Screen.height() - (GRID_CELL_SIZE * 1.5)
+        self._height = Gdk.Screen.height() - style.GRID_CELL_SIZE
         self._scale = self._height / (3 * DOT_SIZE * 1.2)
         self._scale /= 1.5
         self._dot_size = int(DOT_SIZE * self._scale)
@@ -86,7 +85,7 @@ class Game():
         yoffset = self._space * 2  # int(self._space / 2.)
         for y in range(3):
             for x in range(3):
-                xoffset = int((self._width - 3 * self._dot_size - \
+                xoffset = int((self._width - 3 * self._dot_size -
                                2 * self._space) / 2.)
                 self._dots.append(
                     Sprite(self._sprites,
@@ -101,10 +100,93 @@ class Game():
             self._art4apps = Art4Apps()
             self.number_of_images = len(self._art4apps.get_words())
 
+        self._next_prev_pixbuf = []
+        for icon in ['go-previous', 'go-next', 'go-previous-inactive',
+                     'go-next-inactive']:
+            self._next_prev_pixbuf.append(
+                GdkPixbuf.Pixbuf.new_from_file_at_size(
+                    os.path.join(self._root, 'icons', icon + '.svg'),
+                    style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
+
+        x1 = style.GRID_CELL_SIZE
+        x2 = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
+        y = int((Gdk.Screen.height() - 2 * style.GRID_CELL_SIZE) / 2)
+
+        self._prev = Sprite(self._sprites, x1, y, self._next_prev_pixbuf[2])
+        self._prev.set_layer(1)
+        self._prev.type = 'prev'
+        if self._mode == 'array':
+            self._prev.hide()
+
+        self._next = Sprite(self._sprites, x2, y, self._next_prev_pixbuf[1])
+        self._next.set_layer(1)
+        self._next.type = 'next'
+        if self._mode == 'array':
+            self._next.hide()
+        
+    def _button_press_cb(self, win, event):
+        ''' The mouse button was pressed. Is it on a sprite? '''
+        x, y = map(int, event.get_coords())
+
+        if self._mode == 'array':
+            return
+
+        spr = self._sprites.find_sprite((x, y))
+        if spr is not None:
+            if spr.type == 'prev' and self._current_image > 0:
+                self._dots[self._current_image].hide()
+                self._current_image -= 1
+                self._dots[self._current_image].set_layer(100)
+                if self._current_image == 0:
+                    self._prev.set_image(self._next_prev_pixbuf[2])
+                self._next.set_image(self._next_prev_pixbuf[1])
+            elif spr.type == 'next' and self._current_image < 8:
+                self._dots[self._current_image].hide()
+                self._current_image += 1
+                self._dots[self._current_image].set_layer(100)
+                if self._current_image == 8:
+                    self._next.set_image(self._next_prev_pixbuf[3])
+                self._prev.set_image(self._next_prev_pixbuf[0])
+            elif spr.type not in ['prev', 'background'] and \
+                 self._current_image < 8:
+                self._dots[self._current_image].hide()
+                self._current_image += 1
+                self._dots[self._current_image].set_layer(100)
+                if self._current_image == 8:
+                    self._next.set_image(self._next_prev_pixbuf[3])
+                self._prev.set_image(self._next_prev_pixbuf[0])
+            self._prev.set_layer(1)
+            self._next.set_layer(1)
+        return False
+
+    def set_mode(self, mode):
+        self._current_image = 0
+        self._prev.set_image(self._next_prev_pixbuf[2])
+        self._next.set_image(self._next_prev_pixbuf[1])
+        if mode == 'array':
+            self._mode = 'array'
+            self._prev.hide()
+            self._next.hide()
+        else:
+            self._mode = 'linear'
+            self._prev.set_layer(1)
+            self._next.set_layer(1)
+
+        for i in range(9):
+            if self._mode == 'array':
+                self._dots[i].set_layer(100)
+            else:
+                if self._current_image == i:
+                    self._dots[i].set_layer(100)
+                else:
+                    self._dots[i].hide()
+
     def _all_clear(self):
         ''' Things to reinitialize when starting up a new game. '''
         if self._timeout_id is not None:
             GObject.source_remove(self._timeout_id)
+
+        self.set_mode(self._mode)
 
         for dot in self._dots:
             if dot.type != -1:
@@ -124,31 +206,48 @@ class Game():
         if self._dance_counter < 10:
             self._timeout_id = GObject.timeout_add(500, self._dance_step)
         else:
-            self._new_game()
+            self._new_images()
 
     def new_game(self):
         ''' Start a new game. '''
         self._all_clear()
 
-    def _new_game(self):
+    def _new_images(self):
         ''' Select pictures at random '''
-        for i in range(3 * 3):
+        for i in range(9):
             self._dots[i].set_label('')
             self._dots[i].type = int(uniform(0, self.number_of_images))
             _logger.debug(self._dots[i].type)
             self._dots[i].set_shape(self._new_dot_surface(
                 image=self._dots[i].type))
+            if self._mode == 'array':
+                self._dots[i].set_layer(100)
+            else:
+                if self._current_image == i:
+                    self._dots[i].set_layer(100)
+                else:
+                    self._dots[i].hide()
 
         if self.we_are_sharing:
             _logger.debug('sending a new game')
-            self._parent.send_new_game()
+            self._parent.send_new_images()
 
     def restore_game(self, dot_list):
         ''' Restore a game from the Journal or share '''
+
+        self.set_mode(self._mode)
+
         for i, dot in enumerate(dot_list):
             self._dots[i].type = dot
             self._dots[i].set_shape(self._new_dot_surface(
                 image=self._dots[i].type))
+            if self._mode == 'array':
+                self._dots[i].set_layer(100)
+            else:
+                if self._current_image == i:
+                    self._dots[i].set_layer(100)
+                else:
+                    self._dots[i].hide()
 
     def save_game(self):
         ''' Return dot list for saving to Journal or
@@ -225,7 +324,7 @@ class Game():
                     svg_string += line.replace('#000000', color)
                 fd.close()
                 pixbuf = svg_str_to_pixbuf(svg_string, w=self._dot_size,
-                                           h = self._dot_size)
+                                           h=self._dot_size)
             else:
                 word = self._art4apps.get_words()[image]
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
@@ -238,12 +337,10 @@ class Game():
             self._fill = color
             self._svg_width = self._dot_size
             self._svg_height = self._dot_size
-
-            i = self._colors.index(color)
             pixbuf = svg_str_to_pixbuf(
-                self._header() + \
+                self._header() +
                 self._circle(self._dot_size / 2., self._dot_size / 2.,
-                             self._dot_size / 2.) + \
+                             self._dot_size / 2.) +
                 self._footer())
 
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
@@ -360,8 +457,8 @@ class SVG:
 
 def svg_str_to_pixbuf(svg_string, w=None, h=None):
     ''' Load pixbuf from SVG string '''
-     # Admito que fue la parte mas dificil..
-    pl = GdkPixbuf.PixbufLoader.new_with_type('svg') 
+    # Admito que fue la parte mas dificil..
+    pl = GdkPixbuf.PixbufLoader.new_with_type('svg')
     if w is not None:
         pl.set_size(w, h)
     pl.write(svg_string)

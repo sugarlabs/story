@@ -13,8 +13,6 @@
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject
-import subprocess
-import cairo
 import os
 import time
 
@@ -27,7 +25,7 @@ from sugar3.activity.widgets import StopButton
 
 from sugar3.graphics.alert import Alert
 
-from toolbar_utils import button_factory, label_factory, separator_factory
+from toolbar_utils import button_factory, separator_factory, radio_factory
 from utils import json_load, json_dump, play_audio_from_file
 from grecord import Grecord
 
@@ -45,9 +43,9 @@ from game import Game
 import logging
 _logger = logging.getLogger('story-activity')
 
-
 SERVICE = 'org.sugarlabs.StoryActivity'
 IFACE = SERVICE
+PATH = '/org/sugarlabs/StoryActivity'
 
 
 class StoryActivity(activity.Activity):
@@ -84,7 +82,7 @@ class StoryActivity(activity.Activity):
         self.show_all()
 
         self._game = Game(canvas, parent=self, path=self.path,
-                          colors=self.colors)
+                          root=activity.get_bundle_path(), colors=self.colors)
         self._setup_presence_service()
 
         if 'dotlist' in self.metadata:
@@ -113,6 +111,14 @@ class StoryActivity(activity.Activity):
             'view-refresh', self.toolbar, self._new_game_cb,
             tooltip=_('Load new images.'))
 
+        self.array_button = radio_factory(
+            'array', self.toolbar, self._array_cb,
+            tooltip=_('View images all at once.'), group=None)
+
+        self.linear_button = radio_factory(
+            'linear', self.toolbar, self._linear_cb,
+            tooltip=_('View images one at a time.'), group=self.array_button)
+
         separator_factory(self.toolbar)
 
         self.save_as_image = button_factory(
@@ -135,6 +141,12 @@ class StoryActivity(activity.Activity):
         stop_button.props.accelerator = '<Ctrl>q'
         toolbox.toolbar.insert(stop_button, -1)
         stop_button.show()
+
+    def _array_cb(self, button=None):
+        self._game.set_mode('array')
+
+    def _linear_cb(self, button=None):
+        self._game.set_mode('linear')
 
     def _new_game_cb(self, button=None):
         ''' Start a new game. '''
@@ -217,12 +229,12 @@ class StoryActivity(activity.Activity):
         if os.path.exists(os.path.join(self.datapath, 'output.ogg')):
             _logger.debug('Saving recording to Journal...')
             dsobject = datastore.create()
-            dsobject.metadata['title'] = _('audio note for %s') % \
-                (self.metadata['title'])
+            dsobject.metadata['title'] = \
+                _('audio note for %s') % (self.metadata['title'])
             dsobject.metadata['icon-color'] = profile.get_color().to_string()
             dsobject.metadata['mime_type'] = 'audio/ogg'
-            _logger.debug('setting file path to %s' % (
-                    os.path.join(self.datapath, 'output.ogg')))
+            _logger.debug('setting file path to %s' %
+                          (os.path.join(self.datapath, 'output.ogg')))
             dsobject.set_file_path(os.path.join(self.datapath, 'output.ogg'))
             datastore.write(dsobject)
             dsobject.destroy()
@@ -280,7 +292,7 @@ class StoryActivity(activity.Activity):
 
         if sharer:
             _logger.debug('This is my activity: making a tube...')
-            id = self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].OfferDBusTube(
+            self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].OfferDBusTube(
                 SERVICE, {})
         else:
             _logger.debug('I am joining an activity: waiting for a tube...')
@@ -300,25 +312,28 @@ class StoryActivity(activity.Activity):
 
     def _new_tube_cb(self, id, initiator, type, service, params, state):
         ''' Create a new tube. '''
-        _logger.debug('New tube: ID=%d initator=%d type=%d service=%s \
-params=%r state=%d' % (id, initiator, type, service, params, state))
+        _logger.debug('New tube: ID=%d initator=%d type=%d service=%s'
+                      ' params=%r state=%d' %
+                      (id, initiator, type, service, params, state))
 
         if (type == telepathy.TUBE_TYPE_DBUS and service == SERVICE):
             if state == telepathy.TUBE_STATE_LOCAL_PENDING:
-                self.tubes_chan[ \
-                              telepathy.CHANNEL_TYPE_TUBES].AcceptDBusTube(id)
+                self.tubes_chan[
+                    telepathy.CHANNEL_TYPE_TUBES].AcceptDBusTube(id)
 
-            tube_conn = TubeConnection(self.conn,
-                self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES], id, \
+            tube_conn = TubeConnection(
+                self.conn,
+                self.tubes_chan[
+                    telepathy.CHANNEL_TYPE_TUBES], id,
                 group_iface=self.text_chan[telepathy.CHANNEL_INTERFACE_GROUP])
 
-            self.chattube = ChatTube(tube_conn, self.initiating, \
-                self.event_received_cb)
+            self.chattube = ChatTube(tube_conn, self.initiating,
+                                     self.event_received_cb)
 
     def _setup_dispatch_table(self):
         ''' Associate tokens with commands. '''
         self._processing_methods = {
-            'n': [self._receive_new_game, 'get a new game grid'],
+            'n': [self._receive_new_images, 'get a new game grid'],
             'p': [self._receive_dot_click, 'get a dot click'],
             }
 
@@ -333,11 +348,11 @@ params=%r state=%d' % (id, initiator, type, service, params, state))
             return
         self._processing_methods[command][0](payload)
 
-    def send_new_game(self):
-        ''' Send a new grid to all players '''
+    def send_new_images(self):
+        ''' Send a new image grid to all players '''
         self.send_event('n|%s' % (json_dump(self._game.save_game())))
 
-    def _receive_new_game(self, payload):
+    def _receive_new_images(self, payload):
         ''' Sharer can start a new game. '''
         dot_list = json_load(payload)
         self._game.restore_game(dot_list)

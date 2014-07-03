@@ -1,7 +1,13 @@
+13
+
+BUG_FIX:
+* Add missing PATH for setting up collaboration chattube
+
 12
 
 ENHANCEMENTS:
 * Use art4apps (Gonzalo Odiard)
+* Use white background image
 
 BUG_FIX:
 * Complete conversion to Gst1.0 to fix audio recording/playback

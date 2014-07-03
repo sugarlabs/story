@@ -88,7 +88,7 @@ def radio_factory(name, toolbar, callback, cb_arg=None, tooltip=None,
                   group=None):
     ''' Add a radio button to a toolbar '''
     button = RadioToolButton(group=group)
-    button.set_named_icon(name)
+    button.set_icon_name(name)
     if callback is not None:
         if cb_arg is None:
             button.connect('clicked', callback)
