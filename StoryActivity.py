@@ -160,9 +160,16 @@ class StoryActivity(activity.Activity):
             self.metadata['dotlist'] += str(dot)
             if dot_list.index(dot) < len(dot_list) - 1:
                 self.metadata['dotlist'] += ' '
+        self.metadata['mode'] = self._game.get_mode()
 
     def _restore(self):
         ''' Restore the game state from metadata '''
+        if 'mode' in self.metadata:
+            self._game.set_mode(self.metadata['mode'])
+            if self.metadata['mode'] == 'array':
+                self.array_button.set_active(True)
+            else:
+                self.linear_button.set_active(True)
         dot_list = []
         dots = self.metadata['dotlist'].split()
         for dot in dots:

@@ -19,7 +19,7 @@ import glob
 from random import uniform
 
 import logging
-_logger = logging.getLogger('search-activity')
+_logger = logging.getLogger('story-activity')
 
 from sugar3.graphics import style
 
@@ -158,6 +158,9 @@ class Game():
             self._prev.set_layer(1)
             self._next.set_layer(1)
         return False
+
+    def get_mode(self):
+        return self._mode
 
     def set_mode(self, mode):
         self._current_image = 0
@@ -327,9 +330,17 @@ class Game():
                                            h=self._dot_size)
             else:
                 word = self._art4apps.get_words()[image]
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-                    self._art4apps.get_image_filename(word),
-                    self._dot_size, self._dot_size)
+                try:
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
+                        self._art4apps.get_image_filename(word),
+                        self._dot_size, self._dot_size)
+                except Exception, e:
+                    _logger.error('new dot surface %s %s: %s' %
+                                  (image, word, e))
+                    word = 'zebra'
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
+                        self._art4apps.get_image_filename(word),
+                        self._dot_size, self._dot_size)
         else:
             if color in self._dot_cache:
                 return self._dot_cache[color]
