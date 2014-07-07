@@ -19,11 +19,10 @@ import time
 from sugar3.activity import activity
 from sugar3 import profile
 from sugar3.datastore import datastore
-from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity.widgets import StopButton
-
-from sugar3.graphics.alert import Alert
+from sugar3.graphics.toolbarbox import ToolbarBox
+from sugar3.graphics.alert import Alert, ConfirmationAlert
 
 from toolbar_utils import button_factory, separator_factory, radio_factory
 from utils import json_load, json_dump, play_audio_from_file
@@ -177,7 +176,17 @@ class StoryActivity(activity.Activity):
 
     def _new_game_cb(self, button=None):
         ''' Start a new game. '''
-        self._game.new_game()
+        alert = ConfirmationAlert()
+        alert.props.title = _('Do you really want to load new images?')
+        alert.props.msg = _('You have done work on this story.'
+                            ' Do you want to overwrite it?')
+        alert.connect('response', self._confirmation_alert_cb)
+        self.add_alert(alert)
+
+    def _confirmation_alert_cb(self, alert, response_id):
+        self.remove_alert(alert)
+        if response_id is Gtk.ResponseType.OK:
+            self._game.new_game()
 
     def write_file(self, file_path):
         ''' Write the grid status to the Journal '''
