@@ -67,7 +67,7 @@ class StoryActivity(activity.Activity):
         else:
             self.colors = ['#A0FFA0', '#FF8080']
 
-        self._recording = False
+        self.recording = False
         self._grecord = None
         self._alert = None
         self._uid = None
@@ -95,16 +95,21 @@ class StoryActivity(activity.Activity):
 
         if 'uid' in self.metadata:
             self._uid = self.metadata['uid']
-            if self._search_for_audio_note(self._uid):
-                self._game.set_play_icon_state(True)
         else:
             self._uid = generate_uid()
             self.metadata['uid'] = self._uid
 
         if 'dotlist' in self.metadata:
             self._restore()
+            self.check_audio_status()
         else:
             self._game.new_game()
+
+    def check_audio_status(self):
+        if self._search_for_audio_note(self._uid):
+            self._game.set_play_icon_state(True)
+        else:
+            self._game.set_play_icon_state(False)
 
     def _setup_toolbars(self):
         ''' Setup the toolbars. '''
@@ -162,9 +167,13 @@ class StoryActivity(activity.Activity):
 
     def _array_cb(self, button=None):
         self._game.set_mode('array')
+        if self._uid is not None:
+            self.check_audio_status()
 
     def _linear_cb(self, button=None):
         self._game.set_mode('linear')
+        if self._uid is not None:
+            self.check_audio_status()
 
     def _new_game_cb(self, button=None):
         ''' Start a new game. '''
@@ -193,9 +202,14 @@ class StoryActivity(activity.Activity):
         dsobject: the object id is stored in a tag in the audio file. '''
         dsobjects, nobjects = datastore.find({'mime_type': ['audio/ogg']})
         # Look for tag that matches the target object id
+        if self._game.get_mode() == 'array':
+            target = obj_id
+        else:
+            target = '%s-%d' % (obj_id, self._game.current_image)
+
         for dsobject in dsobjects:
             if 'tags' in dsobject.metadata and \
-               obj_id in dsobject.metadata['tags']:
+               target in dsobject.metadata['tags']:
                 _logger.debug('Found audio note')
                 return dsobject
         return None
@@ -225,11 +239,11 @@ class StoryActivity(activity.Activity):
         if self._grecord is None:
             _logger.debug('setting up grecord')
             self._grecord = Grecord(self)
-        if self._recording:  # Was recording, so stop (and save?)
+        if self.recording:  # Was recording, so stop (and save?)
             _logger.debug('recording...True. Preparing to save.')
             self._game.set_record_icon_state(False)
             self._grecord.stop_recording_audio()
-            self._recording = False
+            self.recording = False
             # self._record_button.set_icon_name('media-record')
             # self._record_button.set_tooltip(_('Start recording'))
             # self._playback_button.set_icon_name('media-playback-start')
@@ -240,7 +254,7 @@ class StoryActivity(activity.Activity):
             _logger.debug('recording...False. Start recording.')
             self._game.set_record_icon_state(True)
             self._grecord.record_audio()
-            self._recording = True
+            self.recording = True
             # self._record_button.set_icon_name('media-recording')
             # self._record_button.set_tooltip(_('Stop recording'))
 
@@ -254,6 +268,9 @@ class StoryActivity(activity.Activity):
 
     def playback_recording_cb(self, button=None):
         ''' Play back current recording '''
+        if self.recording:  # Stop recording if we happen to be recording
+            self.record_cb()
+
         path = os.path.join(self.datapath, 'output.ogg')
         if self._uid is not None:
             dsobject = self._search_for_audio_note(self._uid)
@@ -266,16 +283,24 @@ class StoryActivity(activity.Activity):
     def _save_recording(self):
         if os.path.exists(os.path.join(self.datapath, 'output.ogg')):
             _logger.debug('Saving recording to Journal...')
-            if self._uid is not None:
-                dsobject = self._search_for_audio_note(self._uid)
-            if self._uid is None or dsobject is None:
+            if self._uid is None:
+                self._uid = generate_uid()
+
+            if self._game.get_mode() == 'array':
+                target = self._uid
+            else:
+                target = '%s-%d' % (self._uid, self._game.current_image)
+
+            dsobject = self._search_for_audio_note(target)
+            if dsobject is None:
                 dsobject = datastore.create()
+
             dsobject.metadata['title'] = \
                 _('audio note for %s') % (self.metadata['title'])
             dsobject.metadata['icon-color'] = profile.get_color().to_string()
             dsobject.metadata['mime_type'] = 'audio/ogg'
             if self._uid is not None:
-                dsobject.metadata['tags'] = self._uid
+                dsobject.metadata['tags'] = target
             _logger.debug('setting file path to %s' %
                           (os.path.join(self.datapath, 'output.ogg')))
             dsobject.set_file_path(os.path.join(self.datapath, 'output.ogg'))

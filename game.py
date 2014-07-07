@@ -56,7 +56,7 @@ class Game():
         self._path = path
         self._root = root
         self._mode = mode
-        self._current_image = 0
+        self.current_image = 0
 
         self._colors = ['#FFFFFF']
         self._colors.append(colors[0])
@@ -204,30 +204,34 @@ class Game():
             elif self._mode == 'array':
                 return
 
-            if spr.type == 'prev' and self._current_image > 0:
-                self._Dots[self._current_image].hide()
-                self._current_image -= 1
-                self._Dots[self._current_image].set_layer(100)
-                if self._current_image == 0:
+            if self._parent.recording:
+                self._parent.record_cb()
+
+            if spr.type == 'prev' and self.current_image > 0:
+                self._Dots[self.current_image].hide()
+                self.current_image -= 1
+                self._Dots[self.current_image].set_layer(100)
+                if self.current_image == 0:
                     self._prev.set_image(
                         self._next_prev_pixbufs[PREV_INACTIVE])
                 self._next.set_image(self._next_prev_pixbufs[NEXT])
-            elif spr.type == 'next' and self._current_image < 8:
-                self._Dots[self._current_image].hide()
-                self._current_image += 1
-                self._Dots[self._current_image].set_layer(100)
-                if self._current_image == 8:
+            elif spr.type == 'next' and self.current_image < 8:
+                self._Dots[self.current_image].hide()
+                self.current_image += 1
+                self._Dots[self.current_image].set_layer(100)
+                if self.current_image == 8:
                     self._next.set_image(
                         self._next_prev_pixbufs[NEXT_INACTIVE])
                 self._prev.set_image(self._next_prev_pixbufs[PREV])
             elif spr.type not in ['prev', 'background'] and \
-                 self._current_image < 8:
-                self._Dots[self._current_image].hide()
-                self._current_image += 1
-                self._Dots[self._current_image].set_layer(100)
-                if self._current_image == 8:
+                 self.current_image < 8:
+                self._Dots[self.current_image].hide()
+                self.current_image += 1
+                self._Dots[self.current_image].set_layer(100)
+                if self.current_image == 8:
                     self._next.set_image(self._next_prev_pixbufs[NEXT_INACTIVE])
                 self._prev.set_image(self._next_prev_pixbufs[PREV])
+            self._parent.check_audio_status()
             self._prev.set_layer(1)
             self._next.set_layer(1)
         return False
@@ -236,7 +240,7 @@ class Game():
         return self._mode
 
     def set_mode(self, mode):
-        self._current_image = 0
+        self.current_image = 0
         self._prev.set_image(self._next_prev_pixbufs[PREV_INACTIVE])
         self._next.set_image(self._next_prev_pixbufs[NEXT])
         if mode == 'array':
@@ -254,7 +258,7 @@ class Game():
                 self._Dots[i].hide()
             else:
                 self._dots[i].hide()
-                if self._current_image == i:
+                if self.current_image == i:
                     self._Dots[i].set_layer(100)
                 else:
                     self._Dots[i].hide()
@@ -322,7 +326,7 @@ class Game():
                 self._dots[i].set_layer(100)
                 self._Dots[i].hide()
             else:
-                if self._current_image == i:
+                if self.current_image == i:
                     self._Dots[i].set_layer(100)
                 else:
                     self._Dots[i].hide()
@@ -352,7 +356,7 @@ class Game():
                 self._dots[i].set_layer(100)
                 self._Dots[i].hide()
             else:
-                if self._current_image == i:
+                if self.current_image == i:
                     self._Dots[i].set_layer(100)
                 else:
                     self._Dots[i].hide()
