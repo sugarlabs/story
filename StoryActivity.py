@@ -102,8 +102,9 @@ class StoryActivity(activity.Activity):
         self.entry.set_wrap_mode(Gtk.WrapMode.WORD)
         self.entry.set_pixels_above_lines(0)
         self.entry.set_size_request(
-            Gdk.Screen.width() - 4 * style.GRID_CELL_SIZE,
-            style.GRID_CELL_SIZE * 3)
+            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE -
+            2 * style.DEFAULT_SPACING,
+            style.GRID_CELL_SIZE * 3 - 2 * style.DEFAULT_SPACING)
         font_desc = Pango.font_description_from_string('24')
         self.entry.modify_font(font_desc)
         self.text_buffer = self.entry.get_buffer() 
@@ -111,18 +112,25 @@ class StoryActivity(activity.Activity):
         self.entry.connect('focus-in-event', self._text_focus_in_cb)
         self.entry.connect('focus-out-event', self._text_focus_out_cb)
 
-        evbox = Gtk.EventBox()
-        evbox.add(self.entry)
+        grid = Gtk.Grid()
+        grid.set_border_width(style.DEFAULT_PADDING)
+        grid.attach(self.entry, 0, 0, 1, 1)
         self.entry.show()
+
+        evbox = Gtk.EventBox()
+        evbox.add(grid)
+        grid.show()
         evbox.connect('focus-in-event', self._text_focus_in_cb)
         evbox.connect('focus-out-event', self._text_focus_out_cb)
 
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         scrolled_window.set_size_request(
-            Gdk.Screen.width() - 4 * style.GRID_CELL_SIZE,
+            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
         scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
+        vadj = scrolled_window.get_vadjustment()
+        vadj.connect('changed', self._scroll_changed_cb)
         scrolled_window.add_with_viewport(evbox)
         evbox.show()
 
@@ -154,6 +162,10 @@ class StoryActivity(activity.Activity):
             self.check_text_status()
         else:
             self._game.new_game()
+
+    def _scroll_changed_cb(self, adj, scroll=None):
+        '''Scroll the chat window to the bottom'''
+        adj.set_value(adj.get_upper() - adj.get_page_size())
 
     def _fixed_resize_cb(self, widget=None, rect=None):
         ''' If a toolbar opens or closes, we need to resize the vbox

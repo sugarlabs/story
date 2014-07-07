@@ -71,7 +71,7 @@ class Game():
         self._scale = self._height / (3 * DOT_SIZE * 1.2)
         self._scale /= 1.5
         self._dot_size = int(DOT_SIZE * self._scale)
-        self._yoff = style.GRID_CELL_SIZE * 3
+        self._yoff = style.GRID_CELL_SIZE * 4
         self._space = int(self._dot_size / 5.)
         self.we_are_sharing = False
 
@@ -85,11 +85,13 @@ class Game():
         self._sprites = Sprites(self._canvas)
 
         size = max(Gdk.Screen.width(), Gdk.Screen.height())
+        '''
         self._my_canvas = Sprite(
             self._sprites, 0, 0, svg_str_to_pixbuf(genblank(
                 size, size, ('#FFFFFF', '#FFFFFF'))))
         self._my_canvas.set_layer(-1)
         self._my_canvas.type = 'background'
+        '''
 
         self._dots = []
         self._Dots = []  # larger dots for linear mode
