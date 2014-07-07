@@ -71,6 +71,7 @@ class Game():
         self._scale = self._height / (3 * DOT_SIZE * 1.2)
         self._scale /= 1.5
         self._dot_size = int(DOT_SIZE * self._scale)
+        self._yoff = int(Gdk.Screen.height() / 5)
         self._space = int(self._dot_size / 5.)
         self.we_are_sharing = False
 
@@ -93,8 +94,8 @@ class Game():
         self._dots = []
         self._Dots = []  # larger dots for linear mode
         X = int((Gdk.Screen.width() - self._dot_size * 3) / 2.)
-        Y = style.GRID_CELL_SIZE
-        yoffset = self._space * 2  # int(self._space / 2.)
+        Y = style.GRID_CELL_SIZE + self._yoff
+        yoffset = self._space * 2 + self._yoff
         for y in range(3):
             for x in range(3):
                 xoffset = int((self._width - 3 * self._dot_size -

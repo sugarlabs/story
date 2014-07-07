@@ -13,6 +13,8 @@
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject
+from gi.repository import Pango
+
 import os
 import time
 
@@ -23,6 +25,7 @@ from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity.widgets import StopButton
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.graphics.alert import Alert, ConfirmationAlert
+from sugar3.graphics import style
 
 from toolbar_utils import button_factory, separator_factory, radio_factory
 from utils import json_load, json_dump, play_audio_from_file
@@ -41,6 +44,8 @@ from game import Game
 
 import logging
 _logger = logging.getLogger('story-activity')
+
+PLACEHOLDER = _('Write your story here.')
 
 SERVICE = 'org.sugarlabs.StoryActivity'
 IFACE = SERVICE
@@ -74,14 +79,47 @@ class StoryActivity(activity.Activity):
         self._setup_toolbars()
         self._setup_dispatch_table()
 
-        # Create a canvas
-        canvas = Gtk.DrawingArea()
-        canvas.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
-        self.set_canvas(canvas)
-        canvas.show()
-        self.show_all()
+        self.fixed = Gtk.Fixed()
+        self.fixed.connect('size-allocate', self._fixed_resize_cb)
+        self.fixed.show()
+        self.set_canvas(self.fixed)
 
-        self._game = Game(canvas, parent=self, path=self.path,
+        self.vbox = Gtk.VBox(False, 0)
+        self.vbox.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
+        self.fixed.put(self.vbox, 0, 0)
+        self.vbox.show()
+
+        self._canvas = Gtk.DrawingArea()
+        self._canvas.set_size_request(int(Gdk.Screen.width()),
+                                      int(Gdk.Screen.height()))
+        self._canvas.show()
+        self.show_all()
+        self.vbox.pack_end(self._canvas, True, True, 0)
+        self.vbox.show()
+
+        # TODO: Use scrolling window
+
+        self.entry = Gtk.TextView()
+        self.entry.set_wrap_mode(Gtk.WrapMode.WORD)
+        self.entry.set_pixels_above_lines(0)
+        self.entry.set_size_request(
+            Gdk.Screen.width() - 4 * style.GRID_CELL_SIZE,
+            int(Gdk.Screen.height() / 5))
+        rgba = Gdk.RGBA()
+        rgba.red, rgba.green, rgba.blue = 0.9, 0.9, 0.9
+        rgba.alpha = 1.
+        self.entry.override_background_color(Gtk.StateFlags.NORMAL, rgba)
+        font_desc = Pango.font_description_from_string('24')
+        self.entry.modify_font(font_desc)
+        self.text_buffer = self.entry.get_buffer() 
+        self.text_buffer.set_text(PLACEHOLDER)
+        self.fixed.put(self.entry, 2 * style.GRID_CELL_SIZE,
+                       style.GRID_CELL_SIZE)
+        self.entry.show()
+
+        self.fixed.show()
+
+        self._game = Game(self._canvas, parent=self, path=self.path,
                           root=activity.get_bundle_path(), colors=self.colors)
         self._setup_presence_service()
 
@@ -103,6 +141,11 @@ class StoryActivity(activity.Activity):
             self.check_audio_status()
         else:
             self._game.new_game()
+
+    def _fixed_resize_cb(self, widget=None, rect=None):
+        ''' If a toolbar opens or closes, we need to resize the vbox
+        holding out scrolling window. '''
+        self.vbox.set_size_request(rect.width, rect.height)
 
     def check_audio_status(self):
         if self._search_for_audio_note(self._uid):
