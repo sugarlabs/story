@@ -128,7 +128,8 @@ class StoryActivity(activity.Activity):
         scrolled_window.set_size_request(
             Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
-        scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
+        scrolled_window.set_policy(Gtk.PolicyType.NEVER,
+                                   Gtk.PolicyType.AUTOMATIC)
         vadj = scrolled_window.get_vadjustment()
         vadj.connect('changed', self._scroll_changed_cb)
         scrolled_window.add_with_viewport(evbox)
