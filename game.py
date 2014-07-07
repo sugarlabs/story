@@ -33,6 +33,16 @@ except ImportError:
 from sprites import Sprites, Sprite
 
 
+PREV = 0
+NEXT = 1
+PREV_INACTIVE = 2
+NEXT_INACTIVE = 3
+
+RECORD_OFF = 0
+RECORD_ON = 1
+PLAY_OFF = 0
+PLAY_ON = 1
+
 DOT_SIZE = 40
 COLORS = ['#000000', '#a00000', '#907000', '#009000', '#0000ff', '#9000a0']
 
@@ -43,7 +53,6 @@ class Game():
                  colors=['#A0FFA0', '#FF8080']):
         self._canvas = canvas
         self._parent = parent
-        self._parent.show_all()
         self._path = path
         self._root = root
         self._mode = mode
@@ -113,61 +122,114 @@ class Game():
             self._art4apps = Art4Apps()
             self.number_of_images = len(self._art4apps.get_words())
 
-        self._next_prev_pixbuf = []
-        for icon in ['go-previous', 'go-next', 'go-previous-inactive',
-                     'go-next-inactive']:
-            self._next_prev_pixbuf.append(
+        self._record_pixbufs = []
+        for icon in ['media-audio', 'media-audio-recording']:
+            self._record_pixbufs.append(
                 GdkPixbuf.Pixbuf.new_from_file_at_size(
                     os.path.join(self._root, 'icons', icon + '.svg'),
                     style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
 
-        x1 = style.GRID_CELL_SIZE
-        x2 = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
-        y = int((Gdk.Screen.height() - 2 * style.GRID_CELL_SIZE) / 2)
+        self._play_pixbufs = []
+        for icon in ['play-inactive', 'play']:
+            self._play_pixbufs.append(
+                GdkPixbuf.Pixbuf.new_from_file_at_size(
+                    os.path.join(self._root, 'icons', icon + '.svg'),
+                    style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
 
-        self._prev = Sprite(self._sprites, x1, y, self._next_prev_pixbuf[2])
+        left = style.GRID_CELL_SIZE
+        right = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
+        y0 = style.GRID_CELL_SIZE
+        y1 = style.GRID_CELL_SIZE * 2
+        y2 = int((Gdk.Screen.height() - 2 * style.GRID_CELL_SIZE) / 2)
+
+        self._record = Sprite(self._sprites, right, y0,
+                              self._record_pixbufs[RECORD_OFF])
+        self._record.set_layer(1)
+        self._record.type = 'record'
+
+        self._play = Sprite(self._sprites, right, y1,
+                            self._play_pixbufs[PLAY_OFF])
+        self._play.set_layer(1)
+        self._play.type = 'play-inactive'
+
+        self._next_prev_pixbufs = []
+        for icon in ['go-previous', 'go-next', 'go-previous-inactive',
+                     'go-next-inactive']:
+            self._next_prev_pixbufs.append(
+                GdkPixbuf.Pixbuf.new_from_file_at_size(
+                    os.path.join(self._root, 'icons', icon + '.svg'),
+                    style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
+
+        self._prev = Sprite(self._sprites, left, y2,
+                            self._next_prev_pixbufs[PREV_INACTIVE])
         self._prev.set_layer(1)
         self._prev.type = 'prev'
         if self._mode == 'array':
             self._prev.hide()
 
-        self._next = Sprite(self._sprites, x2, y, self._next_prev_pixbuf[1])
+        self._next = Sprite(self._sprites, right, y2,
+                            self._next_prev_pixbufs[NEXT])
         self._next.set_layer(1)
         self._next.type = 'next'
         if self._mode == 'array':
             self._next.hide()
         
+    def set_record_icon_state(self, state):
+        if state:
+            self._record.set_image(self._record_pixbufs[RECORD_ON])
+        else:
+            self._record.set_image(self._record_pixbufs[RECORD_OFF])
+        self._record.set_layer(1)
+
+    def set_play_icon_state(self, state):
+        if state:
+            self._play.set_image(self._play_pixbufs[PLAY_ON])
+            self._play.type = 'play'
+        else:
+            self._play.set_image(self._play_pixbufs[PLAY_OFF])
+            self._play.type = 'play-inactive'
+        self._play.set_layer(1)
+
     def _button_press_cb(self, win, event):
         ''' The mouse button was pressed. Is it on a sprite? '''
         x, y = map(int, event.get_coords())
 
-        if self._mode == 'array':
-            return
 
         spr = self._sprites.find_sprite((x, y))
         if spr is not None:
+            if spr.type in ['record', 'play', 'play-inactive']:
+                if spr.type == 'record':
+                    self._parent.record_cb()
+                elif spr.type == 'play':
+                    self._parent.playback_recording_cb()
+                return
+            elif self._mode == 'array':
+                return
+
             if spr.type == 'prev' and self._current_image > 0:
                 self._Dots[self._current_image].hide()
                 self._current_image -= 1
                 self._Dots[self._current_image].set_layer(100)
                 if self._current_image == 0:
-                    self._prev.set_image(self._next_prev_pixbuf[2])
-                self._next.set_image(self._next_prev_pixbuf[1])
+                    self._prev.set_image(
+                        self._next_prev_pixbufs[PREV_INACTIVE])
+                self._next.set_image(self._next_prev_pixbufs[NEXT])
             elif spr.type == 'next' and self._current_image < 8:
                 self._Dots[self._current_image].hide()
                 self._current_image += 1
                 self._Dots[self._current_image].set_layer(100)
                 if self._current_image == 8:
-                    self._next.set_image(self._next_prev_pixbuf[3])
-                self._prev.set_image(self._next_prev_pixbuf[0])
+                    self._next.set_image(
+                        self._next_prev_pixbufs[NEXT_INACTIVE])
+                self._prev.set_image(self._next_prev_pixbufs[PREV])
             elif spr.type not in ['prev', 'background'] and \
                  self._current_image < 8:
                 self._Dots[self._current_image].hide()
                 self._current_image += 1
                 self._Dots[self._current_image].set_layer(100)
                 if self._current_image == 8:
-                    self._next.set_image(self._next_prev_pixbuf[3])
-                self._prev.set_image(self._next_prev_pixbuf[0])
+                    self._next.set_image(self._next_prev_pixbufs[NEXT_INACTIVE])
+                self._prev.set_image(self._next_prev_pixbufs[PREV])
             self._prev.set_layer(1)
             self._next.set_layer(1)
         return False
@@ -177,8 +239,8 @@ class Game():
 
     def set_mode(self, mode):
         self._current_image = 0
-        self._prev.set_image(self._next_prev_pixbuf[2])
-        self._next.set_image(self._next_prev_pixbuf[1])
+        self._prev.set_image(self._next_prev_pixbufs[PREV_INACTIVE])
+        self._next.set_image(self._next_prev_pixbufs[NEXT])
         if mode == 'array':
             self._mode = 'array'
             self._prev.hide()

@@ -1,4 +1,4 @@
-#Copyright (c) 2012 Walter Bender
+#Copyright (c) 2012-14 Walter Bender
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -127,13 +127,15 @@ class StoryActivity(activity.Activity):
 
         separator_factory(self.toolbar)
 
+        '''
         self._record_button = button_factory(
             'media-record', self.toolbar,
-            self._record_cb, tooltip=_('Start recording'))
+            self.record_cb, tooltip=_('Start recording'))
 
         self._playback_button = button_factory(
             'media-playback-start-insensitive',  self.toolbar,
-            self._playback_recording_cb, tooltip=_('Nothing to play'))
+            self.playback_recording_cb, tooltip=_('Nothing to play'))
+        '''
 
         separator_factory(toolbox.toolbar, True, False)
 
@@ -196,27 +198,29 @@ class StoryActivity(activity.Activity):
             self.remove_alert(self._alert)
             self._alert = None
 
-    def _record_cb(self, button=None):
+    def record_cb(self, button=None):
         ''' Start/stop audio recording '''
         if self._grecord is None:
             _logger.debug('setting up grecord')
             self._grecord = Grecord(self)
         if self._recording:  # Was recording, so stop (and save?)
             _logger.debug('recording...True. Preparing to save.')
+            self._game.set_record_icon_state(False)
             self._grecord.stop_recording_audio()
             self._recording = False
-            self._record_button.set_icon_name('media-record')
-            self._record_button.set_tooltip(_('Start recording'))
-            self._playback_button.set_icon_name('media-playback-start')
-            self._playback_button.set_tooltip(_('Play recording'))
+            # self._record_button.set_icon_name('media-record')
+            # self._record_button.set_tooltip(_('Start recording'))
+            # self._playback_button.set_icon_name('media-playback-start')
+            # self._playback_button.set_tooltip(_('Play recording'))
             self._notify_successful_save(title=_('Save recording'))
             GObject.timeout_add(100, self._wait_for_transcoding_to_finish)
         else:  # Wasn't recording, so start
             _logger.debug('recording...False. Start recording.')
+            self._game.set_record_icon_state(True)
             self._grecord.record_audio()
             self._recording = True
-            self._record_button.set_icon_name('media-recording')
-            self._record_button.set_tooltip(_('Stop recording'))
+            # self._record_button.set_icon_name('media-recording')
+            # self._record_button.set_tooltip(_('Stop recording'))
 
     def _wait_for_transcoding_to_finish(self, button=None):
         while not self._grecord.transcoding_complete():
@@ -226,7 +230,7 @@ class StoryActivity(activity.Activity):
             self._alert = None
         self._save_recording()
 
-    def _playback_recording_cb(self, button=None):
+    def playback_recording_cb(self, button=None):
         ''' Play back current recording '''
         _logger.debug('Playback current recording from output.ogg...')
         play_audio_from_file(os.path.join(self.datapath, 'output.ogg'))
@@ -245,6 +249,10 @@ class StoryActivity(activity.Activity):
             dsobject.set_file_path(os.path.join(self.datapath, 'output.ogg'))
             datastore.write(dsobject)
             dsobject.destroy()
+
+            # Enable playback after record is finished
+            self._game.set_play_icon_state(True)
+
             # Always save an image with the recording.
             self._do_save_as_image_cb()
         else:
