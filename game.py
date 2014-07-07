@@ -409,20 +409,37 @@ class Game():
 
     def export(self):
         ''' Write dot to cairo surface. '''
-        w = h = int(4 * self._space + 3 * self._dot_size)
-        png_surface = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
-        cr = cairo.Context(png_surface)
-        cr.set_source_rgb(192, 192, 192)
-        cr.rectangle(0, 0, w, h)
-        cr.fill()
-        for i in range(9):
-            y = self._space + int(i / 3.) * (self._dot_size + self._space)
-            x = self._space + (i % 3) * (self._dot_size + self._space)
+        if self._mode == 'array':
+            w = h = int(4 * self._space + 3 * self._dot_size)
+            png_surface = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
+            cr = cairo.Context(png_surface)
+            cr.set_source_rgb(192, 192, 192)
+            cr.rectangle(0, 0, w, h)
+            cr.fill()
+            for i in range(9):
+                y = self._space + int(i / 3.) * (self._dot_size + self._space)
+                x = self._space + (i % 3) * (self._dot_size + self._space)
+                cr.save()
+                cr.set_source_surface(self._dots[i].images[0], x, y)
+                cr.rectangle(x, y, self._dot_size, self._dot_size)
+                cr.fill()
+                cr.restore()
+        else:
+            w = h = int(2 * self._space + 3 * self._dot_size)
+            png_surface = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
+            cr = cairo.Context(png_surface)
+            cr.set_source_rgb(192, 192, 192)
+            cr.rectangle(0, 0, w, h)
+            cr.fill()
+            y = self._space
+            x = self._space
             cr.save()
-            cr.set_source_surface(self._dots[i].images[0], x, y)
-            cr.rectangle(x, y, self._dot_size, self._dot_size)
+            cr.set_source_surface(self._Dots[self.current_image].images[0],
+                                  x, y)
+            cr.rectangle(x, y, 3 * self._dot_size, 3 * self._dot_size)
             cr.fill()
             cr.restore()
+
         return png_surface
 
     def _new_dot_surface(self, color='#000000', image=None, large=False):

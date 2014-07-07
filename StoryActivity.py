@@ -148,10 +148,6 @@ class StoryActivity(activity.Activity):
         separator_factory(self.toolbar)
 
         '''
-        self._record_button = button_factory(
-            'media-record', self.toolbar,
-            self.record_cb, tooltip=_('Start recording'))
-
         self._playback_button = button_factory(
             'media-playback-start-insensitive',  self.toolbar,
             self.playback_recording_cb, tooltip=_('Nothing to play'))
@@ -228,6 +224,14 @@ class StoryActivity(activity.Activity):
 
     def _do_save_as_image_cb(self, button=None):
         ''' Grab the current canvas and save it to the Journal. '''
+        if self._uid is None:
+            self._uid = generate_uid()
+
+        if self._game.get_mode() == 'array':
+            target = self._uid
+        else:
+            target = '%s-%d' % (self._uid, self._game.current_image)
+
         self._notify_successful_save(title=_('Save as image'))
         file_path = os.path.join(self.datapath, 'story.png')
         png_surface = self._game.export()
@@ -238,6 +242,7 @@ class StoryActivity(activity.Activity):
             (self.metadata['title'], _('image'))
         dsobject.metadata['icon-color'] = profile.get_color().to_string()
         dsobject.metadata['mime_type'] = 'image/png'
+        dsobject.metadata['tags'] = target
         dsobject.set_file_path(file_path)
         datastore.write(dsobject)
         dsobject.destroy()
@@ -256,10 +261,6 @@ class StoryActivity(activity.Activity):
             self._game.set_record_icon_state(False)
             self._grecord.stop_recording_audio()
             self.recording = False
-            # self._record_button.set_icon_name('media-record')
-            # self._record_button.set_tooltip(_('Start recording'))
-            # self._playback_button.set_icon_name('media-playback-start')
-            # self._playback_button.set_tooltip(_('Play recording'))
             self._notify_successful_save(title=_('Save recording'))
             GObject.timeout_add(100, self._wait_for_transcoding_to_finish)
         else:  # Wasn't recording, so start
@@ -267,8 +268,6 @@ class StoryActivity(activity.Activity):
             self._game.set_record_icon_state(True)
             self._grecord.record_audio()
             self.recording = True
-            # self._record_button.set_icon_name('media-recording')
-            # self._record_button.set_tooltip(_('Stop recording'))
 
     def _wait_for_transcoding_to_finish(self, button=None):
         while not self._grecord.transcoding_complete():
