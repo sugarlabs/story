@@ -176,12 +176,15 @@ class StoryActivity(activity.Activity):
 
     def _new_game_cb(self, button=None):
         ''' Start a new game. '''
-        alert = ConfirmationAlert()
-        alert.props.title = _('Do you really want to load new images?')
-        alert.props.msg = _('You have done work on this story.'
-                            ' Do you want to overwrite it?')
-        alert.connect('response', self._confirmation_alert_cb)
-        self.add_alert(alert)
+        if 'dirty' in self.metadata:
+            alert = ConfirmationAlert()
+            alert.props.title = _('Do you really want to load new images?')
+            alert.props.msg = _('You have done work on this story.'
+                                ' Do you want to overwrite it?')
+            alert.connect('response', self._confirmation_alert_cb)
+            self.add_alert(alert)
+        else:
+            self._game.new_game()
 
     def _confirmation_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
@@ -290,6 +293,7 @@ class StoryActivity(activity.Activity):
         return
 
     def _save_recording(self):
+        self.metadata['dirty'] = 'True'  # So we know that we've done work
         if os.path.exists(os.path.join(self.datapath, 'output.ogg')):
             _logger.debug('Saving recording to Journal...')
             if self._uid is None:
