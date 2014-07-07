@@ -106,16 +106,15 @@ class Game():
                            self._new_dot_surface(color=self._colors[0])))
                 self._dots[-1].type = -1  # No image
                 self._dots[-1].set_label_attributes(72)
-
-                self._dot_size *= 3
+                self._dots[-1].set_label('?')
 
                 self._Dots.append(
                     Sprite(self._sprites, X, Y, 
-                           self._new_dot_surface(color=self._colors[0])))
+                           self._new_dot_surface(color=self._colors[0],
+                                                 large=True)))
                 self._Dots[-1].type = -1  # No image
                 self._Dots[-1].set_label_attributes(72 * 3)
-
-                self._dot_size /= 3
+                self._Dots[-1].set_label('?')
 
         self.number_of_images = len(self._PATHS)
         if USE_ART4APPS:
@@ -193,7 +192,6 @@ class Game():
     def _button_press_cb(self, win, event):
         ''' The mouse button was pressed. Is it on a sprite? '''
         x, y = map(int, event.get_coords())
-
 
         spr = self._sprites.find_sprite((x, y))
         if spr is not None:
@@ -276,14 +274,13 @@ class Game():
                         self._colors[abs(dot.type)]))
                     dot.set_label('?')
         else:
-            self._dot_size *= 3
             for dot in self._Dots:
-                if Dot.type != -1:
-                    Dot.type = -1
-                    Dot.set_shape(self._new_dot_surface(
-                        self._colors[abs(dot.type)]))
-                    Dot.set_label('?')
-            self._dot_size /= 3
+                if dot.type != -1:
+                    dot.type = -1
+                    dot.set_shape(self._new_dot_surface(
+                        self._colors[abs(dot.type)],
+                        large=True))
+                    dot.set_label('?')
         self._dance_counter = 0
         self._dance_step()
 
@@ -294,10 +291,9 @@ class Game():
                 dot.set_shape(self._new_dot_surface(
                     self._colors[int(uniform(0, 3))]))
         else:
-            self._dot_size *= 3
             self._Dots[0].set_shape(self._new_dot_surface(
-                self._colors[int(uniform(0, 3))]))
-            self._dot_size /= 3
+                self._colors[int(uniform(0, 3))],
+                large=True))
 
         self._dance_counter += 1
         if self._dance_counter < 10:
@@ -317,12 +313,10 @@ class Game():
             self._dots[i].set_shape(self._new_dot_surface(
                 image=self._dots[i].type))
 
-            self._dot_size *= 3
             self._Dots[i].set_label('')
-            self._Dots[i].type = int(uniform(0, self.number_of_images))
+            self._Dots[i].type = self._dots[i].type
             self._Dots[i].set_shape(self._new_dot_surface(
-                image=self._Dots[i].type))
-            self._dot_size /= 3
+                image=self._Dots[i].type, large=True))
 
             if self._mode == 'array':
                 self._dots[i].set_layer(100)
@@ -347,12 +341,12 @@ class Game():
             self._dots[i].type = dot
             self._dots[i].set_shape(self._new_dot_surface(
                 image=self._dots[i].type))
+            self._dots[i].set_label('')
 
-            self._dot_size *= 3
             self._Dots[i].type = dot
             self._Dots[i].set_shape(self._new_dot_surface(
-                image=self._Dots[i].type))
-            self._dot_size /= 3
+                image=self._Dots[i].type, large=True))
+            self._Dots[i].set_label('')
 
             if self._mode == 'array':
                 self._dots[i].set_layer(100)
@@ -427,44 +421,44 @@ class Game():
             cr.restore()
         return png_surface
 
-    def _new_dot_surface(self, color='#000000', image=None):
+    def _new_dot_surface(self, color='#000000', image=None, large=False):
         ''' generate a dot of a color color '''
-        self._dot_cache = {}
-        if image is not None:
-            if not USE_ART4APPS:
+
+        if large:
+            size = self._dot_size * 3
+        else:
+            size = self._dot_size
+        self._svg_width = size
+        self._svg_height = size
+
+        if image is None:  # color dot
+            self._stroke = color
+            self._fill = color
+            pixbuf = svg_str_to_pixbuf(
+                self._header() +
+                self._circle(size / 2., size / 2., size / 2.) +
+                self._footer())
+        else:
+            if USE_ART4APPS:
+                word = self._art4apps.get_words()[image]
+                try:
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
+                        self._art4apps.get_image_filename(word), size, size)
+                except Exception, e:
+                    _logger.error('new dot surface %s %s: %s' %
+                                  (image, word, e))
+                    word = 'zebra'  # default in case image is not found
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
+                        self._art4apps.get_image_filename(word), size, size)
+            else:
+                # Set SVG color
                 color = COLORS[int(uniform(0, 6))]
                 fd = open(os.path.join(self._path, self._PATHS[image]), 'r')
                 svg_string = ''
                 for line in fd:
                     svg_string += line.replace('#000000', color)
                 fd.close()
-                pixbuf = svg_str_to_pixbuf(svg_string, w=self._dot_size,
-                                           h=self._dot_size)
-            else:
-                word = self._art4apps.get_words()[image]
-                try:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-                        self._art4apps.get_image_filename(word),
-                        self._dot_size, self._dot_size)
-                except Exception, e:
-                    _logger.error('new dot surface %s %s: %s' %
-                                  (image, word, e))
-                    word = 'zebra'
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-                        self._art4apps.get_image_filename(word),
-                        self._dot_size, self._dot_size)
-        else:
-            if color in self._dot_cache:
-                return self._dot_cache[color]
-            self._stroke = color
-            self._fill = color
-            self._svg_width = self._dot_size
-            self._svg_height = self._dot_size
-            pixbuf = svg_str_to_pixbuf(
-                self._header() +
-                self._circle(self._dot_size / 2., self._dot_size / 2.,
-                             self._dot_size / 2.) +
-                self._footer())
+                pixbuf = svg_str_to_pixbuf(svg_string, w=size, h=size)
 
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                                      self._svg_width, self._svg_height)
@@ -472,8 +466,6 @@ class Game():
         Gdk.cairo_set_source_pixbuf(context, pixbuf, 0, 0)
         context.rectangle(0, 0, self._svg_width, self._svg_height)
         context.fill()
-        if image is None:
-            self._dot_cache[color] = surface
         return surface
 
     def _header(self):
