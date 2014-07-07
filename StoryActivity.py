@@ -70,6 +70,7 @@ class StoryActivity(activity.Activity):
         self._recording = False
         self._grecord = None
         self._alert = None
+        self._uid = None
 
         self._setup_toolbars()
         self._setup_dispatch_table()
@@ -84,6 +85,21 @@ class StoryActivity(activity.Activity):
         self._game = Game(canvas, parent=self, path=self.path,
                           root=activity.get_bundle_path(), colors=self.colors)
         self._setup_presence_service()
+
+        if 'mode' in self.metadata:
+            self._game.set_mode(self.metadata['mode'])
+            if self.metadata['mode'] == 'array':
+                self.array_button.set_active(True)
+            else:
+                self.linear_button.set_active(True)
+
+        if 'uid' in self.metadata:
+            self._uid = self.metadata['uid']
+            if self._search_for_audio_note(self._uid):
+                self._game.set_play_icon_state(True)
+        else:
+            self._uid = generate_uid()
+            self.metadata['uid'] = self._uid
 
         if 'dotlist' in self.metadata:
             self._restore()
@@ -166,17 +182,23 @@ class StoryActivity(activity.Activity):
 
     def _restore(self):
         ''' Restore the game state from metadata '''
-        if 'mode' in self.metadata:
-            self._game.set_mode(self.metadata['mode'])
-            if self.metadata['mode'] == 'array':
-                self.array_button.set_active(True)
-            else:
-                self.linear_button.set_active(True)
         dot_list = []
         dots = self.metadata['dotlist'].split()
         for dot in dots:
             dot_list.append(int(dot))
         self._game.restore_game(dot_list)
+
+    def _search_for_audio_note(self, obj_id):
+        ''' Look to see if there is already a sound recorded for this
+        dsobject: the object id is stored in a tag in the audio file. '''
+        dsobjects, nobjects = datastore.find({'mime_type': ['audio/ogg']})
+        # Look for tag that matches the target object id
+        for dsobject in dsobjects:
+            if 'tags' in dsobject.metadata and \
+               obj_id in dsobject.metadata['tags']:
+                _logger.debug('Found audio note')
+                return dsobject
+        return None
 
     def _do_save_as_image_cb(self, button=None):
         ''' Grab the current canvas and save it to the Journal. '''
@@ -232,18 +254,28 @@ class StoryActivity(activity.Activity):
 
     def playback_recording_cb(self, button=None):
         ''' Play back current recording '''
-        _logger.debug('Playback current recording from output.ogg...')
-        play_audio_from_file(os.path.join(self.datapath, 'output.ogg'))
+        path = os.path.join(self.datapath, 'output.ogg')
+        if self._uid is not None:
+            dsobject = self._search_for_audio_note(self._uid)
+            if dsobject is not None:
+                path = dsobject.file_path
+        _logger.debug('Playback current recording from %s.' % (path))
+        play_audio_from_file(path)
         return
 
     def _save_recording(self):
         if os.path.exists(os.path.join(self.datapath, 'output.ogg')):
             _logger.debug('Saving recording to Journal...')
-            dsobject = datastore.create()
+            if self._uid is not None:
+                dsobject = self._search_for_audio_note(self._uid)
+            if self._uid is None or dsobject is None:
+                dsobject = datastore.create()
             dsobject.metadata['title'] = \
                 _('audio note for %s') % (self.metadata['title'])
             dsobject.metadata['icon-color'] = profile.get_color().to_string()
             dsobject.metadata['mime_type'] = 'audio/ogg'
+            if self._uid is not None:
+                dsobject.metadata['tags'] = self._uid
             _logger.debug('setting file path to %s' %
                           (os.path.join(self.datapath, 'output.ogg')))
             dsobject.set_file_path(os.path.join(self.datapath, 'output.ogg'))
@@ -409,3 +441,10 @@ class ChatTube(ExportedGObject):
     @signal(dbus_interface=IFACE, signature='s')
     def SendText(self, text):
         self.stack = text
+
+
+def generate_uid():
+    left = '%04x' % int(uniform(0, int(0xFFFF)))
+    right = '%04x' % int(uniform(0, int(0xFFFF)))
+    uid = '%s-%s' % (left, right)
+    return uid.upper()
