@@ -46,6 +46,7 @@ import logging
 _logger = logging.getLogger('story-activity')
 
 PLACEHOLDER = _('Write your story here.')
+PLACEHOLDER2 = _('Continue your story here.')
 
 SERVICE = 'org.sugarlabs.StoryActivity'
 IFACE = SERVICE
@@ -97,26 +98,37 @@ class StoryActivity(activity.Activity):
         self.vbox.pack_end(self._canvas, True, True, 0)
         self.vbox.show()
 
-        # TODO: Use scrolling window
-
         self.entry = Gtk.TextView()
         self.entry.set_wrap_mode(Gtk.WrapMode.WORD)
         self.entry.set_pixels_above_lines(0)
         self.entry.set_size_request(
             Gdk.Screen.width() - 4 * style.GRID_CELL_SIZE,
-            int(Gdk.Screen.height() / 5))
-        rgba = Gdk.RGBA()
-        rgba.red, rgba.green, rgba.blue = 0.9, 0.9, 0.9
-        rgba.alpha = 1.
-        self.entry.override_background_color(Gtk.StateFlags.NORMAL, rgba)
+            style.GRID_CELL_SIZE * 3)
         font_desc = Pango.font_description_from_string('24')
         self.entry.modify_font(font_desc)
         self.text_buffer = self.entry.get_buffer() 
         self.text_buffer.set_text(PLACEHOLDER)
-        self.fixed.put(self.entry, 2 * style.GRID_CELL_SIZE,
-                       style.GRID_CELL_SIZE)
-        self.entry.show()
+        self.entry.connect('focus-in-event', self._text_focus_in_cb)
+        self.entry.connect('focus-out-event', self._text_focus_out_cb)
 
+        evbox = Gtk.EventBox()
+        evbox.add(self.entry)
+        self.entry.show()
+        evbox.connect('focus-in-event', self._text_focus_in_cb)
+        evbox.connect('focus-out-event', self._text_focus_out_cb)
+
+        scrolled_window = Gtk.ScrolledWindow()
+        scrolled_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        scrolled_window.set_size_request(
+            Gdk.Screen.width() - 4 * style.GRID_CELL_SIZE,
+            style.GRID_CELL_SIZE * 3)
+        scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
+        scrolled_window.add_with_viewport(evbox)
+        evbox.show()
+
+        self.fixed.put(scrolled_window, 2 * style.GRID_CELL_SIZE,
+                       style.GRID_CELL_SIZE)
+        scrolled_window.show()
         self.fixed.show()
 
         self._game = Game(self._canvas, parent=self, path=self.path,
@@ -139,6 +151,7 @@ class StoryActivity(activity.Activity):
         if 'dotlist' in self.metadata:
             self._restore()
             self.check_audio_status()
+            self.check_text_status()
         else:
             self._game.new_game()
 
@@ -146,6 +159,41 @@ class StoryActivity(activity.Activity):
         ''' If a toolbar opens or closes, we need to resize the vbox
         holding out scrolling window. '''
         self.vbox.set_size_request(rect.width, rect.height)
+
+    def _text_focus_in_cb(self, widget=None, event=None):
+        bounds = self.text_buffer.get_bounds()
+        text = self.text_buffer.get_text(bounds[0], bounds[1], True)
+        if text == PLACEHOLDER or text == PLACEHOLDER2:
+            self.text_buffer.set_text('')
+
+    def _text_focus_out_cb(self, widget=None, event=None):
+        self.save_text_cb()
+    
+    def save_text_cb(self, button=None):
+        bounds = self.text_buffer.get_bounds()
+        text = self.text_buffer.get_text(bounds[0], bounds[1], True)
+        if self._game.get_mode() == 'array':
+            if text != PLACEHOLDER:
+                self.metadata['text'] = text
+        else:
+            if text != PLACEHOLDER and text != PLACEHOLDER2:
+                key = 'text-%d' % self._game.current_image
+                self.metadata[key] = text
+
+    def check_text_status(self):
+        if self._game.get_mode() == 'array':
+            if 'text' in self.metadata:
+                self.text_buffer.set_text(self.metadata['text'])
+            else:
+                self.text_buffer.set_text(PLACEHOLDER)
+        else:
+            key = 'text-%d' % self._game.current_image
+            if key in self.metadata:
+                self.text_buffer.set_text(self.metadata[key])
+            elif self._game.current_image == 0:
+                self.text_buffer.set_text(PLACEHOLDER)
+            else:
+                self.text_buffer.set_text(PLACEHOLDER2)
 
     def check_audio_status(self):
         if self._search_for_audio_note(self._uid):
@@ -204,14 +252,18 @@ class StoryActivity(activity.Activity):
         stop_button.show()
 
     def _array_cb(self, button=None):
+        self.save_text_cb()
         self._game.set_mode('array')
         if self._uid is not None:
             self.check_audio_status()
+            self.check_text_status()
 
     def _linear_cb(self, button=None):
+        self.save_text_cb()
         self._game.set_mode('linear')
         if self._uid is not None:
             self.check_audio_status()
+            self.check_text_status()
 
     def _new_game_cb(self, button=None):
         ''' Start a new game. '''
@@ -239,6 +291,7 @@ class StoryActivity(activity.Activity):
             if dot_list.index(dot) < len(dot_list) - 1:
                 self.metadata['dotlist'] += ' '
         self.metadata['mode'] = self._game.get_mode()
+        self.save_text_cb()
 
     def _restore(self):
         ''' Restore the game state from metadata '''

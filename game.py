@@ -71,7 +71,7 @@ class Game():
         self._scale = self._height / (3 * DOT_SIZE * 1.2)
         self._scale /= 1.5
         self._dot_size = int(DOT_SIZE * self._scale)
-        self._yoff = int(Gdk.Screen.height() / 5)
+        self._yoff = style.GRID_CELL_SIZE * 3
         self._space = int(self._dot_size / 5.)
         self.we_are_sharing = False
 
@@ -136,11 +136,17 @@ class Game():
                     os.path.join(self._root, 'icons', icon + '.svg'),
                     style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
 
+        # TO DO: Save Inactive
+        save_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
+            os.path.join(self._root, 'icons', 'save.svg'),
+            style.GRID_CELL_SIZE, style.GRID_CELL_SIZE)
+
         left = style.GRID_CELL_SIZE
         right = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
         y0 = style.GRID_CELL_SIZE
         y1 = style.GRID_CELL_SIZE * 2
-        y2 = int((Gdk.Screen.height() - 2 * style.GRID_CELL_SIZE) / 2)
+        y2 = style.GRID_CELL_SIZE * 3
+        y3 = int((Gdk.Screen.height() - 2 * style.GRID_CELL_SIZE) / 2)
 
         self._record = Sprite(self._sprites, right, y0,
                               self._record_pixbufs[RECORD_OFF])
@@ -152,6 +158,10 @@ class Game():
         self._play.set_layer(1)
         self._play.type = 'play-inactive'
 
+        self._save = Sprite(self._sprites, right, y2, save_pixbuf)
+        self._save.set_layer(1)
+        self._save.type = 'save'
+
         self._next_prev_pixbufs = []
         for icon in ['go-previous', 'go-next', 'go-previous-inactive',
                      'go-next-inactive']:
@@ -160,14 +170,14 @@ class Game():
                     os.path.join(self._root, 'icons', icon + '.svg'),
                     style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
 
-        self._prev = Sprite(self._sprites, left, y2,
+        self._prev = Sprite(self._sprites, left, y3,
                             self._next_prev_pixbufs[PREV_INACTIVE])
         self._prev.set_layer(1)
         self._prev.type = 'prev'
         if self._mode == 'array':
             self._prev.hide()
 
-        self._next = Sprite(self._sprites, right, y2,
+        self._next = Sprite(self._sprites, right, y3,
                             self._next_prev_pixbufs[NEXT])
         self._next.set_layer(1)
         self._next.type = 'next'
@@ -196,14 +206,19 @@ class Game():
 
         spr = self._sprites.find_sprite((x, y))
         if spr is not None:
-            if spr.type in ['record', 'play', 'play-inactive']:
+            if spr.type in ['record', 'play', 'play-inactive', 'save',
+                            'save-inactive']:
                 if spr.type == 'record':
                     self._parent.record_cb()
                 elif spr.type == 'play':
                     self._parent.playback_recording_cb()
+                elif spr.type == 'save':
+                    self._parent.save_text_cb()
                 return
             elif self._mode == 'array':
                 return
+
+            self._parent.save_text_cb()
 
             if self._parent.recording:
                 self._parent.record_cb()
@@ -233,6 +248,7 @@ class Game():
                     self._next.set_image(self._next_prev_pixbufs[NEXT_INACTIVE])
                 self._prev.set_image(self._next_prev_pixbufs[PREV])
             self._parent.check_audio_status()
+            self._parent.check_text_status()
             self._prev.set_layer(1)
             self._next.set_layer(1)
         return False
