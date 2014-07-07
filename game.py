@@ -82,6 +82,9 @@ class Game():
         self._my_canvas.type = 'background'
 
         self._dots = []
+        self._Dots = []  # larger dots for linear mode
+        X = int((Gdk.Screen.width() - self._dot_size * 3) / 2.)
+        Y = style.GRID_CELL_SIZE
         yoffset = self._space * 2  # int(self._space / 2.)
         for y in range(3):
             for x in range(3):
@@ -94,6 +97,16 @@ class Game():
                            self._new_dot_surface(color=self._colors[0])))
                 self._dots[-1].type = -1  # No image
                 self._dots[-1].set_label_attributes(72)
+
+                self._dot_size *= 3
+
+                self._Dots.append(
+                    Sprite(self._sprites, X, Y, 
+                           self._new_dot_surface(color=self._colors[0])))
+                self._Dots[-1].type = -1  # No image
+                self._Dots[-1].set_label_attributes(72 * 3)
+
+                self._dot_size /= 3
 
         self.number_of_images = len(self._PATHS)
         if USE_ART4APPS:
@@ -134,24 +147,24 @@ class Game():
         spr = self._sprites.find_sprite((x, y))
         if spr is not None:
             if spr.type == 'prev' and self._current_image > 0:
-                self._dots[self._current_image].hide()
+                self._Dots[self._current_image].hide()
                 self._current_image -= 1
-                self._dots[self._current_image].set_layer(100)
+                self._Dots[self._current_image].set_layer(100)
                 if self._current_image == 0:
                     self._prev.set_image(self._next_prev_pixbuf[2])
                 self._next.set_image(self._next_prev_pixbuf[1])
             elif spr.type == 'next' and self._current_image < 8:
-                self._dots[self._current_image].hide()
+                self._Dots[self._current_image].hide()
                 self._current_image += 1
-                self._dots[self._current_image].set_layer(100)
+                self._Dots[self._current_image].set_layer(100)
                 if self._current_image == 8:
                     self._next.set_image(self._next_prev_pixbuf[3])
                 self._prev.set_image(self._next_prev_pixbuf[0])
             elif spr.type not in ['prev', 'background'] and \
                  self._current_image < 8:
-                self._dots[self._current_image].hide()
+                self._Dots[self._current_image].hide()
                 self._current_image += 1
-                self._dots[self._current_image].set_layer(100)
+                self._Dots[self._current_image].set_layer(100)
                 if self._current_image == 8:
                     self._next.set_image(self._next_prev_pixbuf[3])
                 self._prev.set_image(self._next_prev_pixbuf[0])
@@ -178,11 +191,13 @@ class Game():
         for i in range(9):
             if self._mode == 'array':
                 self._dots[i].set_layer(100)
+                self._Dots[i].hide()
             else:
+                self._dots[i].hide()
                 if self._current_image == i:
-                    self._dots[i].set_layer(100)
+                    self._Dots[i].set_layer(100)
                 else:
-                    self._dots[i].hide()
+                    self._Dots[i].hide()
 
     def _all_clear(self):
         ''' Things to reinitialize when starting up a new game. '''
@@ -191,20 +206,37 @@ class Game():
 
         self.set_mode(self._mode)
 
-        for dot in self._dots:
-            if dot.type != -1:
-                dot.type = -1
-                dot.set_shape(self._new_dot_surface(
-                    self._colors[abs(dot.type)]))
-            dot.set_label('?')
+        if self._mode == 'array':
+            for dot in self._dots:
+                if dot.type != -1:
+                    dot.type = -1
+                    dot.set_shape(self._new_dot_surface(
+                        self._colors[abs(dot.type)]))
+                    dot.set_label('?')
+        else:
+            self._dot_size *= 3
+            for dot in self._Dots:
+                if Dot.type != -1:
+                    Dot.type = -1
+                    Dot.set_shape(self._new_dot_surface(
+                        self._colors[abs(dot.type)]))
+                    Dot.set_label('?')
+            self._dot_size /= 3
         self._dance_counter = 0
         self._dance_step()
 
     def _dance_step(self):
         ''' Short animation before loading new game '''
-        for dot in self._dots:
-            dot.set_shape(self._new_dot_surface(
+        if self._mode == 'array':
+            for dot in self._dots:
+                dot.set_shape(self._new_dot_surface(
+                    self._colors[int(uniform(0, 3))]))
+        else:
+            self._dot_size *= 3
+            self._Dots[0].set_shape(self._new_dot_surface(
                 self._colors[int(uniform(0, 3))]))
+            self._dot_size /= 3
+
         self._dance_counter += 1
         if self._dance_counter < 10:
             self._timeout_id = GObject.timeout_add(500, self._dance_step)
@@ -220,16 +252,25 @@ class Game():
         for i in range(9):
             self._dots[i].set_label('')
             self._dots[i].type = int(uniform(0, self.number_of_images))
-            _logger.debug(self._dots[i].type)
             self._dots[i].set_shape(self._new_dot_surface(
                 image=self._dots[i].type))
+
+            self._dot_size *= 3
+            self._Dots[i].set_label('')
+            self._Dots[i].type = int(uniform(0, self.number_of_images))
+            self._Dots[i].set_shape(self._new_dot_surface(
+                image=self._Dots[i].type))
+            self._dot_size /= 3
+
             if self._mode == 'array':
                 self._dots[i].set_layer(100)
+                self._Dots[i].hide()
             else:
                 if self._current_image == i:
-                    self._dots[i].set_layer(100)
+                    self._Dots[i].set_layer(100)
                 else:
-                    self._dots[i].hide()
+                    self._Dots[i].hide()
+                self._dots[i].hide()
 
         if self.we_are_sharing:
             _logger.debug('sending a new game')
@@ -244,13 +285,22 @@ class Game():
             self._dots[i].type = dot
             self._dots[i].set_shape(self._new_dot_surface(
                 image=self._dots[i].type))
+
+            self._dot_size *= 3
+            self._Dots[i].type = dot
+            self._Dots[i].set_shape(self._new_dot_surface(
+                image=self._Dots[i].type))
+            self._dot_size /= 3
+
             if self._mode == 'array':
                 self._dots[i].set_layer(100)
+                self._Dots[i].hide()
             else:
                 if self._current_image == i:
-                    self._dots[i].set_layer(100)
+                    self._Dots[i].set_layer(100)
                 else:
-                    self._dots[i].hide()
+                    self._Dots[i].hide()
+                self._dots[i].hide()
 
     def save_game(self):
         ''' Return dot list for saving to Journal or
