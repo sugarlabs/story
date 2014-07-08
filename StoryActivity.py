@@ -272,14 +272,6 @@ class StoryActivity(activity.Activity):
             'save-as-pdf', self.toolbar, self._do_save_as_pdf_cb,
             tooltip=_('Save as PDF'))
 
-        separator_factory(self.toolbar)
-
-        '''
-        self._playback_button = button_factory(
-            'media-playback-start-insensitive',  self.toolbar,
-            self.playback_recording_cb, tooltip=_('Nothing to play'))
-        '''
-
         separator_factory(toolbox.toolbar, True, False)
 
         stop_button = StopButton(self)
