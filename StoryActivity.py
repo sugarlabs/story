@@ -143,7 +143,7 @@ class StoryActivity(activity.Activity):
         evbox.show()
 
         self.fixed.put(scrolled_window, 2 * style.GRID_CELL_SIZE,
-                       style.GRID_CELL_SIZE)
+                       style.DEFAULT_SPACING)
         scrolled_window.show()
         self.fixed.show()
 
@@ -185,47 +185,47 @@ class StoryActivity(activity.Activity):
         text = self.text_buffer.get_text(bounds[0], bounds[1], True)
         if text == PLACEHOLDER or text == PLACEHOLDER2:
             self.text_buffer.set_text('')
-        self._game.set_save_icon_state(True)
+        self._game.set_speak_icon_state(True)
 
     def _text_focus_out_cb(self, widget=None, event=None):
-        self.save_text_cb()
+        self.speak_text_cb()
     
-    def save_text_cb(self, button=None):
+    def speak_text_cb(self, button=None):
         bounds = self.text_buffer.get_bounds()
         text = self.text_buffer.get_text(bounds[0], bounds[1], True)
         if self._game.get_mode() == 'array':
             if text != PLACEHOLDER:
                 self.metadata['text'] = text
-                self._game.set_save_icon_state(True)
+                self._game.set_speak_icon_state(True)
             else:
-                self._game.set_save_icon_state(False)
+                self._game.set_speak_icon_state(False)
         else:
             if text != PLACEHOLDER and text != PLACEHOLDER2:
                 key = 'text-%d' % self._game.current_image
                 self.metadata[key] = text
-                self._game.set_save_icon_state(True)
+                self._game.set_speak_icon_state(True)
             else:
-                self._game.set_save_icon_state(False)
+                self._game.set_speak_icon_state(False)
 
     def check_text_status(self):
         if self._game.get_mode() == 'array':
             if 'text' in self.metadata:
                 self.text_buffer.set_text(self.metadata['text'])
-                self._game.set_save_icon_state(True)
+                self._game.set_speak_icon_state(True)
             else:
                 self.text_buffer.set_text(PLACEHOLDER)
-                self._game.set_save_icon_state(False)
+                self._game.set_speak_icon_state(False)
         else:
             key = 'text-%d' % self._game.current_image
             if key in self.metadata:
                 self.text_buffer.set_text(self.metadata[key])
-                self._game.set_save_icon_state(True)
+                self._game.set_speak_icon_state(True)
             elif self._game.current_image == 0:
                 self.text_buffer.set_text(PLACEHOLDER)
-                self._game.set_save_icon_state(False)
+                self._game.set_speak_icon_state(False)
             else:
                 self.text_buffer.set_text(PLACEHOLDER2)
-                self._game.set_save_icon_state(False)
+                self._game.set_speak_icon_state(False)
 
     def check_audio_status(self):
         if self._search_for_audio_note(self._uid):
@@ -284,14 +284,14 @@ class StoryActivity(activity.Activity):
         stop_button.show()
 
     def _array_cb(self, button=None):
-        self.save_text_cb()
+        self.speak_text_cb()
         self._game.set_mode('array')
         if self._uid is not None:
             self.check_audio_status()
             self.check_text_status()
 
     def _linear_cb(self, button=None):
-        self.save_text_cb()
+        self.speak_text_cb()
         self._game.set_mode('linear')
         if self._uid is not None:
             self.check_audio_status()
@@ -323,7 +323,7 @@ class StoryActivity(activity.Activity):
             if dot_list.index(dot) < len(dot_list) - 1:
                 self.metadata['dotlist'] += ' '
         self.metadata['mode'] = self._game.get_mode()
-        self.save_text_cb()
+        self.speak_text_cb()
 
     def _restore(self):
         ''' Restore the game state from metadata '''

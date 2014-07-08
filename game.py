@@ -42,8 +42,8 @@ RECORD_OFF = 0
 RECORD_ON = 1
 PLAY_OFF = 0
 PLAY_ON = 1
-SAVE_OFF = 0
-SAVE_ON = 1
+SPEAK_OFF = 0
+SPEAK_ON = 1
 
 DOT_SIZE = 40
 COLORS = ['#000000', '#a00000', '#907000', '#009000', '#0000ff', '#9000a0']
@@ -73,7 +73,7 @@ class Game():
         self._scale = self._height / (3 * DOT_SIZE * 1.2)
         self._scale /= 1.5
         self._dot_size = int(DOT_SIZE * self._scale)
-        self._yoff = style.GRID_CELL_SIZE * 4
+        self._yoff = style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING
         self._space = int(self._dot_size / 5.)
         self.we_are_sharing = False
 
@@ -140,18 +140,18 @@ class Game():
                     os.path.join(self._root, 'icons', icon + '.svg'),
                     style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
 
-        self._save_pixbufs = []
-        for icon in ['save-inactive', 'save']:
-            self._save_pixbufs.append(
+        self._speak_pixbufs = []
+        for icon in ['speak-inactive', 'speak']:
+            self._speak_pixbufs.append(
                 GdkPixbuf.Pixbuf.new_from_file_at_size(
                     os.path.join(self._root, 'icons', icon + '.svg'),
                     style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
 
         left = style.GRID_CELL_SIZE
         right = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
-        y0 = style.GRID_CELL_SIZE
-        y1 = style.GRID_CELL_SIZE * 2
-        y2 = style.GRID_CELL_SIZE * 3
+        y0 = style.DEFAULT_SPACING
+        y1 = y0 + style.GRID_CELL_SIZE
+        y2 = y1 + style.GRID_CELL_SIZE
         y3 = int((Gdk.Screen.height() - 2 * style.GRID_CELL_SIZE) / 2)
 
         self._record = Sprite(self._sprites, right, y0,
@@ -164,10 +164,10 @@ class Game():
         self._play.set_layer(1)
         self._play.type = 'play-inactive'
 
-        self._save = Sprite(self._sprites, right, y2,
-                            self._save_pixbufs[SAVE_OFF])
-        self._save.set_layer(1)
-        self._save.type = 'save-inactive'
+        self._speak = Sprite(self._sprites, right, y2,
+                            self._speak_pixbufs[SPEAK_OFF])
+        self._speak.set_layer(1)
+        self._speak.type = 'speak-inactive'
 
         self._next_prev_pixbufs = []
         for icon in ['go-previous', 'go-next', 'go-previous-inactive',
@@ -191,14 +191,14 @@ class Game():
         if self._mode == 'array':
             self._next.hide()
         
-    def set_save_icon_state(self, state):
+    def set_speak_icon_state(self, state):
         if state:
-            self._save.set_image(self._save_pixbufs[SAVE_ON])
-            self._save.type = 'save'
+            self._speak.set_image(self._speak_pixbufs[SPEAK_ON])
+            self._speak.type = 'speak'
         else:
-            self._save.set_image(self._save_pixbufs[SAVE_OFF])
-            self._save.type = 'save-inactive'
-        self._save.set_layer(1)
+            self._speak.set_image(self._speak_pixbufs[SPEAK_OFF])
+            self._speak.type = 'speak-inactive'
+        self._speak.set_layer(1)
 
     def set_record_icon_state(self, state):
         if state:
@@ -222,19 +222,22 @@ class Game():
 
         spr = self._sprites.find_sprite((x, y))
         if spr is not None:
-            if spr.type in ['record', 'play', 'play-inactive', 'save',
-                            'save-inactive']:
+            if spr.type in ['record', 'play', 'play-inactive', 'speak',
+                            'speak-inactive']:
                 if spr.type == 'record':
                     self._parent.record_cb()
                 elif spr.type == 'play':
                     self._parent.playback_recording_cb()
-                elif spr.type == 'save':
-                    self._parent.save_text_cb()
+                elif spr.type == 'speak':
+                    bounds = self._parent.text_buffer.get_bounds()
+                    text = self._parent.text_buffer.get_text(
+                        bounds[0], bounds[1], True)
+                    speak(text)
                 return
             elif self._mode == 'array':
                 return
 
-            self._parent.save_text_cb()
+            self._parent.speak_text_cb()
 
             if self._parent.recording:
                 self._parent.record_cb()
@@ -633,3 +636,33 @@ def svg_str_to_pixbuf(svg_string, w=None, h=None):
     pl.write(svg_string)
     pl.close()
     return pl.get_pixbuf()
+
+
+VOICES = {'af': 'afrikaans', 'cy': 'welsh-test', 'el': 'greek',
+          'es': 'spanish', 'hi': 'hindi-test', 'hy': 'armenian',
+          'ku': 'kurdish', 'mk': 'macedonian-test', 'pt': 'brazil',
+          'sk': 'slovak', 'sw': 'swahili', 'bs': 'bosnian',
+          'da': 'danish', 'en': 'english', 'fi': 'finnish',
+          'hr': 'croatian', 'id': 'indonesian-test', 'la': 'latin',
+          'nl': 'dutch-test', 'sq': 'albanian', 'ta': 'tamil',
+          'vi': 'vietnam-test', 'ca': 'catalan', 'de': 'german',
+          'eo': 'esperanto', 'fr': 'french', 'hu': 'hungarian',
+          'is': 'icelandic-test', 'lv': 'latvian', 'no': 'norwegian',
+          'ro': 'romanian', 'sr': 'serbian', 'zh': 'Mandarin',
+          'cs': 'czech', 'it': 'italian', 'pl': 'polish',
+          'ru': 'russian_test', 'sv': 'swedish', 'tr': 'turkish'}
+
+
+def speak(text):
+    """ Speak text """
+
+    if type(text) == float and int(text) == text:
+        text = int(text)
+
+    lang = os.environ['LANG'][0:2]
+    if lang in VOICES:
+        language_option = '-v ' + VOICES[lang]
+    else:
+        language_option = ''
+    os.system('espeak %s "%s" --stdout | aplay' %
+              (language_option, str(text)))
