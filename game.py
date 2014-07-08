@@ -68,13 +68,7 @@ class Game():
         self._canvas.connect('draw', self.__draw_cb)
         self._canvas.connect('button-press-event', self._button_press_cb)
 
-        self._width = Gdk.Screen.width()
-        self._height = Gdk.Screen.height() - style.GRID_CELL_SIZE
-        self._scale = self._height / (3 * DOT_SIZE * 1.2)
-        self._scale /= 1.5
-        self._dot_size = int(DOT_SIZE * self._scale)
-        self._yoff = style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING
-        self._space = int(self._dot_size / 5.)
+        self.configure(move=False)
         self.we_are_sharing = False
 
         self._start_time = 0
@@ -86,7 +80,7 @@ class Game():
         # Generate the sprites we'll need...
         self._sprites = Sprites(self._canvas)
 
-        foo = Sprite(
+        self._bg = Sprite(
             self._sprites, 0, 0,
             svg_str_to_pixbuf(genhole(
                 Gdk.Screen.width(),
@@ -96,17 +90,19 @@ class Game():
                 Gdk.Screen.width() - 3 * style.GRID_CELL_SIZE +
                 2 * style.DEFAULT_SPACING,
                 style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING)))
-        foo.set_layer(-2)
-        foo.type = 'background'
+        self._bg.set_layer(-2)
+        self._bg.type = 'background'
 
         size = 3 * self._dot_size + 4 * self._space
         x = int((Gdk.Screen.width() - size) / 2.)
+        '''
         self._my_canvas = Sprite(
             self._sprites, x, self._yoff + self._space,
             svg_str_to_pixbuf(genblank(
                 size, size, ('#FFFFFF', '#FFFFFF'))))
         self._my_canvas.set_layer(-1)
         self._my_canvas.type = 'background'
+        '''
 
         self._dots = []
         self._Dots = []  # larger dots for linear mode
@@ -204,6 +200,57 @@ class Game():
         if self._mode == 'array':
             self._next.hide()
         
+    def configure(self, move=True):
+        self._width = Gdk.Screen.width()
+        self._height = Gdk.Screen.height() - style.GRID_CELL_SIZE
+        if not move:
+            self._scale = self._height / (3 * DOT_SIZE * 1.2)
+            self._scale /= 1.5
+            self._dot_size = int(DOT_SIZE * self._scale)
+            self._yoff = style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING
+            self._space = int(self._dot_size / 5.)
+            return
+
+        left = style.GRID_CELL_SIZE
+        right = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
+        y0 = style.DEFAULT_SPACING
+        y1 = y0 + style.GRID_CELL_SIZE
+        y2 = y1 + style.GRID_CELL_SIZE
+        y3 = int((Gdk.Screen.height() - 2 * style.GRID_CELL_SIZE) / 2)
+        self._record.move((right, y0))
+        self._play.move((right, y1))
+        self._speak.move((right, y2))
+        self._prev.move((left, y3))
+        self._next.move((right, y3))
+
+        # Move the dots
+        X = int((Gdk.Screen.width() - self._dot_size * 3) / 2.)
+        Y = style.GRID_CELL_SIZE + self._yoff
+        yoffset = self._space * 2 + self._yoff
+        for y in range(3):
+            for x in range(3):
+                xoffset = int((self._width - 3 * self._dot_size -
+                               2 * self._space) / 2.)
+                self._dots[x + y * 3].move(
+                           (xoffset + x * (self._dot_size + self._space),
+                           y * (self._dot_size + self._space) + yoffset))
+                self._Dots[x + y * 3].move((X, Y))
+
+        # Regenerate the bg sprite
+        self._bg.hide()
+        self._bg = Sprite(
+            self._sprites, 0, 0,
+            svg_str_to_pixbuf(genhole(
+                Gdk.Screen.width(),
+                Gdk.Screen.height(),
+                2 * style.GRID_CELL_SIZE,
+                style.DEFAULT_SPACING,
+                Gdk.Screen.width() - 3 * style.GRID_CELL_SIZE +
+                2 * style.DEFAULT_SPACING,
+                style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING)))
+        self._bg.set_layer(-2)
+        self._bg.type = 'background'
+
     def set_speak_icon_state(self, state):
         if state:
             self._speak.set_image(self._speak_pixbufs[SPEAK_ON])

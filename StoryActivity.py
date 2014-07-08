@@ -116,37 +116,37 @@ class StoryActivity(activity.Activity):
         self.entry.connect('focus-in-event', self._text_focus_in_cb)
         self.entry.connect('focus-out-event', self._text_focus_out_cb)
 
-        grid = Gtk.Grid()
-        grid.set_border_width(style.DEFAULT_PADDING)
-        grid.attach(self.entry, 0, 0, 1, 1)
+        self._grid = Gtk.Grid()
+        self._grid.set_border_width(style.DEFAULT_PADDING)
+        self._grid.attach(self.entry, 0, 0, 1, 1)
         self.entry.show()
 
-        evbox = Gtk.EventBox()
-        evbox.add(grid)
-        grid.show()
-        evbox.connect('focus-in-event', self._text_focus_in_cb)
-        evbox.connect('focus-out-event', self._text_focus_out_cb)
+        self._evbox = Gtk.EventBox()
+        self._evbox.add(self._grid)
+        self._grid.show()
+        self._evbox.connect('focus-in-event', self._text_focus_in_cb)
+        self._evbox.connect('focus-out-event', self._text_focus_out_cb)
 
-        scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        scrolled_window.set_size_request(
+        self.scrolled_window = Gtk.ScrolledWindow()
+        self.scrolled_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        self.scrolled_window.set_size_request(
             Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
-        scrolled_window.set_policy(Gtk.PolicyType.NEVER,
+        self.scrolled_window.set_policy(Gtk.PolicyType.NEVER,
                                    Gtk.PolicyType.AUTOMATIC)
         rgba = Gdk.RGBA()
         rgba.red, rgba.green, rgba.blue, rgba.alpha = 1., 1., 1., 1.
-        scrolled_window.override_background_color(
+        self.scrolled_window.override_background_color(
             Gtk.StateFlags.NORMAL, rgba)
 
-        vadj = scrolled_window.get_vadjustment()
+        vadj = self.scrolled_window.get_vadjustment()
         vadj.connect('changed', self._scroll_changed_cb)
-        scrolled_window.add_with_viewport(evbox)
-        evbox.show()
+        self.scrolled_window.add_with_viewport(self._evbox)
+        self._evbox.show()
 
-        self.fixed.put(scrolled_window, 2 * style.GRID_CELL_SIZE,
+        self.fixed.put(self.scrolled_window, 2 * style.GRID_CELL_SIZE,
                        style.DEFAULT_SPACING)
-        scrolled_window.show()
+        self.scrolled_window.show()
         self.fixed.show()
 
         self._game = Game(self._canvas, parent=self, path=self.path,
@@ -172,6 +172,27 @@ class StoryActivity(activity.Activity):
             self.check_text_status()
         else:
             self._game.new_game()
+
+        Gdk.Screen.get_default().connect('size-changed', self._configure_cb)
+
+    def _configure_cb(self, event):
+        self._canvas.set_size_request(int(Gdk.Screen.width()),
+                                      int(Gdk.Screen.height()))
+        self.vbox.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
+        self.entry.set_size_request(
+            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE -
+            2 * style.DEFAULT_SPACING,
+            style.GRID_CELL_SIZE * 3 - 2 * style.DEFAULT_SPACING)
+        self._grid.set_size_request(
+            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
+            style.GRID_CELL_SIZE * 3)
+        self._evbox.set_size_request(
+            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
+            style.GRID_CELL_SIZE * 3)
+        self.scrolled_window.set_size_request(
+            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
+            style.GRID_CELL_SIZE * 3)
+        self._game.configure()
 
     def _restore_cursor(self):
         ''' No longer waiting, so restore standard cursor. '''
