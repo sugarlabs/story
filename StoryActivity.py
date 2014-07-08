@@ -106,7 +106,7 @@ class StoryActivity(activity.Activity):
             Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE -
             2 * style.DEFAULT_SPACING,
             style.GRID_CELL_SIZE * 3 - 2 * style.DEFAULT_SPACING)
-        font_desc = Pango.font_description_from_string('24')
+        font_desc = Pango.font_description_from_string('14')
         self.entry.modify_font(font_desc)
         self.text_buffer = self.entry.get_buffer() 
         self.text_buffer.set_text(PLACEHOLDER)
