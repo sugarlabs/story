@@ -29,6 +29,7 @@ from sugar3.graphics import style
 
 from toolbar_utils import button_factory, separator_factory, radio_factory
 from utils import json_load, json_dump, play_audio_from_file
+from exportpdf import save_pdf
 from grecord import Grecord
 
 import telepathy
@@ -267,6 +268,10 @@ class StoryActivity(activity.Activity):
             'image-saveoff', self.toolbar, self._do_save_as_image_cb,
             tooltip=_('Save as image'))
 
+        self.save_as_pdf = button_factory(
+            'save-as-pdf', self.toolbar, self._do_save_as_pdf_cb,
+            tooltip=_('Save as PDF'))
+
         separator_factory(self.toolbar)
 
         '''
@@ -348,6 +353,29 @@ class StoryActivity(activity.Activity):
                 _logger.debug('Found audio note')
                 return dsobject
         return None
+
+    def _do_save_as_pdf_cb(self, button=None):
+        self._notify_successful_save(title=_('Save as pdf'))
+        file_path = os.path.join(self.datapath, 'output.pdf')
+        if 'description' in self.metadata:
+            save_pdf(self, file_path, self.nick,
+                     description=self.metadata['desciption'])
+        else:
+            save_pdf(self, file_path, self.nick)
+
+        dsobject = datastore.create()
+        dsobject.metadata['title'] = '%s %s' % \
+            (self.metadata['title'], _('PDF'))
+        dsobject.metadata['icon-color'] = profile.get_color().to_string()
+        dsobject.metadata['mime_type'] = 'application/pdf'
+        dsobject.metadata['activity'] = 'org.laptop.sugar3.ReadActivity'
+        dsobject.set_file_path(file_path)
+        datastore.write(dsobject)
+        dsobject.destroy()
+        # os.remove(file_path)
+        if self._alert is not None:
+            self.remove_alert(self._alert)
+            self._alert = None
 
     def _do_save_as_image_cb(self, button=None):
         ''' Grab the current canvas and save it to the Journal. '''
