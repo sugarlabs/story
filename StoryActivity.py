@@ -119,12 +119,6 @@ class StoryActivity(activity.Activity):
         self.entry.show()
 
         evbox = Gtk.EventBox()
-        rgba = Gdk.RGBA()
-        rgba.red, rgba.green, rgba.blue = 1., 1., 1.
-        rgba.alpha = 1.
-        evbox.override_background_color(
-            Gtk.StateFlags.NORMAL, rgba)
-
         evbox.add(grid)
         grid.show()
         evbox.connect('focus-in-event', self._text_focus_in_cb)
@@ -137,6 +131,11 @@ class StoryActivity(activity.Activity):
             style.GRID_CELL_SIZE * 3)
         scrolled_window.set_policy(Gtk.PolicyType.NEVER,
                                    Gtk.PolicyType.AUTOMATIC)
+        rgba = Gdk.RGBA()
+        rgba.red, rgba.green, rgba.blue, rgba.alpha = 1., 1., 1., 1.
+        scrolled_window.override_background_color(
+            Gtk.StateFlags.NORMAL, rgba)
+
         vadj = scrolled_window.get_vadjustment()
         vadj.connect('changed', self._scroll_changed_cb)
         scrolled_window.add_with_viewport(evbox)

@@ -86,6 +86,19 @@ class Game():
         # Generate the sprites we'll need...
         self._sprites = Sprites(self._canvas)
 
+        foo = Sprite(
+            self._sprites, 0, 0,
+            svg_str_to_pixbuf(genhole(
+                Gdk.Screen.width(),
+                Gdk.Screen.height(),
+                2 * style.GRID_CELL_SIZE,
+                style.DEFAULT_SPACING,
+                Gdk.Screen.width() - 3 * style.GRID_CELL_SIZE +
+                2 * style.DEFAULT_SPACING,
+                style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING)))
+        foo.set_layer(-2)
+        foo.type = 'background'
+
         size = 3 * self._dot_size + 4 * self._space
         x = int((Gdk.Screen.width() - size) / 2.)
         self._my_canvas = Sprite(
@@ -559,6 +572,19 @@ def genblank(w, h, colors, stroke_width=1.0):
     svg_string = svg.header(w, h)
     svg_string += svg.footer()
     return svg_string
+
+
+def genhole(w, h, x1, y1, x2, y2):
+    return \
+'<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + \
+'<svg ' + \
+'   width="%d"' % w + \
+'   height="%d">\n' % h + \
+'    <path ' + \
+'       d="m 0,0 0,%d %d,0 0,%d z m %d,%d %d,0 0,%d %d,0 z"' \
+% (h, w, -h, x1, y1, x2 - x1, y2 - y1, x1 - x2) + \
+'       style="fill:#FFFFFF;fill-opacity:1;stroke:none;stroke-width:3.5;" />\n' + \
+'</svg>'
 
 
 class SVG:
