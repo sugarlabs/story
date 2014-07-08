@@ -2,6 +2,10 @@
 
 ENHANCEMENT:
 * Add "linear" mode: images displayed in sequence
+* Add text entry
+* Add text-to-speech
+* Add export to PDF
+* Add support for screen rotation
 
 BUG_FIX:
 * Add missing PATH for setting up collaboration chattube

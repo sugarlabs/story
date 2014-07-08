@@ -221,6 +221,7 @@ class StoryActivity(activity.Activity):
         text = self.text_buffer.get_text(bounds[0], bounds[1], True)
         if text == PLACEHOLDER or text == PLACEHOLDER2:
             self.text_buffer.set_text('')
+        self.metadata['dirty'] = 'True'
         self._game.set_speak_icon_state(True)
 
     def _text_focus_out_cb(self, widget=None, event=None):
@@ -232,6 +233,7 @@ class StoryActivity(activity.Activity):
         if self._game.get_mode() == 'array':
             if text != PLACEHOLDER:
                 self.metadata['text'] = text
+                self.metadata['dirty'] = 'True'
                 self._game.set_speak_icon_state(True)
             else:
                 self._game.set_speak_icon_state(False)
@@ -239,6 +241,7 @@ class StoryActivity(activity.Activity):
             if text != PLACEHOLDER and text != PLACEHOLDER2:
                 key = 'text-%d' % self._game.current_image
                 self.metadata[key] = text
+                self.metadata['dirty'] = 'True'
                 self._game.set_speak_icon_state(True)
             else:
                 self._game.set_speak_icon_state(False)
@@ -247,6 +250,7 @@ class StoryActivity(activity.Activity):
         if self._game.get_mode() == 'array':
             if 'text' in self.metadata:
                 self.text_buffer.set_text(self.metadata['text'])
+                self.metadata['dirty'] = 'True'
                 self._game.set_speak_icon_state(True)
             else:
                 self.text_buffer.set_text(PLACEHOLDER)
@@ -255,6 +259,7 @@ class StoryActivity(activity.Activity):
             key = 'text-%d' % self._game.current_image
             if key in self.metadata:
                 self.text_buffer.set_text(self.metadata[key])
+                self.metadata['dirty'] = 'True'
                 self._game.set_speak_icon_state(True)
             elif self._game.current_image == 0:
                 self.text_buffer.set_text(PLACEHOLDER)
