@@ -84,14 +84,14 @@ class Game():
         # Generate the sprites we'll need...
         self._sprites = Sprites(self._canvas)
 
-        size = max(Gdk.Screen.width(), Gdk.Screen.height())
-        '''
+        size = 3 * self._dot_size + 4 * self._space
+        x = int((Gdk.Screen.width() - size) / 2.)
         self._my_canvas = Sprite(
-            self._sprites, 0, 0, svg_str_to_pixbuf(genblank(
+            self._sprites, x, self._yoff + self._space,
+            svg_str_to_pixbuf(genblank(
                 size, size, ('#FFFFFF', '#FFFFFF'))))
         self._my_canvas.set_layer(-1)
         self._my_canvas.type = 'background'
-        '''
 
         self._dots = []
         self._Dots = []  # larger dots for linear mode

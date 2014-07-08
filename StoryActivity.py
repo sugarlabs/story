@@ -87,6 +87,7 @@ class StoryActivity(activity.Activity):
 
         self.vbox = Gtk.VBox(False, 0)
         self.vbox.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
+
         self.fixed.put(self.vbox, 0, 0)
         self.vbox.show()
 
@@ -118,6 +119,13 @@ class StoryActivity(activity.Activity):
         self.entry.show()
 
         evbox = Gtk.EventBox()
+        rgba = Gdk.RGBA()
+        rgba.red, rgba.green, rgba.blue = 1., 1., 1.
+        rgba.alpha = 1.
+        evbox.override_background_color(
+            Gtk.StateFlags.NORMAL, rgba)
+
+
         evbox.add(grid)
         grid.show()
         evbox.connect('focus-in-event', self._text_focus_in_cb)
