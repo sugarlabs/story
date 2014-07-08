@@ -64,14 +64,14 @@ class StoryActivity(activity.Activity):
         except dbus.exceptions.DBusException, e:
             _logger.error(str(e))
 
-        self.path = activity.get_bundle_path()
-        self.datapath = os.path.join(activity.get_activity_root(), 'instance')
+        self._path = activity.get_bundle_path()
+        self._datapath = os.path.join(activity.get_activity_root(), 'instance')
 
-        self.nick = profile.get_nick_name()
+        self._nick = profile.get_nick_name()
         if profile.get_color() is not None:
-            self.colors = profile.get_color().to_string().split(',')
+            self._colors = profile.get_color().to_string().split(',')
         else:
-            self.colors = ['#A0FFA0', '#FF8080']
+            self._colors = ['#A0FFA0', '#FF8080']
 
         self._old_cursor = self.get_window().get_cursor()
 
@@ -83,43 +83,43 @@ class StoryActivity(activity.Activity):
         self._setup_toolbars()
         self._setup_dispatch_table()
 
-        self.fixed = Gtk.Fixed()
-        self.fixed.connect('size-allocate', self._fixed_resize_cb)
-        self.fixed.show()
-        self.set_canvas(self.fixed)
+        self._fixed = Gtk.Fixed()
+        self._fixed.connect('size-allocate', self._fixed_resize_cb)
+        self._fixed.show()
+        self.set_canvas(self._fixed)
 
-        self.vbox = Gtk.VBox(False, 0)
-        self.vbox.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
+        self._vbox = Gtk.VBox(False, 0)
+        self._vbox.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
 
-        self.fixed.put(self.vbox, 0, 0)
-        self.vbox.show()
+        self._fixed.put(self._vbox, 0, 0)
+        self._vbox.show()
 
         self._canvas = Gtk.DrawingArea()
         self._canvas.set_size_request(int(Gdk.Screen.width()),
                                       int(Gdk.Screen.height()))
         self._canvas.show()
-        self.show_all()
-        self.vbox.pack_end(self._canvas, True, True, 0)
-        self.vbox.show()
 
-        self.entry = Gtk.TextView()
-        self.entry.set_wrap_mode(Gtk.WrapMode.WORD)
-        self.entry.set_pixels_above_lines(0)
-        self.entry.set_size_request(
+        self._vbox.pack_end(self._canvas, True, True, 0)
+        self._vbox.show()
+
+        self._entry = Gtk.TextView()
+        self._entry.set_wrap_mode(Gtk.WrapMode.WORD)
+        self._entry.set_pixels_above_lines(0)
+        self._entry.set_size_request(
             Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE -
             2 * style.DEFAULT_SPACING,
             style.GRID_CELL_SIZE * 3 - 2 * style.DEFAULT_SPACING)
         font_desc = Pango.font_description_from_string('14')
-        self.entry.modify_font(font_desc)
-        self.text_buffer = self.entry.get_buffer() 
+        self._entry.modify_font(font_desc)
+        self.text_buffer = self._entry.get_buffer() 
         self.text_buffer.set_text(PLACEHOLDER)
-        self.entry.connect('focus-in-event', self._text_focus_in_cb)
-        self.entry.connect('focus-out-event', self._text_focus_out_cb)
+        self._entry.connect('focus-in-event', self._text_focus_in_cb)
+        self._entry.connect('focus-out-event', self._text_focus_out_cb)
 
         self._grid = Gtk.Grid()
         self._grid.set_border_width(style.DEFAULT_PADDING)
-        self._grid.attach(self.entry, 0, 0, 1, 1)
-        self.entry.show()
+        self._grid.attach(self._entry, 0, 0, 1, 1)
+        self._entry.show()
 
         self._evbox = Gtk.EventBox()
         self._evbox.add(self._grid)
@@ -127,38 +127,38 @@ class StoryActivity(activity.Activity):
         self._evbox.connect('focus-in-event', self._text_focus_in_cb)
         self._evbox.connect('focus-out-event', self._text_focus_out_cb)
 
-        self.scrolled_window = Gtk.ScrolledWindow()
-        self.scrolled_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        self.scrolled_window.set_size_request(
+        self._scrolled_window = Gtk.ScrolledWindow()
+        self._scrolled_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        self._scrolled_window.set_size_request(
             Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
-        self.scrolled_window.set_policy(Gtk.PolicyType.NEVER,
+        self._scrolled_window.set_policy(Gtk.PolicyType.NEVER,
                                    Gtk.PolicyType.AUTOMATIC)
         rgba = Gdk.RGBA()
         rgba.red, rgba.green, rgba.blue, rgba.alpha = 1., 1., 1., 1.
-        self.scrolled_window.override_background_color(
+        self._scrolled_window.override_background_color(
             Gtk.StateFlags.NORMAL, rgba)
 
-        vadj = self.scrolled_window.get_vadjustment()
+        vadj = self._scrolled_window.get_vadjustment()
         vadj.connect('changed', self._scroll_changed_cb)
-        self.scrolled_window.add_with_viewport(self._evbox)
+        self._scrolled_window.add_with_viewport(self._evbox)
         self._evbox.show()
 
-        self.fixed.put(self.scrolled_window, 2 * style.GRID_CELL_SIZE,
+        self._fixed.put(self._scrolled_window, 2 * style.GRID_CELL_SIZE,
                        style.DEFAULT_SPACING)
-        self.scrolled_window.show()
-        self.fixed.show()
+        self._scrolled_window.show()
+        self._fixed.show()
 
-        self._game = Game(self._canvas, parent=self, path=self.path,
-                          root=activity.get_bundle_path(), colors=self.colors)
+        self._game = Game(self._canvas, parent=self, path=self._path,
+                          root=activity.get_bundle_path(), colors=self._colors)
         self._setup_presence_service()
 
         if 'mode' in self.metadata:
             self._game.set_mode(self.metadata['mode'])
             if self.metadata['mode'] == 'array':
-                self.array_button.set_active(True)
+                self._array_button.set_active(True)
             else:
-                self.linear_button.set_active(True)
+                self._linear_button.set_active(True)
 
         if 'uid' in self.metadata:
             self._uid = self.metadata['uid']
@@ -178,8 +178,8 @@ class StoryActivity(activity.Activity):
     def _configure_cb(self, event):
         self._canvas.set_size_request(int(Gdk.Screen.width()),
                                       int(Gdk.Screen.height()))
-        self.vbox.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
-        self.entry.set_size_request(
+        self._vbox.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
+        self._entry.set_size_request(
             Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE -
             2 * style.DEFAULT_SPACING,
             style.GRID_CELL_SIZE * 3 - 2 * style.DEFAULT_SPACING)
@@ -189,7 +189,7 @@ class StoryActivity(activity.Activity):
         self._evbox.set_size_request(
             Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
-        self.scrolled_window.set_size_request(
+        self._scrolled_window.set_size_request(
             Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
         self._game.configure()
@@ -214,7 +214,7 @@ class StoryActivity(activity.Activity):
     def _fixed_resize_cb(self, widget=None, rect=None):
         ''' If a toolbar opens or closes, we need to resize the vbox
         holding out scrolling window. '''
-        self.vbox.set_size_request(rect.width, rect.height)
+        self._vbox.set_size_request(rect.width, rect.height)
 
     def _text_focus_in_cb(self, widget=None, event=None):
         bounds = self.text_buffer.get_bounds()
@@ -290,13 +290,13 @@ class StoryActivity(activity.Activity):
             'view-refresh', self.toolbar, self._new_game_cb,
             tooltip=_('Load new images.'))
 
-        self.array_button = radio_factory(
+        self._array_button = radio_factory(
             'array', self.toolbar, self._array_cb,
             tooltip=_('View images all at once.'), group=None)
 
-        self.linear_button = radio_factory(
+        self._linear_button = radio_factory(
             'linear', self.toolbar, self._linear_cb,
-            tooltip=_('View images one at a time.'), group=self.array_button)
+            tooltip=_('View images one at a time.'), group=self._array_button)
 
         separator_factory(self.toolbar)
 
@@ -392,12 +392,12 @@ class StoryActivity(activity.Activity):
         GObject.idle_add(self._save_as_pdf)
 
     def _save_as_pdf(self):
-        file_path = os.path.join(self.datapath, 'output.pdf')
+        file_path = os.path.join(self._datapath, 'output.pdf')
         if 'description' in self.metadata:
-            save_pdf(self, file_path, self.nick,
+            save_pdf(self, file_path, self._nick,
                      description=self.metadata['desciption'])
         else:
-            save_pdf(self, file_path, self.nick)
+            save_pdf(self, file_path, self._nick)
 
         dsobject = datastore.create()
         dsobject.metadata['title'] = '%s %s' % \
@@ -427,7 +427,7 @@ class StoryActivity(activity.Activity):
         else:
             target = '%s-%d' % (self._uid, self._game.current_image)
 
-        file_path = os.path.join(self.datapath, 'story.png')
+        file_path = os.path.join(self._datapath, 'story.png')
         png_surface = self._game.export()
         png_surface.write_to_png(file_path)
 
@@ -475,7 +475,7 @@ class StoryActivity(activity.Activity):
         if self.recording:  # Stop recording if we happen to be recording
             self.record_cb()
 
-        path = os.path.join(self.datapath, 'output.ogg')
+        path = os.path.join(self._datapath, 'output.ogg')
         if self._uid is not None:
             dsobject = self._search_for_audio_note(self._uid)
             if dsobject is not None:
@@ -486,7 +486,7 @@ class StoryActivity(activity.Activity):
 
     def _save_recording(self):
         self.metadata['dirty'] = 'True'  # So we know that we've done work
-        if os.path.exists(os.path.join(self.datapath, 'output.ogg')):
+        if os.path.exists(os.path.join(self._datapath, 'output.ogg')):
             _logger.debug('Saving recording to Journal...')
             if self._uid is None:
                 self._uid = generate_uid()
@@ -507,8 +507,8 @@ class StoryActivity(activity.Activity):
             if self._uid is not None:
                 dsobject.metadata['tags'] = target
             _logger.debug('setting file path to %s' %
-                          (os.path.join(self.datapath, 'output.ogg')))
-            dsobject.set_file_path(os.path.join(self.datapath, 'output.ogg'))
+                          (os.path.join(self._datapath, 'output.ogg')))
+            dsobject.set_file_path(os.path.join(self._datapath, 'output.ogg'))
             datastore.write(dsobject)
             dsobject.destroy()
 

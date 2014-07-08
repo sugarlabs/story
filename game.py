@@ -95,15 +95,6 @@ class Game():
 
         size = 3 * self._dot_size + 4 * self._space
         x = int((Gdk.Screen.width() - size) / 2.)
-        '''
-        self._my_canvas = Sprite(
-            self._sprites, x, self._yoff + self._space,
-            svg_str_to_pixbuf(genblank(
-                size, size, ('#FFFFFF', '#FFFFFF'))))
-        self._my_canvas.set_layer(-1)
-        self._my_canvas.type = 'background'
-        '''
-
         self._dots = []
         self._Dots = []  # larger dots for linear mode
         X = int((Gdk.Screen.width() - self._dot_size * 3) / 2.)
@@ -204,7 +195,10 @@ class Game():
         self._width = Gdk.Screen.width()
         self._height = Gdk.Screen.height() - style.GRID_CELL_SIZE
         if not move:
-            self._scale = self._height / (3 * DOT_SIZE * 1.2)
+            if self._height < self._width:
+                self._scale = self._height / (3 * DOT_SIZE * 1.2)
+            else:
+                self._scale = self._width / (3 * DOT_SIZE * 1.2)
             self._scale /= 1.5
             self._dot_size = int(DOT_SIZE * self._scale)
             self._yoff = style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING
