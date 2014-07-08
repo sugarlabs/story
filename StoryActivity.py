@@ -125,7 +125,6 @@ class StoryActivity(activity.Activity):
         evbox.override_background_color(
             Gtk.StateFlags.NORMAL, rgba)
 
-
         evbox.add(grid)
         grid.show()
         evbox.connect('focus-in-event', self._text_focus_in_cb)
@@ -186,6 +185,7 @@ class StoryActivity(activity.Activity):
         text = self.text_buffer.get_text(bounds[0], bounds[1], True)
         if text == PLACEHOLDER or text == PLACEHOLDER2:
             self.text_buffer.set_text('')
+        self._game.set_save_icon_state(True)
 
     def _text_focus_out_cb(self, widget=None, event=None):
         self.save_text_cb()
@@ -196,25 +196,36 @@ class StoryActivity(activity.Activity):
         if self._game.get_mode() == 'array':
             if text != PLACEHOLDER:
                 self.metadata['text'] = text
+                self._game.set_save_icon_state(True)
+            else:
+                self._game.set_save_icon_state(False)
         else:
             if text != PLACEHOLDER and text != PLACEHOLDER2:
                 key = 'text-%d' % self._game.current_image
                 self.metadata[key] = text
+                self._game.set_save_icon_state(True)
+            else:
+                self._game.set_save_icon_state(False)
 
     def check_text_status(self):
         if self._game.get_mode() == 'array':
             if 'text' in self.metadata:
                 self.text_buffer.set_text(self.metadata['text'])
+                self._game.set_save_icon_state(True)
             else:
                 self.text_buffer.set_text(PLACEHOLDER)
+                self._game.set_save_icon_state(False)
         else:
             key = 'text-%d' % self._game.current_image
             if key in self.metadata:
                 self.text_buffer.set_text(self.metadata[key])
+                self._game.set_save_icon_state(True)
             elif self._game.current_image == 0:
                 self.text_buffer.set_text(PLACEHOLDER)
+                self._game.set_save_icon_state(False)
             else:
                 self.text_buffer.set_text(PLACEHOLDER2)
+                self._game.set_save_icon_state(False)
 
     def check_audio_status(self):
         if self._search_for_audio_note(self._uid):

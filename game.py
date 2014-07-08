@@ -42,6 +42,8 @@ RECORD_OFF = 0
 RECORD_ON = 1
 PLAY_OFF = 0
 PLAY_ON = 1
+SAVE_OFF = 0
+SAVE_ON = 1
 
 DOT_SIZE = 40
 COLORS = ['#000000', '#a00000', '#907000', '#009000', '#0000ff', '#9000a0']
@@ -138,10 +140,12 @@ class Game():
                     os.path.join(self._root, 'icons', icon + '.svg'),
                     style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
 
-        # TO DO: Save Inactive
-        save_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-            os.path.join(self._root, 'icons', 'save.svg'),
-            style.GRID_CELL_SIZE, style.GRID_CELL_SIZE)
+        self._save_pixbufs = []
+        for icon in ['save-inactive', 'save']:
+            self._save_pixbufs.append(
+                GdkPixbuf.Pixbuf.new_from_file_at_size(
+                    os.path.join(self._root, 'icons', icon + '.svg'),
+                    style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
 
         left = style.GRID_CELL_SIZE
         right = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
@@ -160,9 +164,10 @@ class Game():
         self._play.set_layer(1)
         self._play.type = 'play-inactive'
 
-        self._save = Sprite(self._sprites, right, y2, save_pixbuf)
+        self._save = Sprite(self._sprites, right, y2,
+                            self._save_pixbufs[SAVE_OFF])
         self._save.set_layer(1)
-        self._save.type = 'save'
+        self._save.type = 'save-inactive'
 
         self._next_prev_pixbufs = []
         for icon in ['go-previous', 'go-next', 'go-previous-inactive',
@@ -186,6 +191,15 @@ class Game():
         if self._mode == 'array':
             self._next.hide()
         
+    def set_save_icon_state(self, state):
+        if state:
+            self._save.set_image(self._save_pixbufs[SAVE_ON])
+            self._save.type = 'save'
+        else:
+            self._save.set_image(self._save_pixbufs[SAVE_OFF])
+            self._save.type = 'save-inactive'
+        self._save.set_layer(1)
+
     def set_record_icon_state(self, state):
         if state:
             self._record.set_image(self._record_pixbufs[RECORD_ON])
