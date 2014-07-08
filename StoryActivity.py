@@ -73,6 +73,8 @@ class StoryActivity(activity.Activity):
         else:
             self.colors = ['#A0FFA0', '#FF8080']
 
+        self._old_cursor = self.get_window().get_cursor()
+
         self.recording = False
         self._grecord = None
         self._alert = None
@@ -170,6 +172,19 @@ class StoryActivity(activity.Activity):
             self.check_text_status()
         else:
             self._game.new_game()
+
+    def _restore_cursor(self):
+        ''' No longer waiting, so restore standard cursor. '''
+        if not hasattr(self, 'get_window'):
+            return
+        self.get_window().set_cursor(self._old_cursor)
+
+    def _waiting_cursor(self):
+        ''' Waiting, so set watch cursor. '''
+        if not hasattr(self, 'get_window'):
+            return
+        self._old_cursor = self.get_window().get_cursor()
+        self.get_window().set_cursor(Gdk.Cursor.new(Gdk.CursorType.WATCH))
 
     def _scroll_changed_cb(self, adj, scroll=None):
         '''Scroll the chat window to the bottom'''
@@ -296,12 +311,16 @@ class StoryActivity(activity.Activity):
     def _new_game_cb(self, button=None):
         ''' Start a new game. '''
         if 'dirty' in self.metadata:
-            alert = ConfirmationAlert()
-            alert.props.title = _('Do you really want to load new images?')
-            alert.props.msg = _('You have done work on this story.'
-                                ' Do you want to overwrite it?')
-            alert.connect('response', self._confirmation_alert_cb)
-            self.add_alert(alert)
+            if self._alert is not None:
+                self.remove_alert(self._alert)
+                self._alert = None
+            self._alert = ConfirmationAlert()
+            self._alert.props.title = \
+                _('Do you really want to load new images?')
+            self._alert.props.msg = _('You have done work on this story.'
+                                      ' Do you want to overwrite it?')
+            self._alert.connect('response', self._confirmation_alert_cb)
+            self.add_alert(self._alert)
         else:
             self._game.new_game()
 
@@ -347,7 +366,11 @@ class StoryActivity(activity.Activity):
         return None
 
     def _do_save_as_pdf_cb(self, button=None):
-        self._notify_successful_save(title=_('Save as pdf'))
+        self._waiting_cursor()
+        self._notify_successful_save(title=_('Save as PDF'))
+        GObject.idle_add(self._save_as_pdf)
+
+    def _save_as_pdf(self):
         file_path = os.path.join(self.datapath, 'output.pdf')
         if 'description' in self.metadata:
             save_pdf(self, file_path, self.nick,
@@ -364,12 +387,16 @@ class StoryActivity(activity.Activity):
         dsobject.set_file_path(file_path)
         datastore.write(dsobject)
         dsobject.destroy()
-        # os.remove(file_path)
-        if self._alert is not None:
-            self.remove_alert(self._alert)
-            self._alert = None
+        os.remove(file_path)
+
+        GObject.timeout_add(1000, self._remove_alert)
 
     def _do_save_as_image_cb(self, button=None):
+        self._waiting_cursor()
+        self._notify_successful_save(title=_('Save as image'))
+        GObject.idle_add(self._save_as_image)
+
+    def _save_as_image(self):
         ''' Grab the current canvas and save it to the Journal. '''
         if self._uid is None:
             self._uid = generate_uid()
@@ -379,7 +406,6 @@ class StoryActivity(activity.Activity):
         else:
             target = '%s-%d' % (self._uid, self._game.current_image)
 
-        self._notify_successful_save(title=_('Save as image'))
         file_path = os.path.join(self.datapath, 'story.png')
         png_surface = self._game.export()
         png_surface.write_to_png(file_path)
@@ -394,9 +420,8 @@ class StoryActivity(activity.Activity):
         datastore.write(dsobject)
         dsobject.destroy()
         os.remove(file_path)
-        if self._alert is not None:
-            self.remove_alert(self._alert)
-            self._alert = None
+
+        GObject.timeout_add(1000, self._remove_alert)
 
     def record_cb(self, button=None):
         ''' Start/stop audio recording '''
@@ -482,6 +507,12 @@ class StoryActivity(activity.Activity):
         self._alert.props.msg = msg
         self.add_alert(self._alert)
         self._alert.show()
+
+    def _remove_alert(self):
+        if self._alert is not None:
+            self.remove_alert(self._alert)
+            self._alert = None
+        self._restore_cursor()
 
     # Collaboration-related methods
 
