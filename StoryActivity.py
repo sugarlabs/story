@@ -16,6 +16,7 @@ from gi.repository import GObject
 from gi.repository import Pango
 
 import os
+import subprocess
 import time
 
 from sugar3.activity import activity
@@ -75,6 +76,7 @@ class StoryActivity(activity.Activity):
 
         self._old_cursor = self.get_window().get_cursor()
 
+        self.tablet_mode = _is_tablet_mode()
         self.recording = False
         self._grecord = None
         self._alert = None
@@ -144,8 +146,13 @@ class StoryActivity(activity.Activity):
         self._scrolled_window.add_with_viewport(self._evbox)
         self._evbox.show()
 
-        self._fixed.put(self._scrolled_window, 2 * style.GRID_CELL_SIZE,
-                       style.DEFAULT_SPACING)
+        if self.tablet_mode:
+            self._fixed.put(self._scrolled_window, 2 * style.GRID_CELL_SIZE,
+                            style.DEFAULT_SPACING)
+        else:
+            self._fixed.put(self._scrolled_window, 2 * style.GRID_CELL_SIZE,
+                            Gdk.Screen.height() - style.DEFAULT_SPACING -
+                            style.GRID_CELL_SIZE * 4)
         self._scrolled_window.show()
         self._fixed.show()
 
@@ -192,6 +199,13 @@ class StoryActivity(activity.Activity):
         self._scrolled_window.set_size_request(
             Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
+
+        if not self.tablet_mode:
+            self._fixed.move(
+                self._scrolled_window, 2 * style.GRID_CELL_SIZE,
+                Gdk.Screen.height() - style.DEFAULT_SPACING -
+                style.GRID_CELL_SIZE * 4)
+
         self._game.configure()
 
     def _restore_cursor(self):
@@ -689,3 +703,17 @@ def generate_uid():
     right = '%04x' % int(uniform(0, int(0xFFFF)))
     uid = '%s-%s' % (left, right)
     return uid.upper()
+
+
+def _is_tablet_mode():
+    if not os.path.exists('/dev/input/event4'):
+        return False
+    try:
+        output = subprocess.call(
+            ['evtest', '--query', '/dev/input/event4', 'EV_SW',
+             'SW_TABLET_MODE'])
+    except (OSError, subprocess.CalledProcessError):
+        return False
+    if str(output) == '10':
+        return True
+    return False

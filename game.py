@@ -80,16 +80,38 @@ class Game():
         # Generate the sprites we'll need...
         self._sprites = Sprites(self._canvas)
 
-        self._bg = Sprite(
-            self._sprites, 0, 0,
-            svg_str_to_pixbuf(genhole(
-                Gdk.Screen.width(),
-                Gdk.Screen.height(),
-                2 * style.GRID_CELL_SIZE,
-                style.DEFAULT_SPACING,
-                Gdk.Screen.width() - 3 * style.GRID_CELL_SIZE +
-                2 * style.DEFAULT_SPACING,
+        a = max(Gdk.Screen.width(), Gdk.Screen.height())
+        b = min(Gdk.Screen.width(), Gdk.Screen.height())
+        self._bg_pixbufs = []
+        if self._parent.tablet_mode:  # text on top
+            # landscape
+            self._bg_pixbufs.append(svg_str_to_pixbuf(genhole(
+                a, a, 2 * style.GRID_CELL_SIZE, style.DEFAULT_SPACING,
+                a - 3 * style.GRID_CELL_SIZE + 2 * style.DEFAULT_SPACING,
                 style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING)))
+            # portrait
+            self._bg_pixbufs.append(svg_str_to_pixbuf(genhole(
+                a, a, 2 * style.GRID_CELL_SIZE, style.DEFAULT_SPACING,
+                b - 3 * style.GRID_CELL_SIZE + 2 * style.DEFAULT_SPACING,
+                style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING)))
+        else:  # text on bottom
+            # landscape
+            self._bg_pixbufs.append(svg_str_to_pixbuf(genhole(
+                a, a, 2 * style.GRID_CELL_SIZE,
+                b - style.GRID_CELL_SIZE * 4 - style.DEFAULT_SPACING,
+                a - 3 * style.GRID_CELL_SIZE + 2 * style.DEFAULT_SPACING,
+                b - style.GRID_CELL_SIZE - style.DEFAULT_SPACING)))
+            # portrait
+            self._bg_pixbufs.append(svg_str_to_pixbuf(genhole(
+                a, a, 2 * style.GRID_CELL_SIZE,
+                a - style.GRID_CELL_SIZE * 4 - style.DEFAULT_SPACING,
+                b - 3 * style.GRID_CELL_SIZE + 2 * style.DEFAULT_SPACING,
+                a - style.GRID_CELL_SIZE - style.DEFAULT_SPACING)))
+
+        if Gdk.Screen.width() > Gdk.Screen.height():
+            self._bg = Sprite(self._sprites, 0, 0, self._bg_pixbufs[0])
+        else:
+            self._bg = Sprite(self._sprites, 0, 0, self._bg_pixbufs[1])
         self._bg.set_layer(-2)
         self._bg.type = 'background'
 
@@ -99,7 +121,10 @@ class Game():
         self._Dots = []  # larger dots for linear mode
         X = int((Gdk.Screen.width() - self._dot_size * 3) / 2.)
         Y = style.GRID_CELL_SIZE + self._yoff
-        yoffset = self._space * 2 + self._yoff
+        if self._parent.tablet_mode:
+            yoffset = self._space * 2 + self._yoff
+        else:
+            yoffset = self._yoff
         for y in range(3):
             for x in range(3):
                 xoffset = int((self._width - 3 * self._dot_size -
@@ -152,6 +177,12 @@ class Game():
         y0 = style.DEFAULT_SPACING
         y1 = y0 + style.GRID_CELL_SIZE
         y2 = y1 + style.GRID_CELL_SIZE
+        if not self._parent.tablet_mode:
+            dy = Gdk.Screen.height() - 4 * style.GRID_CELL_SIZE - \
+                 2 * style.DEFAULT_SPACING
+            y0 += dy
+            y1 += dy
+            y2 += dy
         y3 = int((Gdk.Screen.height() - 2 * style.GRID_CELL_SIZE) / 2)
 
         self._record = Sprite(self._sprites, right, y0,
@@ -201,7 +232,10 @@ class Game():
                 self._scale = self._width / (3 * DOT_SIZE * 1.2)
             self._scale /= 1.5
             self._dot_size = int(DOT_SIZE * self._scale)
-            self._yoff = style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING
+            if self._parent.tablet_mode:  # text on top
+                self._yoff = style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING
+            else:
+                self._yoff = style.DEFAULT_SPACING
             self._space = int(self._dot_size / 5.)
             return
 
@@ -210,6 +244,12 @@ class Game():
         y0 = style.DEFAULT_SPACING
         y1 = y0 + style.GRID_CELL_SIZE
         y2 = y1 + style.GRID_CELL_SIZE
+        if not self._parent.tablet_mode:
+            dy = Gdk.Screen.height() - 4 * style.GRID_CELL_SIZE - \
+                 2 * style.DEFAULT_SPACING
+            y0 += dy
+            y1 += dy
+            y2 += dy
         y3 = int((Gdk.Screen.height() - 2 * style.GRID_CELL_SIZE) / 2)
         self._record.move((right, y0))
         self._play.move((right, y1))
@@ -220,7 +260,10 @@ class Game():
         # Move the dots
         X = int((Gdk.Screen.width() - self._dot_size * 3) / 2.)
         Y = style.GRID_CELL_SIZE + self._yoff
-        yoffset = self._space * 2 + self._yoff
+        if self._parent.tablet_mode:
+            yoffset = self._space * 2 + self._yoff
+        else:
+            yoffset = self._yoff
         for y in range(3):
             for x in range(3):
                 xoffset = int((self._width - 3 * self._dot_size -
@@ -230,20 +273,12 @@ class Game():
                            y * (self._dot_size + self._space) + yoffset))
                 self._Dots[x + y * 3].move((X, Y))
 
-        # Regenerate the bg sprite
-        self._bg.hide()
-        self._bg = Sprite(
-            self._sprites, 0, 0,
-            svg_str_to_pixbuf(genhole(
-                Gdk.Screen.width(),
-                Gdk.Screen.height(),
-                2 * style.GRID_CELL_SIZE,
-                style.DEFAULT_SPACING,
-                Gdk.Screen.width() - 3 * style.GRID_CELL_SIZE +
-                2 * style.DEFAULT_SPACING,
-                style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING)))
+        # switch orientation the bg sprite
+        if Gdk.Screen.width() > Gdk.Screen.height():
+            self._bg.set_image(self._bg_pixbufs[0])
+        else:
+            self._bg.set_image(self._bg_pixbufs[1])
         self._bg.set_layer(-2)
-        self._bg.type = 'background'
 
     def set_speak_icon_state(self, state):
         if state:
