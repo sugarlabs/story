@@ -6,6 +6,7 @@ ENHANCEMENT:
 * Add text-to-speech
 * Add export to PDF
 * Add support for screen rotation
+* Add gesture support for navigating images
 
 BUG_FIX:
 * Add missing PATH for setting up collaboration chattube
