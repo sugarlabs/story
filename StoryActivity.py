@@ -66,7 +66,7 @@ class StoryActivity(activity.Activity):
             _logger.error(str(e))
 
         self._path = activity.get_bundle_path()
-        self._datapath = os.path.join(activity.get_activity_root(), 'instance')
+        self.datapath = os.path.join(activity.get_activity_root(), 'instance')
 
         self._nick = profile.get_nick_name()
         if profile.get_color() is not None:
@@ -411,7 +411,7 @@ class StoryActivity(activity.Activity):
         GObject.idle_add(self._save_as_pdf)
 
     def _save_as_pdf(self):
-        file_path = os.path.join(self._datapath, 'output.pdf')
+        file_path = os.path.join(self.datapath, 'output.pdf')
         if 'description' in self.metadata:
             save_pdf(self, file_path, self._nick,
                      description=self.metadata['desciption'])
@@ -446,7 +446,7 @@ class StoryActivity(activity.Activity):
         else:
             target = '%s-%d' % (self._uid, self._game.current_image)
 
-        file_path = os.path.join(self._datapath, 'story.png')
+        file_path = os.path.join(self.datapath, 'story.png')
         png_surface = self._game.export()
         png_surface.write_to_png(file_path)
 
@@ -494,18 +494,18 @@ class StoryActivity(activity.Activity):
         if self.recording:  # Stop recording if we happen to be recording
             self.record_cb()
 
-        path = os.path.join(self._datapath, 'output.ogg')
+        path = os.path.join(self.datapath, 'output.ogg')
         if self._uid is not None:
             dsobject = self._search_for_audio_note(self._uid)
             if dsobject is not None:
                 path = dsobject.file_path
         _logger.debug('Playback current recording from %s.' % (path))
         play_audio_from_file(path)
-        return
+        _logger.debug('Finished playing current recording from %s.' % (path))
 
     def _save_recording(self):
         self.metadata['dirty'] = 'True'  # So we know that we've done work
-        if os.path.exists(os.path.join(self._datapath, 'output.ogg')):
+        if os.path.exists(os.path.join(self.datapath, 'output.ogg')):
             _logger.debug('Saving recording to Journal...')
             if self._uid is None:
                 self._uid = generate_uid()
@@ -526,8 +526,8 @@ class StoryActivity(activity.Activity):
             if self._uid is not None:
                 dsobject.metadata['tags'] = target
             _logger.debug('setting file path to %s' %
-                          (os.path.join(self._datapath, 'output.ogg')))
-            dsobject.set_file_path(os.path.join(self._datapath, 'output.ogg'))
+                          (os.path.join(self.datapath, 'output.ogg')))
+            dsobject.set_file_path(os.path.join(self.datapath, 'output.ogg'))
             datastore.write(dsobject)
             dsobject.destroy()
 
