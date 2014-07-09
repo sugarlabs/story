@@ -59,14 +59,22 @@ class Game():
         self._root = root
         self._mode = mode
         self.current_image = 0
+        self.prev_mouse_pos = (0, 0)
 
         self._colors = ['#FFFFFF']
         self._colors.append(colors[0])
         self._colors.append(colors[1])
 
-        self._canvas.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
+        self._canvas.add_events(
+            Gdk.EventMask.BUTTON_PRESS_MASK |
+            Gdk.EventMask.BUTTON_RELEASE_MASK |
+            Gdk.EventMask.BUTTON_MOTION_MASK |
+            Gdk.EventMask.POINTER_MOTION_MASK |
+            Gdk.EventMask.POINTER_MOTION_HINT_MASK |
+            Gdk.EventMask.TOUCH_MASK)
+
         self._canvas.connect('draw', self.__draw_cb)
-        self._canvas.connect('button-press-event', self._button_press_cb)
+        self._canvas.connect('event', self.__event_cb)
 
         self.configure(move=False)
         self.we_are_sharing = False
@@ -305,60 +313,92 @@ class Game():
             self._play.type = 'play-inactive'
         self._play.set_layer(1)
 
-    def _button_press_cb(self, win, event):
-        ''' The mouse button was pressed. Is it on a sprite? '''
-        x, y = map(int, event.get_coords())
+    def __event_cb(self, win, event):
+        ''' The mouse button was pressed. Is it on a sprite? or
+            there was a gesture. '''
 
-        spr = self._sprites.find_sprite((x, y))
-        if spr is not None:
-            if spr.type in ['record', 'play', 'play-inactive', 'speak',
-                            'speak-inactive']:
-                if spr.type == 'record':
+        left = right = False
+
+        if event.type in (Gdk.EventType.TOUCH_BEGIN,
+                          Gdk.EventType.TOUCH_CANCEL,
+                          Gdk.EventType.TOUCH_END,
+                          Gdk.EventType.BUTTON_PRESS,
+                          Gdk.EventType.BUTTON_RELEASE):
+            x = int(event.get_coords()[1])
+            y = int(event.get_coords()[2])
+
+            # logging.error('event x %d y %d type %s', x, y, event.type)
+            if event.type in (Gdk.EventType.TOUCH_BEGIN,
+                              Gdk.EventType.BUTTON_PRESS):
+                self.prev_mouse_pos = (x, y)
+            elif event.type in (Gdk.EventType.TOUCH_END,
+                                Gdk.EventType.BUTTON_RELEASE):
+
+                new_mouse_pos = (x, y)
+                mouse_movement = (new_mouse_pos[0] - self.prev_mouse_pos[0],
+                                  new_mouse_pos[1] - self.prev_mouse_pos[1])
+
+                # horizontal gestures only
+                if (abs(mouse_movement[0]) / 5) > abs(mouse_movement[1]):
+                    if abs(mouse_movement[0]) > abs(mouse_movement[1]):
+                        if mouse_movement[0] > 0:
+                            right = True
+                        else:
+                            left = True
+
+        if event.type in (Gdk.EventType.TOUCH_END,
+                          Gdk.EventType.BUTTON_RELEASE):
+            spr = self._sprites.find_sprite((x, y))
+            if left or right or spr is not None:
+                if spr.type in ['record', 'play', 'play-inactive', 'speak',
+                                'speak-inactive']:
+                    if spr.type == 'record':
+                        self._parent.record_cb()
+                    elif spr.type == 'play':
+                        self._parent.playback_recording_cb()
+                    elif spr.type == 'speak':
+                        bounds = self._parent.text_buffer.get_bounds()
+                        text = self._parent.text_buffer.get_text(
+                            bounds[0], bounds[1], True)
+                        speak(text)
+                    return
+                elif self._mode == 'array':
+                    return
+
+                self._parent.speak_text_cb()
+
+                if self._parent.recording:
                     self._parent.record_cb()
-                elif spr.type == 'play':
-                    self._parent.playback_recording_cb()
-                elif spr.type == 'speak':
-                    bounds = self._parent.text_buffer.get_bounds()
-                    text = self._parent.text_buffer.get_text(
-                        bounds[0], bounds[1], True)
-                    speak(text)
-                return
-            elif self._mode == 'array':
-                return
 
-            self._parent.speak_text_cb()
-
-            if self._parent.recording:
-                self._parent.record_cb()
-
-            if spr.type == 'prev' and self.current_image > 0:
-                self._Dots[self.current_image].hide()
-                self.current_image -= 1
-                self._Dots[self.current_image].set_layer(100)
-                if self.current_image == 0:
-                    self._prev.set_image(
-                        self._next_prev_pixbufs[PREV_INACTIVE])
-                self._next.set_image(self._next_prev_pixbufs[NEXT])
-            elif spr.type == 'next' and self.current_image < 8:
-                self._Dots[self.current_image].hide()
-                self.current_image += 1
-                self._Dots[self.current_image].set_layer(100)
-                if self.current_image == 8:
-                    self._next.set_image(
-                        self._next_prev_pixbufs[NEXT_INACTIVE])
-                self._prev.set_image(self._next_prev_pixbufs[PREV])
-            elif spr.type not in ['prev', 'background'] and \
-                 self.current_image < 8:
-                self._Dots[self.current_image].hide()
-                self.current_image += 1
-                self._Dots[self.current_image].set_layer(100)
-                if self.current_image == 8:
-                    self._next.set_image(self._next_prev_pixbufs[NEXT_INACTIVE])
-                self._prev.set_image(self._next_prev_pixbufs[PREV])
-            self._parent.check_audio_status()
-            self._parent.check_text_status()
-            self._prev.set_layer(1)
-            self._next.set_layer(1)
+                if (left or spr.type == 'prev') and self.current_image > 0:
+                    self._Dots[self.current_image].hide()
+                    self.current_image -= 1
+                    self._Dots[self.current_image].set_layer(100)
+                    if self.current_image == 0:
+                        self._prev.set_image(
+                            self._next_prev_pixbufs[PREV_INACTIVE])
+                    self._next.set_image(self._next_prev_pixbufs[NEXT])
+                elif (right or spr.type == 'next') and self.current_image < 8:
+                    self._Dots[self.current_image].hide()
+                    self.current_image += 1
+                    self._Dots[self.current_image].set_layer(100)
+                    if self.current_image == 8:
+                        self._next.set_image(
+                            self._next_prev_pixbufs[NEXT_INACTIVE])
+                    self._prev.set_image(self._next_prev_pixbufs[PREV])
+                elif spr.type not in ['prev', 'background'] and \
+                     self.current_image < 8:
+                    self._Dots[self.current_image].hide()
+                    self.current_image += 1
+                    self._Dots[self.current_image].set_layer(100)
+                    if self.current_image == 8:
+                        self._next.set_image(
+                            self._next_prev_pixbufs[NEXT_INACTIVE])
+                    self._prev.set_image(self._next_prev_pixbufs[PREV])
+                self._parent.check_audio_status()
+                self._parent.check_text_status()
+                self._prev.set_layer(1)
+                self._next.set_layer(1)
         return False
 
     def get_mode(self):
