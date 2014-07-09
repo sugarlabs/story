@@ -7,6 +7,7 @@ ENHANCEMENT:
 * Add export to PDF
 * Add support for screen rotation
 * Add gesture support for navigating images
+* Add autoplay
 
 BUG_FIX:
 * Add missing PATH for setting up collaboration chattube

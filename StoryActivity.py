@@ -164,6 +164,7 @@ class StoryActivity(activity.Activity):
             self._game.set_mode(self.metadata['mode'])
             if self.metadata['mode'] == 'array':
                 self._array_button.set_active(True)
+                self.autoplay_button.set_sensitive(False)
             else:
                 self._linear_button.set_active(True)
 
@@ -237,6 +238,8 @@ class StoryActivity(activity.Activity):
             self.text_buffer.set_text('')
         self.metadata['dirty'] = 'True'
         self._game.set_speak_icon_state(True)
+        if self._game.playing:
+            self._game.stop()
 
     def _text_focus_out_cb(self, widget=None, event=None):
         self.speak_text_cb()
@@ -307,15 +310,19 @@ class StoryActivity(activity.Activity):
 
         self._new_game_button_h = button_factory(
             'view-refresh', self.toolbar, self._new_game_cb,
-            tooltip=_('Load new images.'))
+            tooltip=_('Load new images'))
 
         self._array_button = radio_factory(
             'array', self.toolbar, self._array_cb,
-            tooltip=_('View images all at once.'), group=None)
+            tooltip=_('View images all at once'), group=None)
 
         self._linear_button = radio_factory(
             'linear', self.toolbar, self._linear_cb,
-            tooltip=_('View images one at a time.'), group=self._array_button)
+            tooltip=_('View images one at a time'), group=self._array_button)
+
+        self.autoplay_button = button_factory(
+            'media-playback-start', self.toolbar, self._do_autoplay_cb,
+            tooltip=_('Play'))
 
         separator_factory(self.toolbar)
 
@@ -334,9 +341,18 @@ class StoryActivity(activity.Activity):
         toolbox.toolbar.insert(stop_button, -1)
         stop_button.show()
 
+    def _do_autoplay_cb(self, button=None):
+        if self._game.playing:
+            self._game.stop()
+        else:
+            self.autoplay_button.set_icon_name('media-playback-pause')
+            self.autoplay_button.set_tooltip(_('Pause'))
+            self._game.autoplay()
+
     def _array_cb(self, button=None):
         self.speak_text_cb()
         self._game.set_mode('array')
+        self.autoplay_button.set_sensitive(False)
         if self._uid is not None:
             self.check_audio_status()
             self.check_text_status()
@@ -344,6 +360,7 @@ class StoryActivity(activity.Activity):
     def _linear_cb(self, button=None):
         self.speak_text_cb()
         self._game.set_mode('linear')
+        self.autoplay_button.set_sensitive(True)
         if self._uid is not None:
             self.check_audio_status()
             self.check_text_status()

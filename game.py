@@ -13,10 +13,14 @@
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 from gi.repository import Gdk, GdkPixbuf, Gtk, GObject
+
 import cairo
 import os
 import glob
+import time
 from random import uniform
+
+from gettext import gettext as _
 
 import logging
 _logger = logging.getLogger('story-activity')
@@ -59,7 +63,10 @@ class Game():
         self._root = root
         self._mode = mode
         self.current_image = 0
-        self.prev_mouse_pos = (0, 0)
+        self.playing = False
+        self._timeout_id = None
+        self._prev_mouse_pos = (0, 0)
+        self._start_time = 0
 
         self._colors = ['#FFFFFF']
         self._colors.append(colors[0])
@@ -313,6 +320,55 @@ class Game():
             self._play.type = 'play-inactive'
         self._play.set_layer(1)
 
+    def autoplay(self):
+        self.set_mode('linear')  # forces current image to 0
+        self.playing = True
+        self._autonext(next=False)
+
+    def stop(self):
+        self.playing = False
+        self._parent.autoplay_button.set_icon_name('media-playback-start')
+        self._parent.autoplay_button.set_tooltip(_('Play'))
+
+    def _autonext(self, next=True):
+        if not self.playing:
+            return
+        if next:
+            self._Dots[self.current_image].hide()
+            self.current_image += 1
+            self._Dots[self.current_image].set_layer(100)
+            if self.current_image == 8:
+                self._next.set_image(
+                    self._next_prev_pixbufs[NEXT_INACTIVE])
+            self._prev.set_image(self._next_prev_pixbufs[PREV])
+        self._parent.check_audio_status()
+        self._parent.check_text_status()
+        logging.debug('autoplay %d' % self.current_image)
+        GObject.idle_add(self._play_sound)
+
+    def _play_sound(self):
+        start_time = time.time()
+
+        # Either play back a recording or speak the text
+        if self._play.type == 'play':
+            self._parent.playback_recording_cb()
+        elif self._speak.type == 'speak':
+            bounds = self._parent.text_buffer.get_bounds()
+            text = self._parent.text_buffer.get_text(
+                bounds[0], bounds[1], True)
+            speak(text)
+
+        accumulated_time = int(time.time() - start_time)
+        if accumulated_time < 5:
+            pause = 5 - accumulated_time
+        else:
+            pause = 1
+        if self.playing and self.current_image < 8:
+            self._timeout_id = GObject.timeout_add(pause * 1000,
+                                                   self._autonext)
+        else:
+            self.stop()
+
     def __event_cb(self, win, event):
         ''' The mouse button was pressed. Is it on a sprite? or
             there was a gesture. '''
@@ -324,19 +380,23 @@ class Game():
                           Gdk.EventType.TOUCH_END,
                           Gdk.EventType.BUTTON_PRESS,
                           Gdk.EventType.BUTTON_RELEASE):
+
+            if self.playing:
+                self.stop()
+
             x = int(event.get_coords()[1])
             y = int(event.get_coords()[2])
 
             # logging.error('event x %d y %d type %s', x, y, event.type)
             if event.type in (Gdk.EventType.TOUCH_BEGIN,
                               Gdk.EventType.BUTTON_PRESS):
-                self.prev_mouse_pos = (x, y)
+                self._prev_mouse_pos = (x, y)
             elif event.type in (Gdk.EventType.TOUCH_END,
                                 Gdk.EventType.BUTTON_RELEASE):
 
                 new_mouse_pos = (x, y)
-                mouse_movement = (new_mouse_pos[0] - self.prev_mouse_pos[0],
-                                  new_mouse_pos[1] - self.prev_mouse_pos[1])
+                mouse_movement = (new_mouse_pos[0] - self._prev_mouse_pos[0],
+                                  new_mouse_pos[1] - self._prev_mouse_pos[1])
 
                 # horizontal gestures only
                 if (abs(mouse_movement[0]) / 5) > abs(mouse_movement[1]):
