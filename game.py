@@ -340,7 +340,9 @@ class Game():
             if self.current_image == 8:
                 self._next.set_image(
                     self._next_prev_pixbufs[NEXT_INACTIVE])
+                self._next.set_layer(1)
             self._prev.set_image(self._next_prev_pixbufs[PREV])
+            self._prev.set_layer(1)
         self._parent.check_audio_status()
         self._parent.check_text_status()
         logging.debug('autoplay %d' % self.current_image)
