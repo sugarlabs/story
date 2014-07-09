@@ -327,12 +327,17 @@ class Game():
 
     def stop(self):
         self.playing = False
+        if self._timeout_id is not None:
+            GObject.source_remove(self._timeout_id)
+            self._timeout_id = None
         self._parent.autoplay_button.set_icon_name('media-playback-start')
         self._parent.autoplay_button.set_tooltip(_('Play'))
 
     def _autonext(self, next=True):
+        self._timeout_id = None
         if not self.playing:
             return
+
         if next:
             self._Dots[self.current_image].hide()
             self.current_image += 1
