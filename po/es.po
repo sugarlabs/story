@@ -21,6 +21,25 @@ msgstr ""
 msgid "Story"
 msgstr "Relatar"
 
+#: StoryActivity.py:50
+msgid "Write your story here."
+msgstr "Escribe su historia aquí."
+
+msgid "Begin your story here."
+msgstr "Comenzar su historia aquí."
+
+#: StoryActivity.py:51
+msgid "Continue your story here."
+msgstr "Continuar su historia aquí."
+
+#: StoryActivity.py:318
+msgid "View images all at once"
+msgstr "Ver todas las imágenes de una sola vez"
+
+#: StoryActivity.py:322
+msgid "View images one at a time"
+msgstr "Ver las imágenes de una en una"
+
 #: StoryActivity.py:121
 msgid "Game"
 msgstr "Juego"
@@ -29,9 +48,15 @@ msgstr "Juego"
 msgid "Load new images."
 msgstr "Cargar nuevas imágenes."
 
+msgid "Load new images"
+msgstr "Cargar nuevas imágenes"
+
 #: StoryActivity.py:134 StoryActivity.py:192
 msgid "Save as image"
 msgstr "Guardar como imagen"
+
+msgid "Save as PDF"
+msgstr "Guardar como PDF"
 
 #: StoryActivity.py:140 StoryActivity.py:204
 msgid "Start recording"

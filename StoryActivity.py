@@ -118,6 +118,7 @@ class StoryActivity(activity.Activity):
         self.text_buffer = self._entry.get_buffer() 
         self.text_buffer.set_text(PLACEHOLDER)
         self._entry.connect('focus-in-event', self._text_focus_in_cb)
+        self._entry.connect('key-press-event', self._text_focus_in_cb)
         self._entry.connect('focus-out-event', self._text_focus_out_cb)
 
         self._grid = Gtk.Grid()

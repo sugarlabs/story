@@ -414,7 +414,6 @@ class Game():
             x = int(event.get_coords()[1])
             y = int(event.get_coords()[2])
 
-            # logging.error('event x %d y %d type %s', x, y, event.type)
             if event.type in (Gdk.EventType.TOUCH_BEGIN,
                               Gdk.EventType.BUTTON_PRESS):
                 self._prev_mouse_pos = (x, y)
@@ -428,7 +427,7 @@ class Game():
                 # horizontal gestures only
                 if (abs(mouse_movement[0]) / 5) > abs(mouse_movement[1]):
                     if abs(mouse_movement[0]) > abs(mouse_movement[1]):
-                        if mouse_movement[0] > 0:
+                        if mouse_movement[0] < 0:
                             right = True
                         else:
                             left = True
