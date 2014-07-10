@@ -353,7 +353,6 @@ class Game():
             self._prev.set_layer(1)
         self._parent.check_audio_status()
         self._parent.check_text_status()
-        logging.debug('autoplay %d' % self.current_image)
         GObject.idle_add(self._play_sound)
 
     def _poll_audio(self):
@@ -404,13 +403,6 @@ class Game():
                           Gdk.EventType.BUTTON_PRESS,
                           Gdk.EventType.BUTTON_RELEASE):
 
-            if self.playing:
-                self.stop()
-
-            if self._parent.audio_process is not None:
-                self._parent.audio_process.terminate()
-                self._parent.audio_process = None
-
             x = int(event.get_coords()[1])
             y = int(event.get_coords()[2])
 
@@ -419,6 +411,16 @@ class Game():
                 self._prev_mouse_pos = (x, y)
             elif event.type in (Gdk.EventType.TOUCH_END,
                                 Gdk.EventType.BUTTON_RELEASE):
+
+                if self._parent.audio_process is not None:
+                    self._parent.audio_process.terminate()
+                    self._parent.audio_process = None
+                    terminated_audio = True
+                else:
+                    terminated_audio = False
+
+                if self.playing:
+                    self.stop()
 
                 new_mouse_pos = (x, y)
                 mouse_movement = (new_mouse_pos[0] - self._prev_mouse_pos[0],
@@ -440,7 +442,7 @@ class Game():
                                 'speak-inactive']:
                     if spr.type == 'record':
                         self._parent.record_cb()
-                    elif spr.type == 'play':
+                    elif spr.type == 'play' and not terminated_audio:
                         self._parent.playback_recording_cb()
                     elif spr.type == 'speak':
                         bounds = self._parent.text_buffer.get_bounds()
@@ -584,7 +586,6 @@ class Game():
                 self._dots[i].hide()
 
         if self.we_are_sharing:
-            _logger.debug('sending a new game')
             self._parent.send_new_images()
 
     def restore_game(self, dot_list):
@@ -622,7 +623,6 @@ class Game():
         return dot_list
 
     def set_sharing(self, share=True):
-        _logger.debug('enabling sharing')
         self.we_are_sharing = share
 
     def _grid_to_dot(self, pos):

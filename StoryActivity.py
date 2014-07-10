@@ -486,17 +486,14 @@ class StoryActivity(activity.Activity):
     def record_cb(self, button=None):
         ''' Start/stop audio recording '''
         if self._grecord is None:
-            _logger.debug('setting up grecord')
             self._grecord = Grecord(self)
         if self.recording:  # Was recording, so stop (and save?)
-            _logger.debug('recording...True. Preparing to save.')
             self._game.set_record_icon_state(False)
             self._grecord.stop_recording_audio()
             self.recording = False
             self._notify_successful_save(title=_('Save recording'))
             GObject.timeout_add(100, self._wait_for_transcoding_to_finish)
         else:  # Wasn't recording, so start
-            _logger.debug('recording...False. Start recording.')
             self._game.set_record_icon_state(True)
             self._grecord.record_audio()
             self.recording = True
@@ -543,8 +540,6 @@ class StoryActivity(activity.Activity):
             dsobject.metadata['mime_type'] = 'audio/ogg'
             if self._uid is not None:
                 dsobject.metadata['tags'] = target
-            _logger.debug('setting file path to %s' %
-                          (os.path.join(self.datapath, 'output.ogg')))
             dsobject.set_file_path(os.path.join(self.datapath, 'output.ogg'))
             datastore.write(dsobject)
             dsobject.destroy()
@@ -628,7 +623,7 @@ class StoryActivity(activity.Activity):
 
     def _list_tubes_error_cb(self, e):
         ''' Log errors. '''
-        _logger.debug('Error: ListTubes() failed: %s' % (e))
+        _logger.error('Error: ListTubes() failed: %s' % (e))
 
     def _new_tube_cb(self, id, initiator, type, service, params, state):
         ''' Create a new tube. '''
