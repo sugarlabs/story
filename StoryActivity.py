@@ -78,6 +78,7 @@ class StoryActivity(activity.Activity):
 
         self.tablet_mode = _is_tablet_mode()
         self.recording = False
+        self.audio_process = None
         self._grecord = None
         self._alert = None
         self._uid = None
@@ -516,9 +517,7 @@ class StoryActivity(activity.Activity):
             dsobject = self._search_for_audio_note(self._uid)
             if dsobject is not None:
                 path = dsobject.file_path
-        _logger.debug('Playback current recording from %s.' % (path))
-        play_audio_from_file(path)
-        _logger.debug('Finished playing current recording from %s.' % (path))
+        play_audio_from_file(path, self)
 
     def _save_recording(self):
         self.metadata['dirty'] = 'True'  # So we know that we've done work

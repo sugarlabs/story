@@ -1,4 +1,4 @@
-#Copyright (c) 2011 Walter Bender
+#Copyright (c) 2011-14 Walter Bender
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -9,8 +9,12 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+import os
 import subprocess
+from subprocess import Popen, PIPE
+from pipes import quote
 from StringIO import StringIO
+
 try:
     OLD_SUGAR_SYSTEM = False
     import json
@@ -53,9 +57,47 @@ def json_dump(data):
         return _io.getvalue()
 
 
-def play_audio_from_file(file_path):
+def play_audio_from_file(file_path, activity):
     """ Audio media """
     command_line = ['gst-launch', 'filesrc', 'location=' + file_path,
                     '! oggdemux', '! vorbisdec', '! audioconvert',
                     '! alsasink']
-    subprocess.call(command_line)
+    activity.audio_process = Popen(command_line)
+    # subprocess.call(command_line)
+
+
+VOICES = {'af': 'afrikaans', 'cy': 'welsh-test', 'el': 'greek',
+          'es': 'spanish', 'hi': 'hindi-test', 'hy': 'armenian',
+          'ku': 'kurdish', 'mk': 'macedonian-test', 'pt': 'brazil',
+          'sk': 'slovak', 'sw': 'swahili', 'bs': 'bosnian',
+          'da': 'danish', 'en': 'english', 'fi': 'finnish',
+          'hr': 'croatian', 'id': 'indonesian-test', 'la': 'latin',
+          'nl': 'dutch-test', 'sq': 'albanian', 'ta': 'tamil',
+          'vi': 'vietnam-test', 'ca': 'catalan', 'de': 'german',
+          'eo': 'esperanto', 'fr': 'french', 'hu': 'hungarian',
+          'is': 'icelandic-test', 'lv': 'latvian', 'no': 'norwegian',
+          'ro': 'romanian', 'sr': 'serbian', 'zh': 'Mandarin',
+          'cs': 'czech', 'it': 'italian', 'pl': 'polish',
+          'ru': 'russian_test', 'sv': 'swedish', 'tr': 'turkish'}
+
+
+def speak(text):
+    """ Speak text """
+
+    if type(text) == float and int(text) == text:
+        text = int(text)
+    safetext = '{}'.format(quote(str(text)))
+
+    lang = os.environ['LANG'][0:2]
+    if lang in VOICES:
+        command = 'espeak -v %s "%s"' % (VOICES[lang], safetext)
+    else:
+        command = 'espeak "%s"' % (safetext)
+
+    p1 = Popen([command, '--stdout'], stdout=PIPE, shell=True)
+    p2 = Popen(['aplay'], stdin=p1.stdout, stdout=PIPE)
+    p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+    output = p2.communicate()[0]
+
+    # os.system('espeak %s "%s" --stdout | aplay' %
+    #           (language_option, str(text)))

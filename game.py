@@ -35,7 +35,7 @@ except ImportError:
     pass
 
 from sprites import Sprites, Sprite
-
+from utils import speak
 
 PREV = 0
 NEXT = 1
@@ -327,6 +327,9 @@ class Game():
 
     def stop(self):
         self.playing = False
+        if self._parent.audio_process is not None:
+            self._parent.audio_process.terminate()
+            self._parent.audio_process = None
         if self._timeout_id is not None:
             GObject.source_remove(self._timeout_id)
             self._timeout_id = None
@@ -353,19 +356,32 @@ class Game():
         logging.debug('autoplay %d' % self.current_image)
         GObject.idle_add(self._play_sound)
 
+    def _poll_audio(self):
+        if self._parent.audio_process is None:  # Already stopped?
+            return
+
+        if self._parent.audio_process.poll() is None:
+            GObject.timeout_add(200, self._poll_audio)
+        else:
+            self._parent.audio_process = None
+            self._next_image()
+
     def _play_sound(self):
-        start_time = time.time()
+        self._start_time = time.time()
 
         # Either play back a recording or speak the text
         if self._play.type == 'play':
             self._parent.playback_recording_cb()
+            self._poll_audio()
         elif self._speak.type == 'speak':
             bounds = self._parent.text_buffer.get_bounds()
             text = self._parent.text_buffer.get_text(
                 bounds[0], bounds[1], True)
             speak(text)
+            self._next_image()
 
-        accumulated_time = int(time.time() - start_time)
+    def _next_image(self):
+        accumulated_time = int(time.time() - self._start_time)
         if accumulated_time < 5:
             pause = 5 - accumulated_time
         else:
@@ -390,6 +406,10 @@ class Game():
 
             if self.playing:
                 self.stop()
+
+            if self._parent.audio_process is not None:
+                self._parent.audio_process.terminate()
+                self._parent.audio_process = None
 
             x = int(event.get_coords()[1])
             y = int(event.get_coords()[2])
@@ -845,33 +865,3 @@ def svg_str_to_pixbuf(svg_string, w=None, h=None):
     pl.write(svg_string)
     pl.close()
     return pl.get_pixbuf()
-
-
-VOICES = {'af': 'afrikaans', 'cy': 'welsh-test', 'el': 'greek',
-          'es': 'spanish', 'hi': 'hindi-test', 'hy': 'armenian',
-          'ku': 'kurdish', 'mk': 'macedonian-test', 'pt': 'brazil',
-          'sk': 'slovak', 'sw': 'swahili', 'bs': 'bosnian',
-          'da': 'danish', 'en': 'english', 'fi': 'finnish',
-          'hr': 'croatian', 'id': 'indonesian-test', 'la': 'latin',
-          'nl': 'dutch-test', 'sq': 'albanian', 'ta': 'tamil',
-          'vi': 'vietnam-test', 'ca': 'catalan', 'de': 'german',
-          'eo': 'esperanto', 'fr': 'french', 'hu': 'hungarian',
-          'is': 'icelandic-test', 'lv': 'latvian', 'no': 'norwegian',
-          'ro': 'romanian', 'sr': 'serbian', 'zh': 'Mandarin',
-          'cs': 'czech', 'it': 'italian', 'pl': 'polish',
-          'ru': 'russian_test', 'sv': 'swedish', 'tr': 'turkish'}
-
-
-def speak(text):
-    """ Speak text """
-
-    if type(text) == float and int(text) == text:
-        text = int(text)
-
-    lang = os.environ['LANG'][0:2]
-    if lang in VOICES:
-        language_option = '-v ' + VOICES[lang]
-    else:
-        language_option = ''
-    os.system('espeak %s "%s" --stdout | aplay' %
-              (language_option, str(text)))
