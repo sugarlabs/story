@@ -48,6 +48,7 @@ import logging
 _logger = logging.getLogger('story-activity')
 
 PLACEHOLDER = _('Write your story here.')
+PLACEHOLDER1 = _('Begin your story here.')
 PLACEHOLDER2 = _('Continue your story here.')
 
 SERVICE = 'org.sugarlabs.StoryActivity'
@@ -235,7 +236,7 @@ class StoryActivity(activity.Activity):
     def _text_focus_in_cb(self, widget=None, event=None):
         bounds = self.text_buffer.get_bounds()
         text = self.text_buffer.get_text(bounds[0], bounds[1], True)
-        if text == PLACEHOLDER or text == PLACEHOLDER2:
+        if text in [PLACEHOLDER, PLACEHOLDER1, PLACEHOLDER2]:
             self.text_buffer.set_text('')
         self.metadata['dirty'] = 'True'
         self._game.set_speak_icon_state(True)
@@ -256,7 +257,7 @@ class StoryActivity(activity.Activity):
             else:
                 self._game.set_speak_icon_state(False)
         else:
-            if text != PLACEHOLDER and text != PLACEHOLDER2:
+            if not text in [PLACEHOLDER, PLACEHOLDER1, PLACEHOLDER2]:
                 key = 'text-%d' % self._game.current_image
                 self.metadata[key] = text
                 self.metadata['dirty'] = 'True'
@@ -280,7 +281,7 @@ class StoryActivity(activity.Activity):
                 self.metadata['dirty'] = 'True'
                 self._game.set_speak_icon_state(True)
             elif self._game.current_image == 0:
-                self.text_buffer.set_text(PLACEHOLDER)
+                self.text_buffer.set_text(PLACEHOLDER1)
                 self._game.set_speak_icon_state(False)
             else:
                 self.text_buffer.set_text(PLACEHOLDER2)
