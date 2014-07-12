@@ -28,12 +28,8 @@ from gettext import gettext as _
 import logging
 _logger = logging.getLogger("story-activity")
 
-
-PAGE_WIDTH = 504
-PAGE_HEIGHT = 648
-LEFT_MARGIN = 10
-TOP_MARGIN = 20
-
+LEFT_MARGIN = 50
+TOP_MARGIN = 50
 
 def save_pdf(activity, tmp_file, nick, description=None):
     ''' Output a PDF document from the title, pictures, and descriptions '''
@@ -41,25 +37,36 @@ def save_pdf(activity, tmp_file, nick, description=None):
     head = 18
     body = 12
 
-    pdf_surface = cairo.PDFSurface(tmp_file, 504, 648)
+    if activity._game.get_mode() == 'array':
+        PAGE_WIDTH = 545
+        PAGE_HEIGHT = 700
+    else:
+        PAGE_WIDTH = 700
+        PAGE_HEIGHT = 545
+    pdf_surface = cairo.PDFSurface(tmp_file, PAGE_WIDTH, PAGE_HEIGHT)
 
     fd = Pango.FontDescription('Sans')
     cr = cairo.Context(pdf_surface)
     cr.set_source_rgb(0, 0, 0)
 
-    show_text(cr, fd, nick, head, LEFT_MARGIN, TOP_MARGIN)
-    show_text(cr, fd, time.strftime('%x', time.localtime()),
-              body, LEFT_MARGIN, TOP_MARGIN + 3 * head)
+    y = TOP_MARGIN * 3
+    show_text(cr, fd, activity.metadata['title'], head, LEFT_MARGIN, y,
+              PAGE_WIDTH)
+    y += 4 * head
+    show_text(cr, fd, nick, body, LEFT_MARGIN, y, PAGE_WIDTH)
+    y += head
+    show_text(cr, fd, time.strftime('%x', time.localtime()), body,
+              LEFT_MARGIN, y, PAGE_WIDTH)
+    y += TOP_MARGIN * 3
     if description is not None:
-        show_text(cr, fd, description,
-                  body, LEFT_MARGIN, TOP_MARGIN + 4 * head)
+        show_text(cr, fd, description, body, LEFT_MARGIN, y, PAGE_WIDTH)
     cr.show_page()
 
     if activity._game.get_mode() == 'array':
         text = ''
         if 'text' in activity.metadata:
             text = activity.metadata['text']
-        one_page(activity, cr, fd, body, text)
+        one_page(activity, cr, fd, body, text, PAGE_WIDTH)
     else:
         save_page = activity._game.current_image
         for i in range(9):
@@ -67,19 +74,21 @@ def save_pdf(activity, tmp_file, nick, description=None):
             text = ''
             if 'text-%d' % i in activity.metadata:
                 text = activity.metadata['text-%d' % i]
-            page(activity, cr, fd, body, text)
+            page(activity, cr, fd, body, text, PAGE_WIDTH)
         activity._game.current_image = save_page
 
 
-def one_page(activity, cr, fd, body, text):
+def one_page(activity, cr, fd, body, text, page_width):
     w = h = int((4 * activity._game._space + 3 * activity._game._dot_size))
+    xo = int((page_width - (w / 2)) * 0.5)
+    yo = TOP_MARGIN
     png_surface = activity._game.export()
     cr.save()
-    cr.scale(0.5, 0.5)
+    cr.scale(0.67, 0.67)
     for i in range(9):
         y = activity._game._space + int(i / 3.) * \
             (activity._game._dot_size + activity._game._space)
-        x = activity._game._space + (i % 3) * \
+        x = xo + activity._game._space + (i % 3) * \
             (activity._game._dot_size + activity._game._space)
         cr.save()
         cr.set_source_surface(activity._game._dots[i].images[0], x, y)
@@ -89,12 +98,12 @@ def one_page(activity, cr, fd, body, text):
     cr.scale(1, 1)
     cr.restore()
 
-    show_text(cr, fd, text, body, LEFT_MARGIN, 300)
+    show_text(cr, fd, text, body, LEFT_MARGIN, 350, page_width)
 
     cr.show_page()
 
 
-def page(activity, cr, fd, body, text):
+def page(activity, cr, fd, body, text, page_width):
     w = h = int((4 * activity._game._space + 3 * activity._game._dot_size))
     png_surface = activity._game.export()
     cr.save()
@@ -108,12 +117,12 @@ def page(activity, cr, fd, body, text):
     cr.fill()
     cr.restore()
 
-    show_text(cr, fd, text, body, LEFT_MARGIN, 200)
+    show_text(cr, fd, text, body, LEFT_MARGIN, 200, page_width)
 
     cr.show_page()
 
 
-def show_text(cr, fd, label, size, x, y):
+def show_text(cr, fd, label, size, x, y, page_width):
     pl = PangoCairo.create_layout(cr)
     fd.set_size(int(size * Pango.SCALE))
     pl.set_font_description(fd)
@@ -121,7 +130,7 @@ def show_text(cr, fd, label, size, x, y):
         pl.set_text(label.replace('\0', ' '), -1)
     else:
         pl.set_text(str(label), -1)
-    pl.set_width((PAGE_WIDTH - LEFT_MARGIN * 2) * Pango.SCALE)
+    pl.set_width((page_width - LEFT_MARGIN * 2) * Pango.SCALE)
     cr.save()
     cr.translate(x, y)
     PangoCairo.update_layout(cr, pl)

@@ -434,7 +434,7 @@ class StoryActivity(activity.Activity):
         file_path = os.path.join(self.datapath, 'output.pdf')
         if 'description' in self.metadata:
             save_pdf(self, file_path, self._nick,
-                     description=self.metadata['desciption'])
+                     description=self.metadata['description'])
         else:
             save_pdf(self, file_path, self._nick)
 
