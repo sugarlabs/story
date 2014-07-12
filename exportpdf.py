@@ -49,7 +49,11 @@ def save_pdf(activity, tmp_file, nick, description=None):
     cr = cairo.Context(pdf_surface)
     cr.set_source_rgb(0, 0, 0)
 
-    y = TOP_MARGIN * 3
+    if activity._game.get_mode() == 'array':
+        y = TOP_MARGIN * 3
+    else:
+        y = TOP_MARGIN
+
     show_text(cr, fd, activity.metadata['title'], head, LEFT_MARGIN, y,
               PAGE_WIDTH)
     y += 4 * head
@@ -57,7 +61,12 @@ def save_pdf(activity, tmp_file, nick, description=None):
     y += head
     show_text(cr, fd, time.strftime('%x', time.localtime()), body,
               LEFT_MARGIN, y, PAGE_WIDTH)
-    y += TOP_MARGIN * 3
+
+    if activity._game.get_mode() == 'array':
+        y += TOP_MARGIN * 3
+    else:
+        y += TOP_MARGIN * 2
+
     if description is not None:
         show_text(cr, fd, description, body, LEFT_MARGIN, y, PAGE_WIDTH)
     cr.show_page()
@@ -95,7 +104,6 @@ def one_page(activity, cr, fd, body, text, page_width):
         cr.rectangle(x, y, activity._game._dot_size, activity._game._dot_size)
         cr.fill()
         cr.restore()
-    cr.scale(1, 1)
     cr.restore()
 
     show_text(cr, fd, text, body, LEFT_MARGIN, 350, page_width)
@@ -105,19 +113,18 @@ def one_page(activity, cr, fd, body, text, page_width):
 
 def page(activity, cr, fd, body, text, page_width):
     w = h = int((4 * activity._game._space + 3 * activity._game._dot_size))
+    x = int((page_width - (w / 2)) * 0.67) + LEFT_MARGIN
+    y = TOP_MARGIN
     png_surface = activity._game.export()
     cr.save()
-    x = int(activity._game._space)
-    y = int(activity._game._space)
-    cr.scale(0.5, 0.5)
+    cr.scale(0.67, 0.67)
     cr.set_source_surface(
         activity._game._Dots[activity._game.current_image].images[0], x, y)
-    cr.scale(1, 1)
-    cr.rectangle(LEFT_MARGIN, TOP_MARGIN, w, h)
+    cr.rectangle(x, y, w, h)
     cr.fill()
     cr.restore()
 
-    show_text(cr, fd, text, body, LEFT_MARGIN, 200, page_width)
+    show_text(cr, fd, text, body, LEFT_MARGIN, 250 + TOP_MARGIN, page_width)
 
     cr.show_page()
 
