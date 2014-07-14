@@ -106,7 +106,7 @@ def one_page(activity, cr, fd, body, text, page_width):
         cr.restore()
     cr.restore()
 
-    show_text(cr, fd, text, body, LEFT_MARGIN, 350, page_width)
+    show_text(cr, fd, text, body, LEFT_MARGIN, 300 + TOP_MARGIN, page_width)
 
     cr.show_page()
 
@@ -124,7 +124,7 @@ def page(activity, cr, fd, body, text, page_width):
     cr.fill()
     cr.restore()
 
-    show_text(cr, fd, text, body, LEFT_MARGIN, 250 + TOP_MARGIN, page_width)
+    show_text(cr, fd, text, body, LEFT_MARGIN, 300 + TOP_MARGIN, page_width)
 
     cr.show_page()
 

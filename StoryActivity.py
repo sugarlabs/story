@@ -431,6 +431,7 @@ class StoryActivity(activity.Activity):
         GObject.idle_add(self._save_as_pdf)
 
     def _save_as_pdf(self):
+        self.speak_text_cb()
         file_path = os.path.join(self.datapath, 'output.pdf')
         if 'description' in self.metadata:
             save_pdf(self, file_path, self._nick,
