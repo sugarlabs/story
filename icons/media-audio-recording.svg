@@ -16,21 +16,17 @@
      id="metadata17"><rdf:RDF><cc:Work
          rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
-     id="defs15">
-	
-
-		
-		
-		
-	</defs><polygon
-     points="13.296,43.314 38.942,21.406 30.782,13.246 8.872,38.893 "
+     id="defs15" /><polygon
+     points="8.872,38.893 13.296,43.314 38.942,21.406 30.782,13.246 "
+     transform="translate(0,4)"
      id="polygon7"
      style="fill:#ffffff;stroke:#010101;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round" /><circle
      cx="37.370998"
      cy="14.759"
      r="8.757"
+     transform="translate(0,4)"
      id="circle9"
      style="fill:#ff0000;fill-opacity:1;stroke:#010101;stroke-width:3.5;stroke-linejoin:round" /><path
-     d="M 10.829,40.85 C 7.222,44.457 9.344,53.996 24.161,45.446 35.687,38.912 43.122,44.297 44.464,51"
+     d="M 10.829,44.85 C 7.222,48.457 9.344,57.996 24.161,49.446 35.687,42.912 43.122,44.297 44.464,51"
      id="path11"
      style="fill:none;stroke:#010101;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round" /></svg>

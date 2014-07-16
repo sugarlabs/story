@@ -110,7 +110,7 @@ class StoryActivity(activity.Activity):
         self._entry.set_wrap_mode(Gtk.WrapMode.WORD)
         self._entry.set_pixels_above_lines(0)
         self._entry.set_size_request(
-            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE -
+            Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE -
             2 * style.DEFAULT_SPACING,
             style.GRID_CELL_SIZE * 3 - 2 * style.DEFAULT_SPACING)
         font_desc = Pango.font_description_from_string('14')
@@ -135,7 +135,7 @@ class StoryActivity(activity.Activity):
         self._scrolled_window = Gtk.ScrolledWindow()
         self._scrolled_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         self._scrolled_window.set_size_request(
-            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
+            Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
         self._scrolled_window.set_policy(Gtk.PolicyType.NEVER,
                                    Gtk.PolicyType.AUTOMATIC)
@@ -150,10 +150,10 @@ class StoryActivity(activity.Activity):
         self._evbox.show()
 
         if self.tablet_mode:
-            self._fixed.put(self._scrolled_window, 2 * style.GRID_CELL_SIZE,
+            self._fixed.put(self._scrolled_window, 3 * style.GRID_CELL_SIZE,
                             style.DEFAULT_SPACING)
         else:
-            self._fixed.put(self._scrolled_window, 2 * style.GRID_CELL_SIZE,
+            self._fixed.put(self._scrolled_window, 3 * style.GRID_CELL_SIZE,
                             Gdk.Screen.height() - style.DEFAULT_SPACING -
                             style.GRID_CELL_SIZE * 4)
         self._scrolled_window.show()
@@ -191,22 +191,22 @@ class StoryActivity(activity.Activity):
                                       int(Gdk.Screen.height()))
         self._vbox.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
         self._entry.set_size_request(
-            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE -
+            Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE -
             2 * style.DEFAULT_SPACING,
             style.GRID_CELL_SIZE * 3 - 2 * style.DEFAULT_SPACING)
         self._grid.set_size_request(
-            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
+            Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
         self._evbox.set_size_request(
-            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
+            Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
         self._scrolled_window.set_size_request(
-            Gdk.Screen.width() - 5 * style.GRID_CELL_SIZE,
+            Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
 
         if not self.tablet_mode:
             self._fixed.move(
-                self._scrolled_window, 2 * style.GRID_CELL_SIZE,
+                self._scrolled_window, 3 * style.GRID_CELL_SIZE,
                 Gdk.Screen.height() - style.DEFAULT_SPACING -
                 style.GRID_CELL_SIZE * 4)
 
