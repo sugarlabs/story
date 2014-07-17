@@ -106,13 +106,13 @@ class StoryActivity(activity.Activity):
         self._vbox.pack_end(self._canvas, True, True, 0)
         self._vbox.show()
 
+        entry_width = Gdk.Screen.width() - 7 * style.GRID_CELL_SIZE - \
+                      2 * style.DEFAULT_SPACING
+        entry_height = 3 * style.GRID_CELL_SIZE - 2 * style.DEFAULT_SPACING
         self._entry = Gtk.TextView()
         self._entry.set_wrap_mode(Gtk.WrapMode.WORD)
         self._entry.set_pixels_above_lines(0)
-        self._entry.set_size_request(
-            Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE -
-            2 * style.DEFAULT_SPACING,
-            style.GRID_CELL_SIZE * 3 - 2 * style.DEFAULT_SPACING)
+        self._entry.set_size_request(entry_width, entry_height)
         font_desc = Pango.font_description_from_string('14')
         self._entry.modify_font(font_desc)
         self.text_buffer = self._entry.get_buffer() 
@@ -190,16 +190,12 @@ class StoryActivity(activity.Activity):
         self._canvas.set_size_request(int(Gdk.Screen.width()),
                                       int(Gdk.Screen.height()))
         self._vbox.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
-        self._entry.set_size_request(
-            Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE -
-            2 * style.DEFAULT_SPACING,
-            style.GRID_CELL_SIZE * 3 - 2 * style.DEFAULT_SPACING)
-        self._grid.set_size_request(
-            Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE,
-            style.GRID_CELL_SIZE * 3)
-        self._evbox.set_size_request(
-            Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE,
-            style.GRID_CELL_SIZE * 3)
+        entry_width = Gdk.Screen.width() - 7 * style.GRID_CELL_SIZE - \
+                      2 * style.DEFAULT_SPACING
+        entry_height = 3 * style.GRID_CELL_SIZE - 2 * style.DEFAULT_SPACING
+        self._entry.set_size_request(entry_width, entry_height)
+        self._grid.set_size_request(entry_width, entry_height)
+        self._evbox.set_size_request(entry_width, entry_height)
         self._scrolled_window.set_size_request(
             Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)

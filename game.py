@@ -101,26 +101,32 @@ class Game():
         if self._parent.tablet_mode:  # text on top
             # landscape
             self._bg_pixbufs.append(svg_str_to_pixbuf(genhole(
-                a, a, 3 * style.GRID_CELL_SIZE, style.DEFAULT_SPACING,
-                a - 3 * style.GRID_CELL_SIZE, # + 2 * style.DEFAULT_SPACING,
+                a, a,
+                3 * style.GRID_CELL_SIZE,
+                style.DEFAULT_SPACING,
+                a - 3 * style.GRID_CELL_SIZE,
                 style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING)))
             # portrait
             self._bg_pixbufs.append(svg_str_to_pixbuf(genhole(
-                a, a, 3 * style.GRID_CELL_SIZE, style.DEFAULT_SPACING,
-                b - 3 * style.GRID_CELL_SIZE, # + 2 * style.DEFAULT_SPACING,
+                a, a,
+                3 * style.GRID_CELL_SIZE,
+                style.DEFAULT_SPACING,
+                b - 3 * style.GRID_CELL_SIZE,
                 style.GRID_CELL_SIZE * 3 + style.DEFAULT_SPACING)))
         else:  # text on bottom
             # landscape
             self._bg_pixbufs.append(svg_str_to_pixbuf(genhole(
-                a, a, 3 * style.GRID_CELL_SIZE,
+                a, a,
+                3 * style.GRID_CELL_SIZE,
                 b - style.GRID_CELL_SIZE * 4 - style.DEFAULT_SPACING,
-                a - 3 * style.GRID_CELL_SIZE + 2 * style.DEFAULT_SPACING,
+                a - 3 * style.GRID_CELL_SIZE,
                 b - style.GRID_CELL_SIZE - style.DEFAULT_SPACING)))
             # portrait
             self._bg_pixbufs.append(svg_str_to_pixbuf(genhole(
-                a, a, 3 * style.GRID_CELL_SIZE,
+                a, a,
+                3 * style.GRID_CELL_SIZE,
                 a - style.GRID_CELL_SIZE * 4 - style.DEFAULT_SPACING,
-                b - 3 * style.GRID_CELL_SIZE + 2 * style.DEFAULT_SPACING,
+                b - 3 * style.GRID_CELL_SIZE,
                 a - style.GRID_CELL_SIZE - style.DEFAULT_SPACING)))
 
         if Gdk.Screen.width() > Gdk.Screen.height():
