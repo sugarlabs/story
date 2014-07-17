@@ -166,6 +166,7 @@ def show_text(cr, fd, label, size, x, y, page_width, page_height):
                     pl.set_font_description(fd)
                     y = TOP_MARGIN
                     x = LEFT_MARGIN
+                    pl.set_text(word + ' ', -1)
             cr.save()
             cr.translate(x, y)
             PangoCairo.update_layout(cr, pl)
