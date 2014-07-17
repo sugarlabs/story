@@ -115,7 +115,7 @@ def one_page(activity, cr, fd, body, text, page_width, page_height):
 
 def page(activity, cr, fd, body, text, page_width, page_height):
     w = h = int((4 * activity._game._space + 3 * activity._game._dot_size))
-    x = int((page_width - (w / 2)) * 0.67) + LEFT_MARGIN
+    x = int((page_width - (w / 2)) * 0.67) + LEFT_MARGIN - 10
     y = TOP_MARGIN
     png_surface = activity._game.export()
     cr.save()
@@ -137,10 +137,11 @@ def show_text(cr, fd, label, size, x, y, page_width, page_height):
 
     # TODO: RTL support
 
+    # Pango doesn't like nulls
     if type(label) == str or type(label) == unicode:
-        text = label.replace('\0', ' ')
+        text = label.replace('\0', ' ').rstrip()
     else:
-        text = str(label)
+        text = str(label).rstrip()
 
     top = y
     left = x
