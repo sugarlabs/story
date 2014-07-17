@@ -115,7 +115,7 @@ def one_page(activity, cr, fd, body, text, page_width, page_height):
 
 def page(activity, cr, fd, body, text, page_width, page_height):
     w = h = int((4 * activity._game._space + 3 * activity._game._dot_size))
-    x = int((page_width - (w / 2)) * 0.67) + LEFT_MARGIN - 10
+    x = int((page_width - (w / 2)) * 0.67) + LEFT_MARGIN - 40
     y = TOP_MARGIN
     png_surface = activity._game.export()
     cr.save()
