@@ -90,7 +90,7 @@ def save_pdf(activity, tmp_file, nick, description=None):
 
 def one_page(activity, cr, fd, body, text, page_width, page_height):
     w = h = int((4 * activity._game._space + 3 * activity._game._dot_size))
-    xo = int((page_width - (w / 2)) * 0.5)
+    xo = int((page_width - (w / 2)) * 0.5) - 10
     yo = TOP_MARGIN
     png_surface = activity._game.export()
     cr.save()
@@ -115,7 +115,7 @@ def one_page(activity, cr, fd, body, text, page_width, page_height):
 
 def page(activity, cr, fd, body, text, page_width, page_height):
     w = h = int((4 * activity._game._space + 3 * activity._game._dot_size))
-    x = int((page_width - (w / 2)) * 0.67) + LEFT_MARGIN - 40
+    x = int((page_width - (w / 2)) * 0.67) + LEFT_MARGIN - 50
     y = TOP_MARGIN
     png_surface = activity._game.export()
     cr.save()
@@ -126,7 +126,7 @@ def page(activity, cr, fd, body, text, page_width, page_height):
     cr.fill()
     cr.restore()
 
-    show_text(cr, fd, text, body, LEFT_MARGIN, 350 + TOP_MARGIN, page_width,
+    show_text(cr, fd, text, body, LEFT_MARGIN, 320 + TOP_MARGIN, page_width,
               page_height)
 
     cr.show_page()
@@ -149,7 +149,7 @@ def show_text(cr, fd, label, size, x, y, page_width, page_height):
     bottom = page_height - TOP_MARGIN * 2
 
     sentences = text.split('\n')
-    for sentence in sentences:
+    for s, sentence in enumerate(sentences):
         pl = PangoCairo.create_layout(cr)
         pl.set_font_description(fd)
         words = sentence.split(' ')
@@ -176,7 +176,7 @@ def show_text(cr, fd, label, size, x, y, page_width, page_height):
             x += width
         x = LEFT_MARGIN
         y += size * 1.5
-        if y > bottom:
+        if y > bottom and s < len(sentences) - 1:
             cr.show_page()
             pl = PangoCairo.create_layout(cr)
             pl.set_font_description(fd)
