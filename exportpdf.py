@@ -153,7 +153,7 @@ def show_text(cr, fd, label, size, x, y, page_width, page_height):
         pl = PangoCairo.create_layout(cr)
         pl.set_font_description(fd)
         words = sentence.split(' ')
-        for word in words:
+        for w, word in enumerate(words):
             pl.set_text(word + ' ', -1)
             width, height = pl.get_size()
             width /= Pango.SCALE
@@ -161,7 +161,8 @@ def show_text(cr, fd, label, size, x, y, page_width, page_height):
             if x + width > right:
                 x = LEFT_MARGIN
                 y += size * 1.5
-                if y > bottom:
+                if y > bottom and \
+                   (w < len(words) - 1 or s < len(sentences) - 1):
                     cr.show_page()
                     pl = PangoCairo.create_layout(cr)
                     pl.set_font_description(fd)
