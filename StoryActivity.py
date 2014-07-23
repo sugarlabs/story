@@ -263,26 +263,64 @@ class StoryActivity(activity.Activity):
                 self._game.set_speak_icon_state(False)
 
     def check_text_status(self):
+        self._game.set_speak_icon_state(False)
         if self._game.get_mode() == 'array':
             if 'text' in self.metadata:
                 self.text_buffer.set_text(self.metadata['text'])
-                self.metadata['dirty'] = 'True'
-                self._game.set_speak_icon_state(True)
+                if len(self.metadata['text']) > 0:
+                    self.metadata['dirty'] = 'True'
+                    self._game.set_speak_icon_state(True)
+                else:
+                    self.text_buffer.set_text(PLACEHOLDER)
             else:
                 self.text_buffer.set_text(PLACEHOLDER)
-                self._game.set_speak_icon_state(False)
         else:
             key = 'text-%d' % self._game.current_image
             if key in self.metadata:
                 self.text_buffer.set_text(self.metadata[key])
-                self.metadata['dirty'] = 'True'
-                self._game.set_speak_icon_state(True)
+                if len(self.metadata[key]) > 0:
+                    self.metadata['dirty'] = 'True'
+                    self._game.set_speak_icon_state(True)
+                elif self._game.current_image == 0:
+                    self.text_buffer.set_text(PLACEHOLDER1)
+                else:
+                    self.text_buffer.set_text(PLACEHOLDER2)
             elif self._game.current_image == 0:
                 self.text_buffer.set_text(PLACEHOLDER1)
-                self._game.set_speak_icon_state(False)
             else:
                 self.text_buffer.set_text(PLACEHOLDER2)
-                self._game.set_speak_icon_state(False)
+
+    def _clear_text(self):
+        if 'text' in self.metadata:
+            self.metadata['text'] = ''
+        for i in range(9):
+            if 'text-%d' % i in self.metadata:
+                self.metadata['text-%d' % i] = ''
+        if 'dirty' in self.metadata:
+            self.metadata['dirty'] = 'False'
+        if self._game.get_mode() == 'array':
+            self.text_buffer.set_text(PLACEHOLDER)
+        elif self._game.current_image == 0:
+            self.text_buffer.set_text(PLACEHOLDER1)
+        else:
+            self.text_buffer.set_text(PLACEHOLDER2)
+        self._game.set_speak_icon_state(False)
+
+    def _clear_audio_notes(self):
+        dsobject = self._search_for_audio_note(self._uid, target=self._uid)
+        if dsobject is not None:
+            dsobject.metadata['tags'] = ''
+            datastore.write(dsobject)
+            dsobject.destroy()
+
+        for i in range(9):
+            target = '%s-%d' % (self._uid, i)
+            dsobject = self._search_for_audio_note(self._uid, target=target)
+            if dsobject is not None:
+                dsobject.metadata['tags'] = ''
+                datastore.write(dsobject)
+                dsobject.destroy()
+        self._game.set_play_icon_state(False)
 
     def check_audio_status(self):
         if self._search_for_audio_note(self._uid):
@@ -322,6 +360,7 @@ class StoryActivity(activity.Activity):
         self.autoplay_button = button_factory(
             'media-playback-start', self.toolbar, self._do_autoplay_cb,
             tooltip=_('Play'))
+        self.autoplay_button.set_sensitive(False)
 
         separator_factory(self.toolbar)
 
@@ -366,7 +405,7 @@ class StoryActivity(activity.Activity):
 
     def _new_game_cb(self, button=None):
         ''' Start a new game. '''
-        if 'dirty' in self.metadata:
+        if 'dirty' in self.metadata and self.metadata['dirty'] == 'True':
             if self._alert is not None:
                 self.remove_alert(self._alert)
                 self._alert = None
@@ -378,11 +417,15 @@ class StoryActivity(activity.Activity):
             self._alert.connect('response', self._confirmation_alert_cb)
             self.add_alert(self._alert)
         else:
+            self.autoplay_button.set_sensitive(False)
             self._game.new_game()
 
     def _confirmation_alert_cb(self, alert, response_id):
         self.remove_alert(alert)
         if response_id is Gtk.ResponseType.OK:
+            self.autoplay_button.set_sensitive(False)
+            self._clear_text()
+            self._clear_audio_notes()
             self._game.new_game()
 
     def write_file(self, file_path):
@@ -404,20 +447,22 @@ class StoryActivity(activity.Activity):
             dot_list.append(int(dot))
         self._game.restore_game(dot_list)
 
-    def _search_for_audio_note(self, obj_id):
+    def _search_for_audio_note(self, obj_id, target=None):
         ''' Look to see if there is already a sound recorded for this
         dsobject: the object id is stored in a tag in the audio file. '''
         dsobjects, nobjects = datastore.find({'mime_type': ['audio/ogg']})
         # Look for tag that matches the target object id
-        if self._game.get_mode() == 'array':
-            target = obj_id
-        else:
-            target = '%s-%d' % (obj_id, self._game.current_image)
+        if target is None:
+            if self._game.get_mode() == 'array':
+                target = obj_id
+            else:
+                target = '%s-%d' % (obj_id, self._game.current_image)
 
         for dsobject in dsobjects:
             if 'tags' in dsobject.metadata and \
                target in dsobject.metadata['tags']:
                 _logger.debug('Found audio note')
+                self.metadata['dirty'] = 'True'
                 return dsobject
         return None
 
@@ -544,8 +589,9 @@ class StoryActivity(activity.Activity):
             # Enable playback after record is finished
             self._game.set_play_icon_state(True)
 
+            self.metadata['dirty'] = 'True'
             # Always save an image with the recording.
-            self._do_save_as_image_cb()
+            # self._do_save_as_image_cb()
         else:
             _logger.debug('Nothing to save...')
         return

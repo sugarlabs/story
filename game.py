@@ -195,7 +195,7 @@ class Game():
 
         left = style.GRID_CELL_SIZE
         right = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
-        y0 = style.DEFAULT_SPACING
+        y0 = style.DEFAULT_SPACING + style.DEFAULT_PADDING
         y1 = y0 + style.GRID_CELL_SIZE
         y2 = y1 + style.GRID_CELL_SIZE
         if not self._parent.tablet_mode:
@@ -262,7 +262,7 @@ class Game():
 
         left = style.GRID_CELL_SIZE
         right = Gdk.Screen.width() - 2 * style.GRID_CELL_SIZE
-        y0 = style.DEFAULT_SPACING
+        y0 = style.DEFAULT_SPACING + style.DEFAULT_PADDING
         y1 = y0 + style.GRID_CELL_SIZE
         y2 = y1 + style.GRID_CELL_SIZE
         if not self._parent.tablet_mode:
