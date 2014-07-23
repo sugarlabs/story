@@ -15,46 +15,31 @@ from subprocess import Popen, PIPE
 from pipes import quote
 from StringIO import StringIO
 
-try:
-    OLD_SUGAR_SYSTEM = False
-    import json
-    json.dumps
-    from json import load as jload
-    from json import dump as jdump
-except (ImportError, AttributeError):
-    try:
-        import simplejson as json
-        from simplejson import load as jload
-        from simplejson import dump as jdump
-    except:
-        OLD_SUGAR_SYSTEM = True
+import json
+json.dumps
+from json import load as jload
+from json import dump as jdump
 
 
 def json_load(text):
     """ Load JSON data using what ever resources are available. """
-    if OLD_SUGAR_SYSTEM is True:
-        listdata = json.read(text)
-    else:
-        # strip out leading and trailing whitespace, nulls, and newlines
-        io = StringIO(text)
-        try:
-            listdata = jload(io)
-        except ValueError:
-            # assume that text is ascii list
-            listdata = text.split()
-            for i, value in enumerate(listdata):
-                listdata[i] = int(value)
+    # strip out leading and trailing whitespace, nulls, and newlines
+    io = StringIO(text)
+    try:
+        listdata = jload(io)
+    except ValueError:
+        # assume that text is ascii list
+        listdata = text.split()
+        for i, value in enumerate(listdata):
+            listdata[i] = int(value)
     return listdata
 
 
 def json_dump(data):
     """ Save data using available JSON tools. """
-    if OLD_SUGAR_SYSTEM is True:
-        return json.write(data)
-    else:
-        _io = StringIO()
-        jdump(data, _io)
-        return _io.getvalue()
+    _io = StringIO()
+    jdump(data, _io)
+    return _io.getvalue()
 
 
 def play_audio_from_file(file_path, activity):
@@ -94,10 +79,11 @@ def speak(text):
     else:
         command = 'espeak "%s"' % (safetext)
 
+    '''
     p1 = Popen([command, '--stdout'], stdout=PIPE, shell=True)
     p2 = Popen(['aplay'], stdin=p1.stdout, stdout=PIPE)
     p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
     output = p2.communicate()[0]
+    '''
 
-    # os.system('espeak %s "%s" --stdout | aplay' %
-    #           (language_option, str(text)))
+    os.system('%s --stdout | aplay' % command)
