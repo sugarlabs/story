@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 #Copyright (c) 2012-14 Walter Bender
 # Port to GTK3:
 # Ignacio Rodriguez <ignaciorodriguez@sugarlabs.org>
@@ -341,6 +341,7 @@ class Game():
             self._timeout_id = None
         self._parent.autoplay_button.set_icon_name('media-playback-start')
         self._parent.autoplay_button.set_tooltip(_('Play'))
+        self._parent.array_button.set_sensitive(True)
 
     def _autonext(self, next=True):
         self._timeout_id = None

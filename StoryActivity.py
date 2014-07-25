@@ -9,7 +9,6 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject
@@ -166,7 +165,7 @@ class StoryActivity(activity.Activity):
         if 'mode' in self.metadata:
             self._game.set_mode(self.metadata['mode'])
             if self.metadata['mode'] == 'array':
-                self._array_button.set_active(True)
+                self.array_button.set_active(True)
                 self.autoplay_button.set_sensitive(False)
             else:
                 self._linear_button.set_active(True)
@@ -349,13 +348,13 @@ class StoryActivity(activity.Activity):
             'view-refresh', self.toolbar, self._new_game_cb,
             tooltip=_('Load new images'))
 
-        self._array_button = radio_factory(
+        self.array_button = radio_factory(
             'array', self.toolbar, self._array_cb,
             tooltip=_('View images all at once'), group=None)
 
         self._linear_button = radio_factory(
             'linear', self.toolbar, self._linear_cb,
-            tooltip=_('View images one at a time'), group=self._array_button)
+            tooltip=_('View images one at a time'), group=self.array_button)
 
         self.autoplay_button = button_factory(
             'media-playback-start', self.toolbar, self._do_autoplay_cb,
@@ -385,6 +384,7 @@ class StoryActivity(activity.Activity):
         else:
             self.autoplay_button.set_icon_name('media-playback-pause')
             self.autoplay_button.set_tooltip(_('Pause'))
+            self.array_button.set_sensitive(False)
             self._game.autoplay()
 
     def _array_cb(self, button=None):
