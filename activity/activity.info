@@ -7,3 +7,4 @@ exec = sugar-activity StoryActivity.StoryActivity
 icon = activity-story
 show_launcher = yes
 summary = prompts learner to tell a story by displaying images at random
+categories = language game
