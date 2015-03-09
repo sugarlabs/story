@@ -18,7 +18,6 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
-from glib import GError
 from gi.repository import Pango
 from gi.repository import PangoCairo
 import cairo
