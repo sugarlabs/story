@@ -119,17 +119,9 @@ class StoryActivity(activity.Activity):
         self._entry.connect('focus-in-event', self._text_focus_in_cb)
         self._entry.connect('key-press-event', self._text_focus_in_cb)
         self._entry.connect('focus-out-event', self._text_focus_out_cb)
+        self._entry.get_buffer().connect('changed', self._text_changed_cb)
 
-        self._grid = Gtk.Grid()
-        self._grid.set_border_width(style.DEFAULT_PADDING)
-        self._grid.attach(self._entry, 0, 0, 1, 1)
         self._entry.show()
-
-        self._evbox = Gtk.EventBox()
-        self._evbox.add(self._grid)
-        self._grid.show()
-        self._evbox.connect('focus-in-event', self._text_focus_in_cb)
-        self._evbox.connect('focus-out-event', self._text_focus_out_cb)
 
         self._scrolled_window = Gtk.ScrolledWindow()
         self._scrolled_window.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -143,10 +135,7 @@ class StoryActivity(activity.Activity):
         self._scrolled_window.override_background_color(
             Gtk.StateFlags.NORMAL, rgba)
 
-        vadj = self._scrolled_window.get_vadjustment()
-        vadj.connect('changed', self._scroll_changed_cb)
-        self._scrolled_window.add_with_viewport(self._evbox)
-        self._evbox.show()
+        self._scrolled_window.add(self._entry)
 
         if self.tablet_mode:
             self._fixed.put(self._scrolled_window, 3 * style.GRID_CELL_SIZE,
@@ -193,8 +182,6 @@ class StoryActivity(activity.Activity):
                       2 * style.DEFAULT_SPACING
         entry_height = 3 * style.GRID_CELL_SIZE - 2 * style.DEFAULT_SPACING
         self._entry.set_size_request(entry_width, entry_height)
-        self._grid.set_size_request(entry_width, entry_height)
-        self._evbox.set_size_request(entry_width, entry_height)
         self._scrolled_window.set_size_request(
             Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
@@ -220,9 +207,8 @@ class StoryActivity(activity.Activity):
         self._old_cursor = self.get_window().get_cursor()
         self.get_window().set_cursor(Gdk.Cursor.new(Gdk.CursorType.WATCH))
 
-    def _scroll_changed_cb(self, adj, scroll=None):
-        '''Scroll the chat window to the bottom'''
-        adj.set_value(adj.get_upper() - adj.get_page_size())
+    def _text_changed_cb(self, text_buffer):
+        self.place_cursor_onscreen()
 
     def _fixed_resize_cb(self, widget=None, rect=None):
         ''' If a toolbar opens or closes, we need to resize the vbox
