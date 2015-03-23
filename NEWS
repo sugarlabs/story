@@ -1,3 +1,9 @@
+15
+
+ENHANCEMENT:
+* Use place_cursor_on_screen to ensure cursor is always visible
+  (Gonzalo Odiard)
+
 14
 
 BUG FIX:
