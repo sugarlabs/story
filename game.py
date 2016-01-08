@@ -571,9 +571,14 @@ class Game():
 
     def _new_images(self):
         ''' Select pictures at random '''
+        used_images = [0]*self.number_of_images
         for i in range(9):
+            random_selection = int(uniform(0, self.number_of_images))
+            while used_images[random_selection] != 0:
+                random_selection = int(uniform(0, self.number_of_images))
+            used_images[random_selection] = 1
             self._dots[i].set_label('')
-            self._dots[i].type = int(uniform(0, self.number_of_images))
+            self._dots[i].type = random_selection
             self._dots[i].set_shape(self._new_dot_surface(
                 image=self._dots[i].type))
 
