@@ -37,7 +37,11 @@ import dbus
 from dbus.service import signal
 from dbus.gobject_service import ExportedGObject
 from sugar3.presence import presenceservice
-from sugar3.presence.tubeconn import TubeConnection
+
+try:
+    from sugar3.presence.wrapper import CollabWrapper
+except ImportError:
+    from textchannelwrapper import CollabWrapper
 
 from gettext import gettext as _
 
@@ -665,14 +669,9 @@ class StoryActivity(activity.Activity):
                 self.tubes_chan[
                     telepathy.CHANNEL_TYPE_TUBES].AcceptDBusTube(id)
 
-            tube_conn = TubeConnection(
-                self.conn,
-                self.tubes_chan[
-                    telepathy.CHANNEL_TYPE_TUBES], id,
-                group_iface=self.text_chan[telepathy.CHANNEL_INTERFACE_GROUP])
-
-            self.chattube = ChatTube(tube_conn, self.initiating,
-                                     self.event_received_cb)
+            self.collab = CollabWrapper(self)
+            self.collab.message.connect(self.event_received_cb)
+            self.collab.setup()
 
     def _setup_dispatch_table(self):
         ''' Associate tokens with commands. '''
@@ -681,20 +680,18 @@ class StoryActivity(activity.Activity):
             'p': [self._receive_dot_click, 'get a dot click'],
             }
 
-    def event_received_cb(self, event_message):
+    def event_received_cb(self, collab, buddy, msg):
         ''' Data from a tube has arrived. '''
-        if len(event_message) == 0:
+        command = msg.get("command")
+        if action is None:
             return
-        try:
-            command, payload = event_message.split('|', 2)
-        except ValueError:
-            _logger.debug('Could not split event message %s' % (event_message))
-            return
+
+        payload = msg.get("payload")
         self._processing_methods[command][0](payload)
 
     def send_new_images(self):
         ''' Send a new image grid to all players '''
-        self.send_event('n|%s' % (json_dump(self._game.save_game())))
+        self.send_event("n", json_dump(self._game.save_game()))
 
     def _receive_new_images(self, payload):
         ''' Sharer can start a new game. '''
@@ -703,41 +700,20 @@ class StoryActivity(activity.Activity):
 
     def send_dot_click(self, dot, color):
         ''' Send a dot click to all the players '''
-        self.send_event('p|%s' % (json_dump([dot, color])))
+        self.send_event("p", json_dump([dot, color]))
 
     def _receive_dot_click(self, payload):
         ''' When a dot is clicked, everyone should change its color. '''
         (dot, color) = json_load(payload)
         self._game.remote_button_press(dot, color)
 
-    def send_event(self, entry):
+    def send_event(self, command, payload):
         ''' Send event through the tube. '''
-        if hasattr(self, 'chattube') and self.chattube is not None:
-            self.chattube.SendText(entry)
-
-
-class ChatTube(ExportedGObject):
-    ''' Class for setting up tube for sharing '''
-
-    def __init__(self, tube, is_initiator, stack_received_cb):
-        super(ChatTube, self).__init__(tube, PATH)
-        self.tube = tube
-        self.is_initiator = is_initiator  # Are we sharing or joining activity?
-        self.stack_received_cb = stack_received_cb
-        self.stack = ''
-
-        self.tube.add_signal_receiver(self.send_stack_cb, 'SendText', IFACE,
-                                      path=PATH, sender_keyword='sender')
-
-    def send_stack_cb(self, text, sender=None):
-        if sender == self.tube.get_unique_name():
-            return
-        self.stack = text
-        self.stack_received_cb(text)
-
-    @signal(dbus_interface=IFACE, signature='s')
-    def SendText(self, text):
-        self.stack = text
+        if hasattr(self, 'chattube') and self.collab is not None:
+            self.collab.SendText(dict(
+                command=command,
+                payload=payload,
+            ))
 
 
 def generate_uid():
