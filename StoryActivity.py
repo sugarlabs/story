@@ -17,6 +17,7 @@ from gi.repository import Pango
 import os
 import subprocess
 import time
+import logging
 
 from sugar3.activity import activity
 from sugar3 import profile
@@ -38,6 +39,12 @@ from dbus.service import signal
 from dbus.gobject_service import ExportedGObject
 from sugar3.presence import presenceservice
 from sugar3.presence.tubeconn import TubeConnection
+
+try:
+    from sugar3.presence.wrapper import CollabWrapper
+    logging.error('USING SUGAR COLLAB WRAPPER!')
+except ImportError:
+    from collabwrapper.collabwrapper import CollabWrapper
 
 from gettext import gettext as _
 
@@ -84,7 +91,6 @@ class StoryActivity(activity.Activity):
         self._uid = None
 
         self._setup_toolbars()
-        self._setup_dispatch_table()
 
         self._fixed = Gtk.Fixed()
         self._fixed.connect('size-allocate', self._fixed_resize_cb)
@@ -149,7 +155,7 @@ class StoryActivity(activity.Activity):
 
         self._game = Game(self._canvas, parent=self, path=self._path,
                           root=activity.get_bundle_path(), colors=self._colors)
-        self._setup_presence_service()
+        self._setup_collab()
 
         if 'mode' in self.metadata:
             self._game.set_mode(self.metadata['mode'])
@@ -598,103 +604,32 @@ class StoryActivity(activity.Activity):
 
     # Collaboration-related methods
 
-    def _setup_presence_service(self):
-        ''' Setup the Presence Service. '''
-        self.pservice = presenceservice.get_instance()
-        self.initiating = None  # sharing (True) or joining (False)
+    def _setup_collab(self):
+        '''Setup the Collab Wrapper. '''
+        self._collab = CollabWrapper(self)
+        self._collab.connect('message', self.__message_cb)
 
-        owner = self.pservice.get_owner()
+        self.initiating = None # sharing (True) or joining (False)
+        owner = self._collab._leader
         self.owner = owner
-        self._share = ''
-        self.connect('shared', self._shared_cb)
-        self.connect('joined', self._joined_cb)
 
-    def _shared_cb(self, activity):
-        ''' Either set up initial share...'''
-        self._new_tube_common(True)
+        self._collab.setup()
 
-    def _joined_cb(self, activity):
-        ''' ...or join an exisiting share. '''
-        self._new_tube_common(False)
-
-    def _new_tube_common(self, sharer):
-        ''' Joining and sharing are mostly the same... '''
-        if self._shared_activity is None:
-            _logger.debug('Error: Failed to share or join activity ... \
-                _shared_activity is null in _shared_cb()')
-            return
-
-        self.initiating = sharer
-        self.waiting_for_hand = not sharer
-
-        self.conn = self._shared_activity.telepathy_conn
-        self.tubes_chan = self._shared_activity.telepathy_tubes_chan
-        self.text_chan = self._shared_activity.telepathy_text_chan
-
-        self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].connect_to_signal(
-            'NewTube', self._new_tube_cb)
-
-        if sharer:
-            _logger.debug('This is my activity: making a tube...')
-            self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].OfferDBusTube(
-                SERVICE, {})
-        else:
-            _logger.debug('I am joining an activity: waiting for a tube...')
-            self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].ListTubes(
-                reply_handler=self._list_tubes_reply_cb,
-                error_handler=self._list_tubes_error_cb)
-        self._game.set_sharing(True)
-
-    def _list_tubes_reply_cb(self, tubes):
-        ''' Reply to a list request. '''
-        for tube_info in tubes:
-            self._new_tube_cb(*tube_info)
-
-    def _list_tubes_error_cb(self, e):
-        ''' Log errors. '''
-        _logger.error('Error: ListTubes() failed: %s' % (e))
-
-    def _new_tube_cb(self, id, initiator, type, service, params, state):
-        ''' Create a new tube. '''
-        _logger.debug('New tube: ID=%d initator=%d type=%d service=%s'
-                      ' params=%r state=%d' %
-                      (id, initiator, type, service, params, state))
-
-        if (type == telepathy.TUBE_TYPE_DBUS and service == SERVICE):
-            if state == telepathy.TUBE_STATE_LOCAL_PENDING:
-                self.tubes_chan[
-                    telepathy.CHANNEL_TYPE_TUBES].AcceptDBusTube(id)
-
-            tube_conn = TubeConnection(
-                self.conn,
-                self.tubes_chan[
-                    telepathy.CHANNEL_TYPE_TUBES], id,
-                group_iface=self.text_chan[telepathy.CHANNEL_INTERFACE_GROUP])
-
-            self.chattube = ChatTube(tube_conn, self.initiating,
-                                     self.event_received_cb)
-
-    def _setup_dispatch_table(self):
-        ''' Associate tokens with commands. '''
-        self._processing_methods = {
-            'n': [self._receive_new_images, 'get a new game grid'],
-            'p': [self._receive_dot_click, 'get a dot click'],
-            }
-
-    def event_received_cb(self, event_message):
-        ''' Data from a tube has arrived. '''
-        if len(event_message) == 0:
-            return
-        try:
-            command, payload = event_message.split('|', 2)
-        except ValueError:
-            _logger.debug('Could not split event message %s' % (event_message))
-            return
-        self._processing_methods[command][0](payload)
+    def __message_cb(self, collab, buddy, message):
+        action = message.get('action')
+        payload = message.get('payload')
+        if action == 'n':
+            '''Get a new game grid'''
+            self._receive_new_imges(payload)
+        elif action == 'p':
+            '''Get a dot click'''
+            self._receive_dot_click(payload)
 
     def send_new_images(self):
-        ''' Send a new image grid to all players '''
-        self.send_event('n|%s' % (json_dump(self._game.save_game())))
+        self._collab.post(dict(
+            action='n',
+            payload=json_dump(self._game.save_game()) 
+        ))
 
     def _receive_new_images(self, payload):
         ''' Sharer can start a new game. '''
@@ -702,43 +637,15 @@ class StoryActivity(activity.Activity):
         self._game.restore_game(dot_list)
 
     def send_dot_click(self, dot, color):
-        ''' Send a dot click to all the players '''
-        self.send_event('p|%s' % (json_dump([dot, color])))
+        self._collab.post(dict(
+            action='p',
+            payload=json_dump([dot, color])
+        ))
 
     def _receive_dot_click(self, payload):
         ''' When a dot is clicked, everyone should change its color. '''
         (dot, color) = json_load(payload)
         self._game.remote_button_press(dot, color)
-
-    def send_event(self, entry):
-        ''' Send event through the tube. '''
-        if hasattr(self, 'chattube') and self.chattube is not None:
-            self.chattube.SendText(entry)
-
-
-class ChatTube(ExportedGObject):
-    ''' Class for setting up tube for sharing '''
-
-    def __init__(self, tube, is_initiator, stack_received_cb):
-        super(ChatTube, self).__init__(tube, PATH)
-        self.tube = tube
-        self.is_initiator = is_initiator  # Are we sharing or joining activity?
-        self.stack_received_cb = stack_received_cb
-        self.stack = ''
-
-        self.tube.add_signal_receiver(self.send_stack_cb, 'SendText', IFACE,
-                                      path=PATH, sender_keyword='sender')
-
-    def send_stack_cb(self, text, sender=None):
-        if sender == self.tube.get_unique_name():
-            return
-        self.stack = text
-        self.stack_received_cb(text)
-
-    @signal(dbus_interface=IFACE, signature='s')
-    def SendText(self, text):
-        self.stack = text
-
 
 def generate_uid():
     left = '%04x' % int(uniform(0, int(0xFFFF)))
