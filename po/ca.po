@@ -1,0 +1,91 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-07-09 22:25-0400\n"
+"PO-Revision-Date: 2016-03-06 21:39+0000\n"
+"Last-Translator: Robert <rbuj@fedoraproject.org>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.5.1.1\n"
+"X-POOTLE-MTIME: 1457300375.000000\n"
+
+#: activity/activity.info:2
+msgid "Story"
+msgstr "Relat"
+
+#: activity/activity.info:3
+msgid "prompts learner to tell a story by displaying images at random"
+msgstr ""
+"promou que l'alumne expliqui un relat mitjançant la visualització d'imatges "
+"a l'atzar"
+
+#: StoryActivity.py:50
+msgid "Write your story here."
+msgstr "Escriviu aquí el vostre relat."
+
+#: StoryActivity.py:51
+msgid "Continue your story here."
+msgstr "Continueu aquí el vostre relat."
+
+#: StoryActivity.py:314
+msgid "Load new images"
+msgstr "Carrega imatges noves"
+
+#: StoryActivity.py:318
+msgid "View images all at once"
+msgstr "Visualitza a la vegada totes les imatges"
+
+#: StoryActivity.py:322
+msgid "View images one at a time"
+msgstr "Visualitza les imatges d'una en una"
+
+#: StoryActivity.py:326 game.py:337
+msgid "Play"
+msgstr "Reprodueix"
+
+#: StoryActivity.py:332 StoryActivity.py:454
+msgid "Save as image"
+msgstr "Desa com a imatge"
+
+#: StoryActivity.py:336 StoryActivity.py:428
+msgid "Save as PDF"
+msgstr "Desa com a PDF"
+
+#: StoryActivity.py:350
+msgid "Pause"
+msgstr "Pausa"
+
+#: StoryActivity.py:377
+msgid "Do you really want to load new images?"
+msgstr "De veres voleu carregar noves imatges?"
+
+#: StoryActivity.py:378
+msgid "You have done work on this story. Do you want to overwrite it?"
+msgstr "Heu treballat en aquest relat. Voleu sobreescriure'l?"
+
+#: StoryActivity.py:441
+msgid "PDF"
+msgstr "PDF"
+
+#: StoryActivity.py:473
+msgid "image"
+msgstr "imatge"
+
+#: StoryActivity.py:494
+msgid "Save recording"
+msgstr "Desa l'enregistrament"
+
+#: StoryActivity.py:539
+#, python-format
+msgid "audio note for %s"
+msgstr "nota d'àudio per %s"
