@@ -1,3 +1,8 @@
+16
+
+ENHANCEMENT:
+* New translations
+
 15
 
 * Port to new collaboration wrapper (cristian99garcia)
@@ -10,7 +15,7 @@ BUG FIX:
 
 13
 
-ENHANCEMENT:
+ENHANCEMENTS:
 * Add "linear" mode: images displayed in sequence
 * Add text entry
 * Add text-to-speech
