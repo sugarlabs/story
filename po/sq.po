@@ -1,0 +1,88 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-07-09 22:25-0400\n"
+"PO-Revision-Date: 2016-10-27 19:05+0000\n"
+"Last-Translator: Besnik_b <besnik@programeshqip.org>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: sq\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.5.1.1\n"
+"X-POOTLE-MTIME: 1477595136.000000\n"
+
+#: activity/activity.info:2
+msgid "Story"
+msgstr "Histori"
+
+#: activity/activity.info:3
+msgid "prompts learner to tell a story by displaying images at random"
+msgstr "e bën gati nxënësit të rrëfejë një histori duke shfaqur figura kuturu"
+
+#: StoryActivity.py:50
+msgid "Write your story here."
+msgstr "Shkruani këtu historinë tuaj."
+
+#: StoryActivity.py:51
+msgid "Continue your story here."
+msgstr "Vazhdojeni historinë tuaj këtu."
+
+#: StoryActivity.py:314
+msgid "Load new images"
+msgstr "Ngarkoni figurë të re"
+
+#: StoryActivity.py:318
+msgid "View images all at once"
+msgstr "Shihni krejt figurat njëherësh"
+
+#: StoryActivity.py:322
+msgid "View images one at a time"
+msgstr "Shihini figurat një nga një"
+
+#: StoryActivity.py:326 game.py:337
+msgid "Play"
+msgstr "Luaje"
+
+#: StoryActivity.py:332 StoryActivity.py:454
+msgid "Save as image"
+msgstr "Ruaje si pamje"
+
+#: StoryActivity.py:336 StoryActivity.py:428
+msgid "Save as PDF"
+msgstr "Ruaje si PDF"
+
+#: StoryActivity.py:350
+msgid "Pause"
+msgstr "Pushim"
+
+#: StoryActivity.py:377
+msgid "Do you really want to load new images?"
+msgstr "Doni vërtet të ngarkoni figura të reja?"
+
+#: StoryActivity.py:378
+msgid "You have done work on this story. Do you want to overwrite it?"
+msgstr "Keni punuar ca me këtë histori. Doni të mbishkruhet?"
+
+#: StoryActivity.py:441
+msgid "PDF"
+msgstr "PDF"
+
+#: StoryActivity.py:473
+msgid "image"
+msgstr "figurë"
+
+#: StoryActivity.py:494
+msgid "Save recording"
+msgstr "Ruaje incizimin"
+
+#: StoryActivity.py:539
+#, python-format
+msgid "audio note for %s"
+msgstr "shënim audio për %s"
