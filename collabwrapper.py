@@ -18,38 +18,50 @@
 '''
 The wrapper module provides an abstraction over the sugar
 collaboration system.
+
 Using CollabWrapper
 -------------------
 1. Implement the `get_data` and `set_data` methods in your activity
    class::
+
     def get_data(self):
         # return plain python objects - things that can be encoded
         # using the json module
         return dict(
             text=self._entry.get_text()
         )
+
     def set_data(self, data):
         # data will be the same object returned by get_data
         self._entry.set_text(data.get('text'))
+
 2. Make your CollabWrapper instance::
+
     def __init__(self, handle):
         sugar3.activity.activity.Activity.__init__(self, handle)
         self._collab = CollabWrapper(self)
         self._collab.connect('message', self.__message_cb)
+
         # setup your activity
+
         self._collab.setup()
+
 3. Post any changes to the CollabWrapper.  The changes will be sent to
    other users if any are connected::
+
     def __entry_changed_cb(self, *args):
         self._collab.post(dict(
             action='entry_changed',
             new_text=self._entry.get_text()
         ))
+
 4. Handle incoming messages::
+
     def __message_cb(self, collab, buddy, message):
         action = msg.get('action')
         if action == 'entry_changed':
             self._entry.set_text(msg.get('new_text'))
+
 '''
 
 import os
@@ -98,21 +110,26 @@ class CollabWrapper(GObject.GObject):
     collaboration system.  The wrapper deals with setting up the channels,
     encoding and decoding messages, initialization and alerting the user
     to the status.
+
     When a user joins the activity, it will query the leader for the
     contents.  The leader will return the result of the activity's
     `get_data` function which will be passed to the `set_data` function
     on the new user's computer.
+
     The `message` signal is called when a message is received from a
     buddy.  It has 2 arguments.  The first is the buddy, as a
     :class:`sugar3.presence.buddy.Buddy`. The second is the decoded
     content of the message, same as that posted by the other instance.
+
     The `joined` signal is emitted when the buddy joins a running
     activity.  If the user shares and activity, the joined signal
     is not emitted.  By the time this signal is emitted, the channels
     will be setup so all messages will flow through.
+
     The `buddy_joined` and `buddy_left` signals are emitted when
     another user joins or leaves the activity.  They both a
     :class:`sugar3.presence.buddy.Buddy` as their only argument.
+
     The `incoming_file` signal is emitted when a file transfer is
     received from a buddy.  The first argument is the object representing
     the transfer, as a
@@ -139,6 +156,7 @@ class CollabWrapper(GObject.GObject):
         '''
         Setup must be called to so that the activity can join or share
         if appropriate.
+
         .. note::
             As soon as setup is called, any signal, `get_data` or
             `set_data` call must be made.  This means that your
@@ -280,6 +298,7 @@ class CollabWrapper(GObject.GObject):
         Send a 1-to-1 transfer from memory to a given buddy.  They will
         get the file transfer and description through the `incoming_transfer`
         signal.
+
         Args:
             buddy (sugar3.presence.buddy.Buddy), buddy to offer the transfer to
             data (str), the data to offer to the buddy via the transfer
@@ -300,6 +319,7 @@ class CollabWrapper(GObject.GObject):
         Send a 1-to-1 transfer from a file to a given buddy.  They will
         get the file transfer and description through the `incoming_transfer`
         signal.
+
         Args:
             buddy (sugar3.presence.buddy.Buddy), buddy to offer the transfer to
             path (str), path of the file to send to the buddy
@@ -320,6 +340,7 @@ class CollabWrapper(GObject.GObject):
         Broadcast a message to the other buddies if the activity is
         shared.  If it is not shared, the message will not be send
         at all.
+
         Args:
             msg (object): json encodable object to send to the other
                 buddies, eg. :class:`dict` or :class:`str`.
@@ -338,6 +359,7 @@ class CollabWrapper(GObject.GObject):
     def get_client_name(self):
         '''
         Get the name of the activity's telepathy client.
+
         Returns: str, telepathy client name
         '''
         return CLIENT + '.' + self.activity.get_bundle_id()
@@ -363,6 +385,7 @@ class _BaseFileTransfer(GObject.GObject):
     '''
     The base file transfer should not be used directly.  It is used as a
     base class for the incoming and outgoing file transfers.
+
     Props:
         filename (str), metadata provided by the buddy
         file_size (str), size of the file being sent/received, in bytes
@@ -371,6 +394,7 @@ class _BaseFileTransfer(GObject.GObject):
         buddy (:class:`sugar3.presence.buddy.Buddy`), other party
             in the transfer
         reason_last_change (FT_REASON_*), reason for the last state change
+
     GObject Props:
         state (FT_STATE_*), current state of the transfer
         transferred_bytes (int), number of bytes transfered so far
@@ -447,6 +471,7 @@ class _BaseFileTransfer(GObject.GObject):
     def cancel(self):
         '''
         Request that telepathy close the file transfer channel
+
         Spec:  http://telepathy.freedesktop.org/spec/Channel.html#Method:Close
         '''
         self.channel[CHANNEL].Close()
@@ -459,6 +484,7 @@ class IncomingFileTransfer(_BaseFileTransfer):
     to the state and wait until the transfer is completed.  Then you can
     read the file that it was saved to, or access the
     :class:`Gio.MemoryOutputStream` from the `output` property.
+
     The `output` property is different depending on how the file was accepted.
     If the file was accepted to a file on the file system, it is a string
     representing the path to the file.  If the file was accepted to memory,
@@ -483,6 +509,7 @@ class IncomingFileTransfer(_BaseFileTransfer):
         '''
         Accept the file transfer and write it to a new file.  The file must
         already exist.
+
         Args:
             destination_path (str): the path where a new file will be
                 created and saved to
@@ -544,10 +571,12 @@ class IncomingFileTransfer(_BaseFileTransfer):
 class _BaseOutgoingTransfer(_BaseFileTransfer):
     '''
     This class provides the base of an outgoing file transfer.
+
     You can override the `_get_input_stream` method to return any type of
     Gio input stream.  This will then be used to provide the file if
     requested by the application.  You also need to call `_create_channel`
     with the length of the file in bytes during your `__init__`.
+
     Args:
         buddy (sugar3.presence.buddy.Buddy), who to send the transfer to
         conn (telepathy.client.conn.Connection), telepathy connection to
@@ -611,8 +640,10 @@ class OutgoingFileTransfer(_BaseOutgoingTransfer):
     '''
     An outgoing file transfer to send from a file (on the computer's file
     system).
+
     Note that the `path` argument is the path for the file that will be
     sent, whereas the `filename` argument is only for metadata.
+
     Args:
         path (str), path of the file to send
     '''
@@ -626,13 +657,13 @@ class OutgoingFileTransfer(_BaseOutgoingTransfer):
         self._create_channel(file_size)
 
     def _get_input_stream(self):
-        logging.debug('opening %s for reading', self._file_name)
-        input_stream = Gio.File.new_for_path(self._file_name).read(None)
+        input_stream = Gio.File.new_for_path(self._path).read(None)
 
 
 class OutgoingBlobTransfer(_BaseOutgoingTransfer):
     '''
     An outgoing file transfer to send from a string in memory.
+
     Args:
         blob (str), data to send
     '''
@@ -695,6 +726,7 @@ class _TextChannelWrapper(object):
 
     def set_received_callback(self, callback):
         '''Connect the function callback to the signal.
+
         callback -- callback function taking buddy and text args
         '''
         if self._text_chan is None:
@@ -713,6 +745,7 @@ class _TextChannelWrapper(object):
 
     def _received_cb(self, identity, timestamp, sender, type_, flags, text):
         '''Handle received text from the text channel.
+
         Converts sender to a Buddy.
         Calls self._activity_cb which is a callback to the activity.
         '''
@@ -749,7 +782,9 @@ class _TextChannelWrapper(object):
 
     def set_closed_callback(self, callback):
         '''Connect a callback for when the text channel is closed.
+
         callback -- callback function taking no args
+
         '''
         _logger.debug('set closed callback')
         self._activity_close_cb = callback
