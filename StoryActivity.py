@@ -38,10 +38,7 @@ from dbus.service import signal
 from dbus.gobject_service import ExportedGObject
 from sugar3.presence import presenceservice
 
-try:
-    from sugar3.presence.wrapper import CollabWrapper
-except ImportError:
-    from textchannelwrapper import CollabWrapper
+from collabwrapper import CollabWrapper
 
 from gettext import gettext as _
 
