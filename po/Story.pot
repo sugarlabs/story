@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-09 22:25-0400\n"
+"POT-Creation-Date: 2017-06-10 15:16+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,58 +30,74 @@ msgid "Write your story here."
 msgstr ""
 
 #: StoryActivity.py:51
+msgid "Begin your story here."
+msgstr ""
+
+#: StoryActivity.py:52
 msgid "Continue your story here."
 msgstr ""
 
-#: StoryActivity.py:314
+#: StoryActivity.py:336
 msgid "Load new images"
 msgstr ""
 
-#: StoryActivity.py:318
+#: StoryActivity.py:340
 msgid "View images all at once"
 msgstr ""
 
-#: StoryActivity.py:322
+#: StoryActivity.py:344
 msgid "View images one at a time"
 msgstr ""
 
-#: StoryActivity.py:326 game.py:337
+#: StoryActivity.py:348 game.py:343
 msgid "Play"
 msgstr ""
 
-#: StoryActivity.py:332 StoryActivity.py:454
+#: StoryActivity.py:355 StoryActivity.py:485
 msgid "Save as image"
 msgstr ""
 
-#: StoryActivity.py:336 StoryActivity.py:428
+#: StoryActivity.py:359 StoryActivity.py:458
 msgid "Save as PDF"
 msgstr ""
 
-#: StoryActivity.py:350
+#: StoryActivity.py:373
 msgid "Pause"
 msgstr ""
 
-#: StoryActivity.py:377
+#: StoryActivity.py:401
 msgid "Do you really want to load new images?"
 msgstr ""
 
-#: StoryActivity.py:378
+#: StoryActivity.py:402
 msgid "You have done work on this story. Do you want to overwrite it?"
 msgstr ""
 
-#: StoryActivity.py:441
+#: StoryActivity.py:472
 msgid "PDF"
 msgstr ""
 
-#: StoryActivity.py:473
+#: StoryActivity.py:504
 msgid "image"
 msgstr ""
 
-#: StoryActivity.py:494
+#: StoryActivity.py:523
 msgid "Save recording"
 msgstr ""
 
-#: StoryActivity.py:539
+#: StoryActivity.py:567
 #, python-format
 msgid "audio note for %s"
+msgstr ""
+
+#: collabwrapper.py:176
+msgid "Joining activity..."
+msgstr ""
+
+#: collabwrapper.py:177 collabwrapper.py:189
+msgid "Please wait for the connection..."
+msgstr ""
+
+#: collabwrapper.py:188
+msgid "Resuming shared activity..."
 msgstr ""
