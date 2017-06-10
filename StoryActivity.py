@@ -212,7 +212,7 @@ class StoryActivity(activity.Activity):
         self.get_window().set_cursor(Gdk.Cursor.new(Gdk.CursorType.WATCH))
 
     def _text_changed_cb(self, text_buffer):
-        self.place_cursor_onscreen()
+        self._entry.place_cursor_onscreen()
 
     def _fixed_resize_cb(self, widget=None, rect=None):
         ''' If a toolbar opens or closes, we need to resize the vbox
