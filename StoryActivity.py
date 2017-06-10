@@ -623,17 +623,17 @@ class StoryActivity(activity.Activity):
 
     def _new_tube_common(self, sharer):
         ''' Joining and sharing are mostly the same... '''
-        if self._shared_activity is None:
-            _logger.debug('Error: Failed to share or join activity ... \
-                _shared_activity is null in _shared_cb()')
+        shared_activity = self.get_shared_activity()
+        if shared_activity is None:
+            _logger.error('Failed to share or join activity')
             return
 
         self.initiating = sharer
         self.waiting_for_hand = not sharer
 
-        self.conn = self._shared_activity.telepathy_conn
-        self.tubes_chan = self._shared_activity.telepathy_tubes_chan
-        self.text_chan = self._shared_activity.telepathy_text_chan
+        self.conn = shared_activity.telepathy_conn
+        self.tubes_chan = shared_activity.telepathy_tubes_chan
+        self.text_chan = shared_activity.telepathy_text_chan
 
         self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].connect_to_signal(
             'NewTube', self._new_tube_cb)
