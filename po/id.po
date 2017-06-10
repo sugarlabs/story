@@ -2,62 +2,63 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-05-27 00:34-0400\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2016-04-16 10:48+0000\n"
+"Last-Translator: andika <andika@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Translate Toolkit 1.7.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Pootle 2.5.1.1\n"
+"X-POOTLE-MTIME: 1460803721.000000\n"
 
 #: activity/activity.info:2
 msgid "Story"
-msgstr ""
+msgstr "Cerita"
 
 #: StoryActivity.py:121
 msgid "Game"
-msgstr ""
+msgstr "Permainan"
 
 #: StoryActivity.py:128
 msgid "Load new images."
-msgstr ""
+msgstr "Muat gambar baru."
 
 #: StoryActivity.py:134 StoryActivity.py:192
 msgid "Save as image"
-msgstr ""
+msgstr "Simpan sebagai gambar"
 
 #: StoryActivity.py:140 StoryActivity.py:204
 msgid "Start recording"
-msgstr ""
+msgstr "Mulai merekam"
 
 #: StoryActivity.py:144
 msgid "Nothing to play"
-msgstr ""
+msgstr "Tak ada yang diputar"
 
 #: StoryActivity.py:185
 msgid "image"
-msgstr ""
+msgstr "citra"
 
 #: StoryActivity.py:206
 msgid "Play recording"
-msgstr ""
+msgstr "Putar rekaman"
 
 #: StoryActivity.py:207
 msgid "Save recording"
-msgstr ""
+msgstr "Simpan rekaman"
 
 #: StoryActivity.py:220
 msgid "Stop recording"
-msgstr ""
+msgstr "Hentikan rekaman"
 
 #: StoryActivity.py:234
 #, python-format
 msgid "audio note for %s"
-msgstr ""
+msgstr "catatan suara untuk %s"

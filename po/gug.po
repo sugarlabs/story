@@ -2,87 +2,88 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-07-09 22:25-0400\n"
-"PO-Revision-Date: 2017-03-18 22:17+0000\n"
-"Last-Translator: Chris <cjl@sugarlabs.org>\n"
+"PO-Revision-Date: 2017-02-21 15:25+0000\n"
+"Last-Translator: MartínOesterreich <martin.otte80@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: fa\n"
+"Language: gug\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.1\n"
-"X-POOTLE-MTIME: 1489875444.000000\n"
+"X-POOTLE-MTIME: 1487690730.000000\n"
 
 #: activity/activity.info:2
 msgid "Story"
-msgstr "داستان"
+msgstr "Mombe'u."
 
 #: activity/activity.info:3
 msgid "prompts learner to tell a story by displaying images at random"
-msgstr "یادگیرنده را وادار به گفتن داستانی با نشان دادن تصادفی تصاویر میکند"
+msgstr "prompts learner to tell a story by displaying images at random."
 
 #: StoryActivity.py:50
 msgid "Write your story here."
-msgstr "داستانت را اینجا بنویس."
+msgstr "Ohai itembiasakue ápe."
 
 #: StoryActivity.py:51
 msgid "Continue your story here."
-msgstr "داستانت را اینجا ادامه بده."
+msgstr "Japo mante itembiasakue àpe."
 
 #: StoryActivity.py:314
 msgid "Load new images"
-msgstr "اجرای تصاویر جدید"
+msgstr "Ehupi pyahu ta'angakuera."
 
 #: StoryActivity.py:318
 msgid "View images all at once"
-msgstr "همه تصاویر را یک‌‌جا ببین"
+msgstr "Hechapa pe ta'angakuera peteí año jevy."
 
 #: StoryActivity.py:322
 msgid "View images one at a time"
-msgstr "تصویر را یکی یکی ببین"
+msgstr "Hechapa ta'àngakuera peteî peteî gui."
 
 #: StoryActivity.py:326 game.py:337
 msgid "Play"
-msgstr "پخش"
+msgstr "Ñembosarái."
 
 #: StoryActivity.py:332 StoryActivity.py:454
 msgid "Save as image"
-msgstr "ذخیره کردن تصویر"
+msgstr "Ñongatu ta'anga mba'éicha."
 
 #: StoryActivity.py:336 StoryActivity.py:428
 msgid "Save as PDF"
-msgstr "ذخیره کردن به صورت PDF"
+msgstr "Ñongatu PDF icha."
 
 #: StoryActivity.py:350
 msgid "Pause"
-msgstr "مکث"
+msgstr "Pa'ũ."
 
 #: StoryActivity.py:377
 msgid "Do you really want to load new images?"
-msgstr "آیا واقعا تمایل به اجرای تصاویر جدید دارید؟"
+msgstr "Do you really want to load new images?"
 
 #: StoryActivity.py:378
 msgid "You have done work on this story. Do you want to overwrite it?"
-msgstr "کار شما به این داستان تمام شده است. آیا میخواهید دوباره آن را بنویسید؟"
+msgstr "You have done work on this story. Do you want to overwrite it?"
 
 #: StoryActivity.py:441
 msgid "PDF"
-msgstr "PDF"
+msgstr "PDF."
 
 #: StoryActivity.py:473
 msgid "image"
-msgstr "تصویر"
+msgstr "Ta'anga."
 
 #: StoryActivity.py:494
 msgid "Save recording"
-msgstr "ذخیره فایل های ضبط شده"
+msgstr "Ñongatu moñe'embyre."
 
 #: StoryActivity.py:539
 #, python-format
 msgid "audio note for %s"
-msgstr "متن صوتی برای %s"
+msgstr "kuatiavore moñe'embyre %s. "
