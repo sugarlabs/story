@@ -23,8 +23,8 @@ import os
 import time
 
 import gi
-from gi.repository import Gtk, Gst
 gi.require_version('Gst', '1.0')
+from gi.repository import Gtk, Gst
 
 import logging
 _logger = logging.getLogger("portfolio-activity")

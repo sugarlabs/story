@@ -16,6 +16,7 @@ import json
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('PangoCairo', '1.0')
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
 from gi.repository import Pango
