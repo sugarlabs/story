@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-10 15:16+1000\n"
+"POT-Creation-Date: 2018-04-02 16:41+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,67 +25,67 @@ msgstr ""
 msgid "prompts learner to tell a story by displaying images at random"
 msgstr ""
 
-#: StoryActivity.py:50
+#: StoryActivity.py:53
 msgid "Write your story here."
 msgstr ""
 
-#: StoryActivity.py:51
+#: StoryActivity.py:54
 msgid "Begin your story here."
 msgstr ""
 
-#: StoryActivity.py:52
+#: StoryActivity.py:55
 msgid "Continue your story here."
 msgstr ""
 
-#: StoryActivity.py:336
+#: StoryActivity.py:339
 msgid "Load new images"
 msgstr ""
 
-#: StoryActivity.py:340
+#: StoryActivity.py:343
 msgid "View images all at once"
 msgstr ""
 
-#: StoryActivity.py:344
+#: StoryActivity.py:347
 msgid "View images one at a time"
 msgstr ""
 
-#: StoryActivity.py:348 game.py:343
+#: StoryActivity.py:351 game.py:343
 msgid "Play"
 msgstr ""
 
-#: StoryActivity.py:355 StoryActivity.py:485
+#: StoryActivity.py:358 StoryActivity.py:488
 msgid "Save as image"
 msgstr ""
 
-#: StoryActivity.py:359 StoryActivity.py:458
+#: StoryActivity.py:362 StoryActivity.py:461
 msgid "Save as PDF"
 msgstr ""
 
-#: StoryActivity.py:373
+#: StoryActivity.py:376
 msgid "Pause"
 msgstr ""
 
-#: StoryActivity.py:401
+#: StoryActivity.py:404
 msgid "Do you really want to load new images?"
 msgstr ""
 
-#: StoryActivity.py:402
+#: StoryActivity.py:405
 msgid "You have done work on this story. Do you want to overwrite it?"
 msgstr ""
 
-#: StoryActivity.py:472
+#: StoryActivity.py:475
 msgid "PDF"
 msgstr ""
 
-#: StoryActivity.py:504
+#: StoryActivity.py:507
 msgid "image"
 msgstr ""
 
-#: StoryActivity.py:523
+#: StoryActivity.py:526
 msgid "Save recording"
 msgstr ""
 
-#: StoryActivity.py:567
+#: StoryActivity.py:570
 #, python-format
 msgid "audio note for %s"
 msgstr ""

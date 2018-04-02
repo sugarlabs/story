@@ -1,3 +1,13 @@
+18
+
+* Remove unneeded files (Walter Bender),
+* New translations (Chris Leonard et al),
+* Update CollabWrapper (James Cameron),
+* Update POT file (James Cameron),
+* Fix Python GI API version warnings (James Cameron),
+* Fix cursor always visible (James Cameron),
+* Do not use deprecated _shared_activity member (James Cameron).
+
 17
 
 * Add missing file

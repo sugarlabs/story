@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-05-27 00:34-0400\n"
-"PO-Revision-Date: 2013-01-11 05:53+0200\n"
-"Last-Translator: Chris <cjl@laptop.org>\n"
+"PO-Revision-Date: 2017-12-03 16:31+0000\n"
+"Last-Translator: Martin <miles@filmsi.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -16,51 +16,50 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3);\n"
-"X-Generator: Pootle 2.0.5\n"
+"X-Generator: Pootle 2.5.1.1\n"
+"X-POOTLE-MTIME: 1512318701.000000\n"
 
 #: activity/activity.info:2
 msgid "Story"
-msgstr ""
+msgstr "Zgodba"
 
 #: StoryActivity.py:121
-#, fuzzy
 msgid "Game"
 msgstr "Igra"
 
 #: StoryActivity.py:128
 msgid "Load new images."
-msgstr ""
+msgstr "Naloži nove slike."
 
 #: StoryActivity.py:134 StoryActivity.py:192
 msgid "Save as image"
-msgstr ""
+msgstr "Shrani kot sliko"
 
 #: StoryActivity.py:140 StoryActivity.py:204
 msgid "Start recording"
-msgstr ""
+msgstr "Začni snemati"
 
 #: StoryActivity.py:144
 msgid "Nothing to play"
-msgstr ""
+msgstr "Nič ni za predvajati"
 
 #: StoryActivity.py:185
-#, fuzzy
 msgid "image"
-msgstr "Slika"
+msgstr "slika"
 
 #: StoryActivity.py:206
 msgid "Play recording"
-msgstr ""
+msgstr "Predvajaj posnetek"
 
 #: StoryActivity.py:207
 msgid "Save recording"
-msgstr ""
+msgstr "Shrani posnetek"
 
 #: StoryActivity.py:220
 msgid "Stop recording"
-msgstr ""
+msgstr "Ustavi snemanje"
 
 #: StoryActivity.py:234
 #, python-format
 msgid "audio note for %s"
-msgstr ""
+msgstr "zvočna opomba za %s"

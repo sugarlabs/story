@@ -1,6 +1,6 @@
 [Activity]
 name = Story
-activity_version = 17
+activity_version = 18
 license = GPLv3
 bundle_id = org.sugarlabs.StoryActivity
 exec = sugar-activity StoryActivity.StoryActivity
@@ -8,4 +8,4 @@ icon = activity-story
 show_launcher = yes
 summary = prompts learner to tell a story by displaying images at random
 category = language game
-repository = https://github.com/walterbender/story
+repository = https://github.com/sugarlabs/story
