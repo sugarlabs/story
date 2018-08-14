@@ -323,7 +323,7 @@ class StoryActivity(activity.Activity):
     def _setup_toolbars(self):
         ''' Setup the toolbars. '''
 
-        self.max_participants = 4
+        self.max_participants = 1  # collaboration is unfinished
 
         toolbox = ToolbarBox()
 
