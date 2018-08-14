@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-02 16:41+1000\n"
+"POT-Creation-Date: 2018-08-14 14:05+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,82 +22,78 @@ msgid "Story"
 msgstr ""
 
 #: activity/activity.info:3
-msgid "prompts learner to tell a story by displaying images at random"
+msgid "Prompts learner to tell a story by displaying images at random."
 msgstr ""
 
-#: StoryActivity.py:53
+#: StoryActivity.py:52
 msgid "Write your story here."
 msgstr ""
 
-#: StoryActivity.py:54
+#: StoryActivity.py:53
 msgid "Begin your story here."
 msgstr ""
 
-#: StoryActivity.py:55
+#: StoryActivity.py:54
 msgid "Continue your story here."
 msgstr ""
 
-#: StoryActivity.py:339
+#: StoryActivity.py:342
 msgid "Load new images"
 msgstr ""
 
-#: StoryActivity.py:343
+#: StoryActivity.py:346
 msgid "View images all at once"
 msgstr ""
 
-#: StoryActivity.py:347
+#: StoryActivity.py:350
 msgid "View images one at a time"
 msgstr ""
 
-#: StoryActivity.py:351 game.py:343
+#: StoryActivity.py:354 game.py:344
 msgid "Play"
 msgstr ""
 
-#: StoryActivity.py:358 StoryActivity.py:488
+#: StoryActivity.py:361 StoryActivity.py:491
 msgid "Save as image"
 msgstr ""
 
-#: StoryActivity.py:362 StoryActivity.py:461
+#: StoryActivity.py:365 StoryActivity.py:464
 msgid "Save as PDF"
 msgstr ""
 
-#: StoryActivity.py:376
+#: StoryActivity.py:379
 msgid "Pause"
 msgstr ""
 
-#: StoryActivity.py:404
+#: StoryActivity.py:407
 msgid "Do you really want to load new images?"
 msgstr ""
 
-#: StoryActivity.py:405
+#: StoryActivity.py:408
 msgid "You have done work on this story. Do you want to overwrite it?"
 msgstr ""
 
-#: StoryActivity.py:475
+#: StoryActivity.py:478
 msgid "PDF"
 msgstr ""
 
-#: StoryActivity.py:507
+#: StoryActivity.py:510
 msgid "image"
 msgstr ""
 
-#: StoryActivity.py:526
-msgid "Save recording"
-msgstr ""
-
-#: StoryActivity.py:570
+#: StoryActivity.py:577
 #, python-format
 msgid "audio note for %s"
 msgstr ""
 
-#: collabwrapper.py:176
+#: collabwrapper.py:192
 msgid "Joining activity..."
 msgstr ""
 
-#: collabwrapper.py:177 collabwrapper.py:189
+#: collabwrapper.py:193 collabwrapper.py:205
 msgid "Please wait for the connection..."
 msgstr ""
 
-#: collabwrapper.py:188
+#: collabwrapper.py:204
 msgid "Resuming shared activity..."
 msgstr ""
