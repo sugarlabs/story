@@ -1,7 +1,7 @@
 [Activity]
 name = Story
 activity_version = 18
-license = GPLv3+;MIT
+license = GPLv3+;GPLv2+;MIT
 bundle_id = org.sugarlabs.StoryActivity
 exec = sugar-activity StoryActivity.StoryActivity
 icon = activity-story

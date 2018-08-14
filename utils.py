@@ -40,17 +40,6 @@ def json_dump(data):
     _io = StringIO()
     jdump(data, _io)
     return _io.getvalue()
-
-
-def play_audio_from_file(file_path, activity):
-    """ Audio media """
-    command_line = ['gst-launch', 'filesrc', 'location=' + file_path,
-                    '! oggdemux', '! vorbisdec', '! audioconvert',
-                    '! alsasink']
-    activity.audio_process = Popen(command_line)
-    # subprocess.call(command_line)
-
-
 VOICES = {'af': 'afrikaans', 'cy': 'welsh-test', 'el': 'greek',
           'es': 'spanish', 'hi': 'hindi-test', 'hy': 'armenian',
           'ku': 'kurdish', 'mk': 'macedonian-test', 'pt': 'brazil',
