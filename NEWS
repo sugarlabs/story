@@ -1,3 +1,14 @@
+19
+
+* Add README (Rudra Sadhu),
+* Update metadata (Vipul Gupta),
+* New translations (Chris Leonard et al),
+* Update CollabWrapper (James Cameron),
+* Update POT file (James Cameron),
+* Replace audio recording and playback modules (James Cameron),
+* Tidy source code (James Cameron),
+* Disable collaboration - not working yet (James Cameron).
+
 18
 
 * Remove unneeded files (Walter Bender),
