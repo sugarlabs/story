@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#Copyright (c) 2011-14 Walter Bender
+# Copyright (C) 2011-14 Walter Bender
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -10,26 +10,21 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-import os
 import time
-import json
 
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('PangoCairo', '1.0')
-from gi.repository import Gdk
-from gi.repository import GdkPixbuf
 from gi.repository import Pango
 from gi.repository import PangoCairo
 import cairo
-
-from gettext import gettext as _
 
 import logging
 _logger = logging.getLogger("story-activity")
 
 LEFT_MARGIN = 50
 TOP_MARGIN = 50
+
 
 def save_pdf(activity, tmp_file, nick, description=None):
     ''' Output a PDF document from the title, pictures, and descriptions '''
@@ -89,10 +84,9 @@ def save_pdf(activity, tmp_file, nick, description=None):
 
 
 def one_page(activity, cr, fd, body, text, page_width, page_height):
-    w = h = int((4 * activity._game._space + 3 * activity._game._dot_size))
+    w = int((4 * activity._game._space + 3 * activity._game._dot_size))
     xo = int((page_width - (w / 2)) * 0.5) - 10
-    yo = TOP_MARGIN
-    png_surface = activity._game.export()
+    activity._game.export()
     cr.save()
     cr.scale(0.67, 0.67)
     for i in range(9):
@@ -117,7 +111,7 @@ def page(activity, cr, fd, body, text, page_width, page_height):
     w = h = int((4 * activity._game._space + 3 * activity._game._dot_size))
     x = int((page_width - (w / 2)) * 0.67) + LEFT_MARGIN - 50
     y = TOP_MARGIN
-    png_surface = activity._game.export()
+    activity._game.export()
     cr.save()
     cr.scale(0.67, 0.67)
     cr.set_source_surface(
@@ -143,8 +137,6 @@ def show_text(cr, fd, label, size, x, y, page_width, page_height):
     else:
         text = str(label).rstrip()
 
-    top = y
-    left = x
     right = page_width - LEFT_MARGIN
     bottom = page_height - TOP_MARGIN * 2
 

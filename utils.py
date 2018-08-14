@@ -1,4 +1,4 @@
-#Copyright (c) 2011-14 Walter Bender
+# Copyright (c) 2011-14 Walter Bender
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -10,8 +10,6 @@
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 import os
-import subprocess
-from subprocess import Popen, PIPE
 from pipes import quote
 from StringIO import StringIO
 
@@ -67,12 +65,5 @@ def speak(text):
         command = 'espeak -v %s "%s"' % (VOICES[lang], safetext)
     else:
         command = 'espeak "%s"' % (safetext)
-
-    '''
-    p1 = Popen([command, '--stdout'], stdout=PIPE, shell=True)
-    p2 = Popen(['aplay'], stdin=p1.stdout, stdout=PIPE)
-    p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
-    output = p2.communicate()[0]
-    '''
 
     os.system('%s --stdout | aplay' % command)

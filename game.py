@@ -1,5 +1,5 @@
- # -*- coding: utf-8 -*-
-#Copyright (c) 2012-14 Walter Bender
+# -*- coding: utf-8 -*-
+# Copyright (C) 2012-14 Walter Bender
 # Port to GTK3:
 # Ignacio Rodriguez <ignaciorodriguez@sugarlabs.org>
 
@@ -160,9 +160,10 @@ class Game():
                 self._dots[-1].set_label('?')
 
                 self._Dots.append(
-                    Sprite(self._sprites, X, Y, 
-                           self._new_dot_surface(color=self._colors[0],
-                                                 large=True)))
+                    Sprite(
+                        self._sprites, X, Y,
+                        self._new_dot_surface(color=self._colors[0],
+                                              large=True)))
                 self._Dots[-1].type = -1  # No image
                 self._Dots[-1].set_label_attributes(72 * 3)
                 self._Dots[-1].set_label('?')
@@ -200,24 +201,24 @@ class Game():
         y2 = y1 + style.GRID_CELL_SIZE
         if not self._parent.tablet_mode:
             dy = Gdk.Screen.height() - 4 * style.GRID_CELL_SIZE - \
-                 2 * style.DEFAULT_SPACING
+                2 * style.DEFAULT_SPACING
             y0 += dy
             y1 += dy
             y2 += dy
         y3 = int((Gdk.Screen.height() - 2 * style.GRID_CELL_SIZE) / 2)
 
-        self._record = Sprite(self._sprites, right, y0,
-                              self._record_pixbufs[RECORD_OFF])
+        self._record = Sprite(
+            self._sprites, right, y0, self._record_pixbufs[RECORD_OFF])
         self._record.set_layer(1)
         self._record.type = 'record'
 
-        self._play = Sprite(self._sprites, right, y1,
-                            self._play_pixbufs[PLAY_OFF])
+        self._play = Sprite(
+            self._sprites, right, y1, self._play_pixbufs[PLAY_OFF])
         self._play.set_layer(1)
         self._play.type = 'play-inactive'
 
-        self._speak = Sprite(self._sprites, right, y2,
-                            self._speak_pixbufs[SPEAK_OFF])
+        self._speak = Sprite(
+            self._sprites, right, y2, self._speak_pixbufs[SPEAK_OFF])
         self._speak.set_layer(1)
         self._speak.type = 'speak-inactive'
 
@@ -229,20 +230,20 @@ class Game():
                     os.path.join(self._root, 'icons', icon + '.svg'),
                     style.GRID_CELL_SIZE, style.GRID_CELL_SIZE))
 
-        self._prev = Sprite(self._sprites, left, y3,
-                            self._next_prev_pixbufs[PREV_INACTIVE])
+        self._prev = Sprite(
+            self._sprites, left, y3, self._next_prev_pixbufs[PREV_INACTIVE])
         self._prev.set_layer(1)
         self._prev.type = 'prev'
         if self._mode == 'array':
             self._prev.hide()
 
-        self._next = Sprite(self._sprites, right, y3,
-                            self._next_prev_pixbufs[NEXT])
+        self._next = Sprite(
+            self._sprites, right, y3, self._next_prev_pixbufs[NEXT])
         self._next.set_layer(1)
         self._next.type = 'next'
         if self._mode == 'array':
             self._next.hide()
-        
+
     def configure(self, move=True):
         self._width = Gdk.Screen.width()
         self._height = Gdk.Screen.height() - style.GRID_CELL_SIZE
@@ -267,7 +268,7 @@ class Game():
         y2 = y1 + style.GRID_CELL_SIZE
         if not self._parent.tablet_mode:
             dy = Gdk.Screen.height() - 4 * style.GRID_CELL_SIZE - \
-                 2 * style.DEFAULT_SPACING
+                2 * style.DEFAULT_SPACING
             y0 += dy
             y1 += dy
             y2 += dy
@@ -290,8 +291,8 @@ class Game():
                 xoffset = int((self._width - 3 * self._dot_size -
                                2 * self._space) / 2.)
                 self._dots[x + y * 3].move(
-                           (xoffset + x * (self._dot_size + self._space),
-                           y * (self._dot_size + self._space) + yoffset))
+                    (xoffset + x * (self._dot_size + self._space),
+                        y * (self._dot_size + self._space) + yoffset))
                 self._Dots[x + y * 3].move((X, Y))
 
         # switch orientation the bg sprite
@@ -482,7 +483,7 @@ class Game():
                             self._next_prev_pixbufs[NEXT_INACTIVE])
                     self._prev.set_image(self._next_prev_pixbufs[PREV])
                 elif spr.type not in ['prev', 'background'] and \
-                     self.current_image < 8:
+                        self.current_image < 8:
                     self._Dots[self.current_image].hide()
                     self.current_image += 1
                     self._Dots[self.current_image].set_layer(100)
@@ -571,7 +572,7 @@ class Game():
 
     def _new_images(self):
         ''' Select pictures at random '''
-        used_images = [0]*self.number_of_images
+        used_images = [0] * self.number_of_images
         for i in range(9):
             random_selection = int(uniform(0, self.number_of_images))
             while used_images[random_selection] != 0:
@@ -790,15 +791,16 @@ def genblank(w, h, colors, stroke_width=1.0):
 
 def genhole(w, h, x1, y1, x2, y2):
     return \
-'<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + \
-'<svg ' + \
-'   width="%d"' % w + \
-'   height="%d">\n' % h + \
-'    <path ' + \
-'       d="m 0,0 0,%d %d,0 0,%d z m %d,%d %d,0 0,%d %d,0 z"' \
-% (h, w, -h, x1, y1, x2 - x1, y2 - y1, x1 - x2) + \
-'       style="fill:#FFFFFF;fill-opacity:1;stroke:none;stroke-width:3.5;" />\n' + \
-'</svg>'
+        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + \
+        '<svg ' + \
+        '   width="%d"' % w + \
+        '   height="%d">\n' % h + \
+        '    <path ' + \
+        '       d="m 0,0 0,%d %d,0 0,%d z m %d,%d %d,0 0,%d %d,0 z"' % \
+        (h, w, -h, x1, y1, x2 - x1, y2 - y1, x1 - x2) + \
+        '       style="fill:#FFFFFF;fill-opacity:1;' \
+        'stroke:none;stroke-width:3.5;" />\n' + \
+        '</svg>'
 
 
 class SVG:

@@ -1,4 +1,4 @@
-#Copyright (c) 2012-14 Walter Bender
+# Copyright (c) 2012-14 Walter Bender
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ from gi.repository import Pango
 
 import os
 import subprocess
-import time
 import random
 
 from sugar3.activity import activity
@@ -39,8 +38,6 @@ from arecord import Arecord
 
 import telepathy
 import dbus
-from dbus.service import signal
-from dbus.gobject_service import ExportedGObject
 from sugar3.presence import presenceservice
 
 from collabwrapper import CollabWrapper
@@ -112,7 +109,7 @@ class StoryActivity(activity.Activity):
         self._vbox.show()
 
         entry_width = Gdk.Screen.width() - 7 * style.GRID_CELL_SIZE - \
-                      2 * style.DEFAULT_SPACING
+            2 * style.DEFAULT_SPACING
         entry_height = 3 * style.GRID_CELL_SIZE - 2 * style.DEFAULT_SPACING
         self._entry = Gtk.TextView()
         self._entry.set_wrap_mode(Gtk.WrapMode.WORD)
@@ -120,7 +117,7 @@ class StoryActivity(activity.Activity):
         self._entry.set_size_request(entry_width, entry_height)
         font_desc = Pango.font_description_from_string('14')
         self._entry.modify_font(font_desc)
-        self.text_buffer = self._entry.get_buffer() 
+        self.text_buffer = self._entry.get_buffer()
         self.text_buffer.set_text(PLACEHOLDER)
         self._entry.connect('focus-in-event', self._text_focus_in_cb)
         self._entry.connect('key-press-event', self._text_focus_in_cb)
@@ -134,8 +131,8 @@ class StoryActivity(activity.Activity):
         self._scrolled_window.set_size_request(
             Gdk.Screen.width() - 6 * style.GRID_CELL_SIZE,
             style.GRID_CELL_SIZE * 3)
-        self._scrolled_window.set_policy(Gtk.PolicyType.NEVER,
-                                   Gtk.PolicyType.AUTOMATIC)
+        self._scrolled_window.set_policy(
+            Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         rgba = Gdk.RGBA()
         rgba.red, rgba.green, rgba.blue, rgba.alpha = 1., 1., 1., 1.
         self._scrolled_window.override_background_color(
@@ -189,7 +186,7 @@ class StoryActivity(activity.Activity):
                                       int(Gdk.Screen.height()))
         self._vbox.set_size_request(Gdk.Screen.width(), Gdk.Screen.height())
         entry_width = Gdk.Screen.width() - 7 * style.GRID_CELL_SIZE - \
-                      2 * style.DEFAULT_SPACING
+            2 * style.DEFAULT_SPACING
         entry_height = 3 * style.GRID_CELL_SIZE - 2 * style.DEFAULT_SPACING
         self._entry.set_size_request(entry_width, entry_height)
         self._scrolled_window.set_size_request(
@@ -237,7 +234,7 @@ class StoryActivity(activity.Activity):
 
     def _text_focus_out_cb(self, widget=None, event=None):
         self.speak_text_cb()
-    
+
     def speak_text_cb(self, button=None):
         bounds = self.text_buffer.get_bounds()
         text = self.text_buffer.get_text(bounds[0], bounds[1], True)
@@ -249,7 +246,7 @@ class StoryActivity(activity.Activity):
             else:
                 self._game.set_speak_icon_state(False)
         else:
-            if not text in [PLACEHOLDER, PLACEHOLDER1, PLACEHOLDER2]:
+            if text not in [PLACEHOLDER, PLACEHOLDER1, PLACEHOLDER2]:
                 key = 'text-%d' % self._game.current_image
                 self.metadata[key] = text
                 self.metadata['dirty'] = 'True'
@@ -688,7 +685,7 @@ class StoryActivity(activity.Activity):
         self._processing_methods = {
             'n': [self._receive_new_images, 'get a new game grid'],
             'p': [self._receive_dot_click, 'get a dot click'],
-            }
+        }
 
     def event_received_cb(self, collab, buddy, msg):
         ''' Data from a tube has arrived. '''
