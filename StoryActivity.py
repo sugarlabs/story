@@ -31,9 +31,10 @@ from sugar3.graphics.alert import Alert, ConfirmationAlert
 from sugar3.graphics import style
 
 from toolbar_utils import button_factory, separator_factory, radio_factory
-from utils import json_load, json_dump, play_audio_from_file
+from utils import json_load, json_dump
+from aplay import aplay
 from exportpdf import save_pdf
-from grecord import Grecord
+from arecord import Arecord
 
 import telepathy
 import dbus
@@ -83,7 +84,7 @@ class StoryActivity(activity.Activity):
         self.tablet_mode = _is_tablet_mode()
         self.recording = False
         self.audio_process = None
-        self._grecord = None
+        self._arecord = None
         self._alert = None
         self._uid = None
 
@@ -177,6 +178,10 @@ class StoryActivity(activity.Activity):
             self._game.new_game()
 
         Gdk.Screen.get_default().connect('size-changed', self._configure_cb)
+
+    def close(self, **kwargs):
+        aplay.close()
+        activity.Activity.close(self, **kwargs)
 
     def _configure_cb(self, event):
         self._canvas.set_size_request(int(Gdk.Screen.width()),
@@ -515,40 +520,44 @@ class StoryActivity(activity.Activity):
 
         GObject.timeout_add(1000, self._remove_alert)
 
-    def record_cb(self, button=None):
+    def record_cb(self, button=None, cb=None):
         ''' Start/stop audio recording '''
-        if self._grecord is None:
-            self._grecord = Grecord(self)
-        if self.recording:  # Was recording, so stop (and save?)
+        if self._arecord is None:
+            self._arecord = Arecord(self)
+        if self.recording:  # Was recording, so stop and later save
             self._game.set_record_icon_state(False)
-            self._grecord.stop_recording_audio()
+            self._arecord.stop_recording_audio()
             self.recording = False
-            self._notify_successful_save(title=_('Save recording'))
-            GObject.timeout_add(100, self._wait_for_transcoding_to_finish)
+            self.busy()
+            GObject.timeout_add(100, self._is_record_complete_timeout, cb)
         else:  # Wasn't recording, so start
             self._game.set_record_icon_state(True)
-            self._grecord.record_audio()
+            self._arecord.record_audio()
             self.recording = True
 
-    def _wait_for_transcoding_to_finish(self, button=None):
-        while not self._grecord.transcoding_complete():
-            time.sleep(1)
-        if self._alert is not None:
-            self.remove_alert(self._alert)
-            self._alert = None
+    def _is_record_complete_timeout(self, cb=None):
+        if not self._arecord.is_complete():
+            return True  # call back later
         self._save_recording()
+        self.unbusy()
+        if cb is not None:
+            cb()
+        return False  # do not call back
 
     def playback_recording_cb(self, button=None):
         ''' Play back current recording '''
         if self.recording:  # Stop recording if we happen to be recording
-            self.record_cb()
+            self.record_cb(cb=self._playback_recording)
+        else:
+            self._playback_recording()
 
+    def _playback_recording(self):
         path = os.path.join(self.datapath, 'output.ogg')
         if self._uid is not None:
             dsobject = self._search_for_audio_note(self._uid)
             if dsobject is not None:
                 path = dsobject.file_path
-        play_audio_from_file(path, self)
+        aplay.play(path)
 
     def _save_recording(self):
         self.metadata['dirty'] = 'True'  # So we know that we've done work
