@@ -692,7 +692,7 @@ class StoryActivity(activity.Activity):
     def event_received_cb(self, collab, buddy, msg):
         ''' Data from a tube has arrived. '''
         command = msg.get("command")
-        if action is None:
+        if command is None:
             return
 
         payload = msg.get("payload")
