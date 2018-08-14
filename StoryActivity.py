@@ -20,6 +20,7 @@ from gi.repository import Pango
 import os
 import subprocess
 import time
+import random
 
 from sugar3.activity import activity
 from sugar3 import profile
@@ -726,8 +727,8 @@ class StoryActivity(activity.Activity):
 
 
 def generate_uid():
-    left = '%04x' % int(uniform(0, int(0xFFFF)))
-    right = '%04x' % int(uniform(0, int(0xFFFF)))
+    left = '%04x' % int(random.uniform(0, int(0xFFFF)))
+    right = '%04x' % int(random.uniform(0, int(0xFFFF)))
     uid = '%s-%s' % (left, right)
     return uid.upper()
 
