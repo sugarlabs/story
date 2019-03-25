@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-07-09 22:25-0400\n"
-"PO-Revision-Date: 2017-06-05 07:46+0000\n"
-"Last-Translator: Mariana <dias.inkscape@gmail.com>\n"
+"PO-Revision-Date: 2019-03-09 01:13+0000\n"
+"Last-Translator: Paulo Francisco <slomp@ufrgs.br>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.1\n"
-"X-POOTLE-MTIME: 1496648798.000000\n"
+"X-POOTLE-MTIME: 1552094008.000000\n"
 
 #: activity/activity.info:2
 msgid "Story"
@@ -38,7 +38,7 @@ msgstr "Continue sua história aqui."
 
 #: StoryActivity.py:314
 msgid "Load new images"
-msgstr "Carregue novas imagens"
+msgstr "Carreguar novas imagens"
 
 #: StoryActivity.py:318
 msgid "View images all at once"
@@ -54,15 +54,15 @@ msgstr "Jogar"
 
 #: StoryActivity.py:332 StoryActivity.py:454
 msgid "Save as image"
-msgstr "Salve as imagens"
+msgstr "Salvar como imagem"
 
 #: StoryActivity.py:336 StoryActivity.py:428
 msgid "Save as PDF"
-msgstr "Salve como PDF"
+msgstr "Salvar como PDF"
 
 #: StoryActivity.py:350
 msgid "Pause"
-msgstr "Pausa"
+msgstr "Pausar"
 
 #: StoryActivity.py:377
 msgid "Do you really want to load new images?"
@@ -82,9 +82,9 @@ msgstr "imagem"
 
 #: StoryActivity.py:494
 msgid "Save recording"
-msgstr "Salve a gravação"
+msgstr "Salvar a gravação"
 
 #: StoryActivity.py:539
 #, python-format
 msgid "audio note for %s"
-msgstr "Nota para o audio %s"
+msgstr "nota para o áudio %s"
