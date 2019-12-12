@@ -391,7 +391,7 @@ class CollabWrapper(GObject.GObject):
         '''
         return CLIENT + '.' + self.activity.get_bundle_id()
 
-    @GObject.property
+    @GObject.Property #@GObject.property is deprecated
     def leader(self):
         '''
         Boolean of if this client is the leader in this activity.  The
