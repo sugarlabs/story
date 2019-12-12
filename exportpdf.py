@@ -132,7 +132,7 @@ def show_text(cr, fd, label, size, x, y, page_width, page_height):
     # TODO: RTL support
 
     # Pango doesn't like nulls
-    if type(label) == str or type(label) == unicode:
+    if type(label) == str or type(label) == str:
         text = label.replace('\0', ' ').rstrip()
     else:
         text = str(label).rstrip()

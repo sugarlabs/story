@@ -11,7 +11,7 @@
 
 import os
 from pipes import quote
-from StringIO import StringIO
+from io import StringIO
 
 import json
 json.dumps

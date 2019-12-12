@@ -65,7 +65,7 @@ class StoryActivity(activity.Activity):
         ''' Initialize the toolbars and the game board '''
         try:
             super(StoryActivity, self).__init__(handle)
-        except dbus.exceptions.DBusException, e:
+        except dbus.exceptions.DBusException as e:
             _logger.error(str(e))
 
         self._path = activity.get_bundle_path()
