@@ -875,6 +875,6 @@ def svg_str_to_pixbuf(svg_string, w=None, h=None):
     pl = GdkPixbuf.PixbufLoader.new_with_type('svg')
     if w is not None:
         pl.set_size(w, h)
-    pl.write(svg_string)
+    pl.write(bytes(svg_string, 'utf-8'))
     pl.close()
     return pl.get_pixbuf()
