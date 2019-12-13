@@ -36,7 +36,7 @@ from aplay import aplay
 from exportpdf import save_pdf
 from arecord import Arecord
 
-import telepathy
+from gi.repository import TelepathyGLib
 import dbus
 from sugar3.presence import presenceservice
 
@@ -642,16 +642,16 @@ class StoryActivity(activity.Activity):
         self.tubes_chan = shared_activity.telepathy_tubes_chan
         self.text_chan = shared_activity.telepathy_text_chan
 
-        self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].connect_to_signal(
+        self.tubes_chan[TelepathyGLib.IFACE_CHANNEL_TYPE_TUBES].connect_to_signal(
             'NewTube', self._new_tube_cb)
 
         if sharer:
             _logger.debug('This is my activity: making a tube...')
-            self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].OfferDBusTube(
+            self.tubes_chan[TelepathyGLib.IFACE_CHANNEL_TYPE_TUBES].OfferDBusTube(
                 SERVICE, {})
         else:
             _logger.debug('I am joining an activity: waiting for a tube...')
-            self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].ListTubes(
+            self.tubes_chan[TelepathyGLib.IFACE_CHANNEL_TYPE_TUBES].ListTubes(
                 reply_handler=self._list_tubes_reply_cb,
                 error_handler=self._list_tubes_error_cb)
         self._game.set_sharing(True)
@@ -671,10 +671,9 @@ class StoryActivity(activity.Activity):
                       ' params=%r state=%d' %
                       (id, initiator, type, service, params, state))
 
-        if (type == telepathy.TUBE_TYPE_DBUS and service == SERVICE):
-            if state == telepathy.TUBE_STATE_LOCAL_PENDING:
-                self.tubes_chan[
-                    telepathy.CHANNEL_TYPE_TUBES].AcceptDBusTube(id)
+        if (type == TelepathyGLib.TubeType.DBUS and service == SERVICE):
+            if state == TelepathyGLib.TubeState.LOCAL_PENDING:
+                self.tubes_chan[TelepathyGLib.IFACE_CHANNEL_TYPE_TUBES].AcceptDBusTube(id)
 
             self.collab = CollabWrapper(self)
             self.collab.message.connect(self.event_received_cb)
