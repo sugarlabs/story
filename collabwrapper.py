@@ -168,6 +168,7 @@ class CollabWrapper(GObject.GObject):
         self._leader = False
         self._init_waiting = False
         self._text_channel = None
+        self._owner = presenceservice.get_instance().get_owner()
 
     def setup(self):
         '''
@@ -391,7 +392,7 @@ class CollabWrapper(GObject.GObject):
         '''
         return CLIENT + '.' + self.activity.get_bundle_id()
 
-    @GObject.Property #@GObject.property is deprecated
+    @GObject.property
     def leader(self):
         '''
         Boolean of if this client is the leader in this activity.  The
@@ -399,6 +400,13 @@ class CollabWrapper(GObject.GObject):
         ever be one leader for an activity.
         '''
         return self._leader
+
+    @GObject.property
+    def owner(self):
+        '''
+        Ourselves, :class:`sugar3.presence.buddy.Owner`
+        '''
+        return self._owner
 
 
 FT_STATE_NONE = 0
@@ -481,7 +489,7 @@ class _BaseFileTransfer(GObject.GObject):
     def _get_transferred_bytes(self):
         return self._transferred_bytes
 
-    transferred_bytes = GObject.Property(type=int,
+    transferred_bytes = GObject.property(type=int,
                                          default=0,
                                          getter=_get_transferred_bytes,
                                          setter=_set_transferred_bytes)
@@ -501,7 +509,7 @@ class _BaseFileTransfer(GObject.GObject):
     def _get_state(self):
         return self._state
 
-    state = GObject.Property(type=int, getter=_get_state, setter=_set_state)
+    state = GObject.property(type=int, getter=_get_state, setter=_set_state)
 
     def cancel(self):
         '''
@@ -821,12 +829,12 @@ class _TextChannelWrapper(object):
                 nick = self._conn[
                     CONN_INTERFACE_ALIASING].RequestAliases([sender])[0]
                 buddy = {'nick': nick, 'color': '#000000,#808080'}
-                _logger.debug('exception: recieved from sender %r buddy %r' %
+                _logger.debug('exception: received from sender %r buddy %r' %
                               (sender, buddy))
             else:
                 # XXX: cache these
                 buddy = self._get_buddy(sender)
-                _logger.debug('Else: recieved from sender %r buddy %r' %
+                _logger.debug('Else: received from sender %r buddy %r' %
                               (sender, buddy))
 
             self._activity_cb(buddy, msg)
