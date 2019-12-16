@@ -62,8 +62,13 @@ def speak(text):
 
     lang = os.environ['LANG'][0:2]
     if lang in VOICES:
-        command = 'espeak -v %s "%s"' % (VOICES[lang], safetext)
+        language_option = '-v ' + VOICES[lang]
     else:
-        command = 'espeak "%s"' % (safetext)
+        language_option = ''
 
-    os.system('%s --stdout | aplay' % command)
+    if self.tw.running_sugar:
+        from sugar3.speech import SpeechManager
+        sm = SpeechManager()
+        sm.say_text(text)
+    else:
+        os.system('espeak {} "{}" --stdout | aplay'.format(language_option, str(text)))
