@@ -66,9 +66,9 @@ def speak(text):
     else:
         language_option = ''
 
-    if self.tw.running_sugar:
+    try:
         from sugar3.speech import SpeechManager
         sm = SpeechManager()
         sm.say_text(text)
-    else:
+    except ModuleNotFoundError:  # for safety, if sugar's not installed / found [optional]
         os.system('espeak {} "{}" --stdout | aplay'.format(language_option, str(text)))
