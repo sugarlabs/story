@@ -729,7 +729,7 @@ class Game():
                 try:
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
                         self._art4apps.get_image_filename(word), size, size)
-                except Exception, e:
+                except Exception as e:
                     _logger.error('new dot surface %s %s: %s' %
                                   (image, word, e))
                     word = 'zebra'  # default in case image is not found
@@ -875,6 +875,6 @@ def svg_str_to_pixbuf(svg_string, w=None, h=None):
     pl = GdkPixbuf.PixbufLoader.new_with_type('svg')
     if w is not None:
         pl.set_size(w, h)
-    pl.write(svg_string)
+    pl.write(bytes(svg_string, 'utf-8'))
     pl.close()
     return pl.get_pixbuf()

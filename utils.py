@@ -11,7 +11,7 @@
 
 import os
 from pipes import quote
-from StringIO import StringIO
+from io import StringIO
 
 import json
 json.dumps
@@ -62,8 +62,13 @@ def speak(text):
 
     lang = os.environ['LANG'][0:2]
     if lang in VOICES:
-        command = 'espeak -v %s "%s"' % (VOICES[lang], safetext)
+        language_option = '-v ' + VOICES[lang]
     else:
-        command = 'espeak "%s"' % (safetext)
+        language_option = ''
 
-    os.system('%s --stdout | aplay' % command)
+    try:
+        from sugar3.speech import SpeechManager
+        sm = SpeechManager()
+        sm.say_text(text)
+    except ModuleNotFoundError:  # for safety, if sugar's not installed / found [optional]
+        os.system('espeak {} "{}" --stdout | aplay'.format(language_option, str(text)))

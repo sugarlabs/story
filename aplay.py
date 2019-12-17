@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import logging
-from Queue import Queue
+from queue import Queue
 import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
