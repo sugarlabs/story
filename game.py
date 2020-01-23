@@ -18,6 +18,7 @@ import cairo
 import os
 import glob
 import time
+from itertools import islice
 from random import uniform
 
 from gettext import gettext as _
@@ -725,7 +726,9 @@ class Game():
                 self._footer())
         else:
             if USE_ART4APPS:
-                word = self._art4apps.get_words()[image]
+                word = next(
+                    islice(self._art4apps.get_words(), image, None),
+                    None)
                 try:
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
                         self._art4apps.get_image_filename(word), size, size)
