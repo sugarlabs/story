@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-14 14:05+1000\n"
+"POT-Creation-Date: 2020-02-11 02:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,7 +49,7 @@ msgstr ""
 msgid "View images one at a time"
 msgstr ""
 
-#: StoryActivity.py:354 game.py:344
+#: StoryActivity.py:354 game.py:345
 msgid "Play"
 msgstr ""
 
@@ -86,14 +86,14 @@ msgstr ""
 msgid "audio note for %s"
 msgstr ""
 
-#: collabwrapper.py:192
+#: collabwrapper.py:197
 msgid "Joining activity..."
 msgstr ""
 
-#: collabwrapper.py:193 collabwrapper.py:205
+#: collabwrapper.py:198 collabwrapper.py:210
 msgid "Please wait for the connection..."
 msgstr ""
 
-#: collabwrapper.py:204
+#: collabwrapper.py:209
 msgid "Resuming shared activity..."
 msgstr ""
