@@ -569,6 +569,8 @@ class Game():
 
     def new_game(self):
         ''' Start a new game. '''
+        self._timeout_id = None
+        self._start_time = 0
         self._all_clear()
 
     def _new_images(self):
