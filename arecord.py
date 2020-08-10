@@ -23,7 +23,7 @@ import os
 
 import gi
 gi.require_version('Gst', '1.0')
-from gi.repository import GObject, Gst
+from gi.repository import GLib, Gst
 
 import logging
 
@@ -55,7 +55,7 @@ class Arecord:
         def on_message_cb(bus, msg, ogg):
             if msg.type == Gst.MessageType.EOS:
                 logger.debug('record_audio.on_message_cb Gst.MessageType.EOS')
-                GObject.idle_add(self._stop_recording_audio, ogg)
+                GLib.idle_add(self._stop_recording_audio, ogg)
                 return
 
             if msg.type == Gst.MessageType.ERROR:
