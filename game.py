@@ -395,8 +395,11 @@ class Game():
         else:
             pause = 1
         if self.playing and self.current_image < 8:
+            if self._timeout_id is not None:
+                GLib.source_remove(self._timeout_id)
+                self._timeout_id = None
             self._timeout_id = GLib.timeout_add(pause * 1000,
-                                                   self._autonext)
+                                                self._autonext)
         else:
             self.stop()
 
@@ -529,6 +532,7 @@ class Game():
         ''' Things to reinitialize when starting up a new game. '''
         if self._timeout_id is not None:
             GLib.source_remove(self._timeout_id)
+            self._timeout_id = None
 
         self.set_mode(self._mode)
 
@@ -563,6 +567,9 @@ class Game():
 
         self._dance_counter += 1
         if self._dance_counter < 10:
+            if self._timeout_id is not None:
+                GLib.source_remove(self._timeout_id)
+                self._timeout_id = None
             self._timeout_id = GLib.timeout_add(500, self._dance_step)
         else:
             self._new_images()
