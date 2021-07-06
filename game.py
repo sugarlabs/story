@@ -12,7 +12,7 @@
 # along with this library; if not, write to the Free Software
 # Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-from gi.repository import Gdk, GdkPixbuf, Gtk, GObject
+from gi.repository import Gdk, GdkPixbuf, Gtk, GLib
 
 import cairo
 import os
@@ -339,7 +339,7 @@ class Game():
             self._parent.audio_process.terminate()
             self._parent.audio_process = None
         if self._timeout_id is not None:
-            GObject.source_remove(self._timeout_id)
+            GLib.source_remove(self._timeout_id)
             self._timeout_id = None
         self._parent.autoplay_button.set_icon_name('media-playback-start')
         self._parent.autoplay_button.set_tooltip(_('Play'))
@@ -362,14 +362,14 @@ class Game():
             self._prev.set_layer(1)
         self._parent.check_audio_status()
         self._parent.check_text_status()
-        GObject.idle_add(self._play_sound)
+        GLib.idle_add(self._play_sound)
 
     def _poll_audio(self):
         if self._parent.audio_process is None:  # Already stopped?
             return
 
         if self._parent.audio_process.poll() is None:
-            GObject.timeout_add(200, self._poll_audio)
+            GLib.timeout_add(200, self._poll_audio)
         else:
             self._parent.audio_process = None
             self._next_image()
@@ -395,8 +395,11 @@ class Game():
         else:
             pause = 1
         if self.playing and self.current_image < 8:
-            self._timeout_id = GObject.timeout_add(pause * 1000,
-                                                   self._autonext)
+            if self._timeout_id is not None:
+                GLib.source_remove(self._timeout_id)
+                self._timeout_id = None
+            self._timeout_id = GLib.timeout_add(pause * 1000,
+                                                self._autonext)
         else:
             self.stop()
 
@@ -528,7 +531,8 @@ class Game():
     def _all_clear(self):
         ''' Things to reinitialize when starting up a new game. '''
         if self._timeout_id is not None:
-            GObject.source_remove(self._timeout_id)
+            GLib.source_remove(self._timeout_id)
+            self._timeout_id = None
 
         self.set_mode(self._mode)
 
@@ -563,12 +567,17 @@ class Game():
 
         self._dance_counter += 1
         if self._dance_counter < 10:
-            self._timeout_id = GObject.timeout_add(500, self._dance_step)
+            if self._timeout_id is not None:
+                GLib.source_remove(self._timeout_id)
+                self._timeout_id = None
+            self._timeout_id = GLib.timeout_add(500, self._dance_step)
         else:
             self._new_images()
 
     def new_game(self):
         ''' Start a new game. '''
+        self._timeout_id = None
+        self._start_time = 0
         self._all_clear()
 
     def _new_images(self):
