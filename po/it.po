@@ -1,0 +1,98 @@
+# ITALIAN TRANSLATION.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# ALBANO BATTISTELLA <ALBANOBATTISTELLA@GMAIL.COM>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-02-11 02:29+0100\n"
+"PO-Revision-Date: 2024-07-02 08:20+0200\n"
+"Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
+"Language-Team: Italian <LL@li.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: activity/activity.info:2
+msgid "Story"
+msgstr "Storia"
+
+#: activity/activity.info:3
+msgid "Prompts learner to tell a story by displaying images at random."
+msgstr "Sollecita lo studente a raccontare una storia visualizzando immagini in modo casuale."
+
+#: StoryActivity.py:52
+msgid "Write your story here."
+msgstr "Scrivi la tua storia qui."
+
+#: StoryActivity.py:53
+msgid "Begin your story here."
+msgstr "Inizia la tua storia qui."
+
+#: StoryActivity.py:54
+msgid "Continue your story here."
+msgstr "Continua la tua storia qui."
+
+#: StoryActivity.py:342
+msgid "Load new images"
+msgstr "Carica nuove immagini"
+
+#: StoryActivity.py:346
+msgid "View images all at once"
+msgstr ""
+
+#: StoryActivity.py:350
+msgid "View images one at a time"
+msgstr "Visualizza le immagini tutte in una volta"
+
+#: StoryActivity.py:354 game.py:345
+msgid "Play"
+msgstr "Avvia"
+
+#: StoryActivity.py:361 StoryActivity.py:491
+msgid "Save as image"
+msgstr "Salva come immagine"
+
+#: StoryActivity.py:365 StoryActivity.py:464
+msgid "Save as PDF"
+msgstr "Salva come PDF"
+
+#: StoryActivity.py:379
+msgid "Pause"
+msgstr "Pausa"
+
+#: StoryActivity.py:407
+msgid "Do you really want to load new images?"
+msgstr "Vuoi davvero caricare nuove immagini?"
+
+#: StoryActivity.py:408
+msgid "You have done work on this story. Do you want to overwrite it?"
+msgstr "Hai lavorato su questa storia. Vuoi sovrascriverla?"
+
+#: StoryActivity.py:478
+msgid "PDF"
+msgstr "PDF"
+
+#: StoryActivity.py:510
+msgid "image"
+msgstr "immagine"
+
+#: StoryActivity.py:577
+#, python-format
+msgid "audio note for %s"
+msgstr "nota audio per %s"
+
+#: collabwrapper.py:197
+msgid "Joining activity..."
+msgstr "Partecipazione all'attività..."
+
+#: collabwrapper.py:198 collabwrapper.py:210
+msgid "Please wait for the connection..."
+msgstr "Si prega di attendere la connessione..."
+
+#: collabwrapper.py:209
+msgid "Resuming shared activity..."
+msgstr "Ripresa dell'attività condivisa..."
