@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-02-11 02:29+0100\n"
-"PO-Revision-Date: 2025-03-30 03:53+0000\n"
+"PO-Revision-Date: 2025-04-14 13:22+0000\n"
 "Last-Translator: NF <rkavt@smartprojects.ge>\n"
 "Language-Team: Georgian <http://weblate.sugarlabs.org/projects/"
 "sugar-activities/story/ka/>\n"
@@ -29,7 +29,7 @@ msgstr ""
 
 #: StoryActivity.py:52
 msgid "Write your story here."
-msgstr ""
+msgstr "დაწერეთ თქვენი ისტორია აქ."
 
 #: StoryActivity.py:53
 msgid "Begin your story here."
@@ -37,56 +37,56 @@ msgstr ""
 
 #: StoryActivity.py:54
 msgid "Continue your story here."
-msgstr ""
+msgstr "გააგრძელეთ თქვენი ისტორია აქ."
 
 #: StoryActivity.py:342
 msgid "Load new images"
-msgstr ""
+msgstr "ახალი გამოსახულებების ჩატვირთვა"
 
 #: StoryActivity.py:346
 msgid "View images all at once"
-msgstr ""
+msgstr "ყველა გამოსახულების ერთად ნახვა"
 
 #: StoryActivity.py:350
 msgid "View images one at a time"
-msgstr ""
+msgstr "ერთი გამოსახულების ნახვა"
 
 #: StoryActivity.py:354 game.py:345
 msgid "Play"
-msgstr ""
+msgstr "დაკვრა"
 
 #: StoryActivity.py:361 StoryActivity.py:491
 msgid "Save as image"
-msgstr ""
+msgstr "შენახვა, როგორც გამოსახულების"
 
 #: StoryActivity.py:365 StoryActivity.py:464
 msgid "Save as PDF"
-msgstr ""
+msgstr "შენახვა PDF-ის სახით"
 
 #: StoryActivity.py:379
 msgid "Pause"
-msgstr ""
+msgstr "შეჩერება"
 
 #: StoryActivity.py:407
 msgid "Do you really want to load new images?"
-msgstr ""
+msgstr "მართლა გნებავთ ახალი გამოსახულებების ჩატვირთვა?"
 
 #: StoryActivity.py:408
 msgid "You have done work on this story. Do you want to overwrite it?"
-msgstr ""
+msgstr "თქვენს დაასრულეთ მუშაობა ამ ისტორიაზე. გნებავთ, თავზე გადააწეროთ?"
 
 #: StoryActivity.py:478
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 #: StoryActivity.py:510
 msgid "image"
-msgstr ""
+msgstr "გამოსახულება"
 
 #: StoryActivity.py:577
 #, python-format
 msgid "audio note for %s"
-msgstr ""
+msgstr "აუდიიშენიშვნა %s-სთვის"
 
 #: collabwrapper.py:197
 msgid "Joining activity..."
@@ -99,3 +99,11 @@ msgstr ""
 #: collabwrapper.py:209
 msgid "Resuming shared activity..."
 msgstr ""
+
+#: activity/activity.info:3
+msgid "prompts learner to tell a story by displaying images at random"
+msgstr "სთხოვს მსწავლელს, მოუყვეს ისტორია სურათების შემთხვევით ჩვენებით"
+
+#: StoryActivity.py:494
+msgid "Save recording"
+msgstr "ჩანაწერის შენახვა"
