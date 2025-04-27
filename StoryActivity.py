@@ -14,7 +14,7 @@ gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk
 from gi.repository import Gtk
-from gi.repository import GObject
+from gi.repository import GLib
 from gi.repository import Pango
 
 import os
@@ -458,7 +458,7 @@ class StoryActivity(activity.Activity):
     def _do_save_as_pdf_cb(self, button=None):
         self._waiting_cursor()
         self._notify_successful_save(title=_('Save as PDF'))
-        GObject.idle_add(self._save_as_pdf)
+        GLib.idle_add(self._save_as_pdf)
 
     def _save_as_pdf(self):
         self.speak_text_cb()
@@ -480,12 +480,12 @@ class StoryActivity(activity.Activity):
         dsobject.destroy()
         os.remove(file_path)
 
-        GObject.timeout_add(1000, self._remove_alert)
+        GLib.timeout_add(1000, self._remove_alert)
 
     def _do_save_as_image_cb(self, button=None):
         self._waiting_cursor()
         self._notify_successful_save(title=_('Save as image'))
-        GObject.idle_add(self._save_as_image)
+        GLib.idle_add(self._save_as_image)
 
     def _save_as_image(self):
         ''' Grab the current canvas and save it to the Journal. '''
@@ -512,7 +512,7 @@ class StoryActivity(activity.Activity):
         dsobject.destroy()
         os.remove(file_path)
 
-        GObject.timeout_add(1000, self._remove_alert)
+        GLib.timeout_add(1000, self._remove_alert)
 
     def record_cb(self, button=None, cb=None):
         ''' Start/stop audio recording '''
@@ -523,7 +523,7 @@ class StoryActivity(activity.Activity):
             self._arecord.stop_recording_audio()
             self.recording = False
             self.busy()
-            GObject.timeout_add(100, self._is_record_complete_timeout, cb)
+            GLib.timeout_add(100, self._is_record_complete_timeout, cb)
         else:  # Wasn't recording, so start
             self._game.set_record_icon_state(True)
             self._arecord.record_audio()
