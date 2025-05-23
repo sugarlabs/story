@@ -7,15 +7,16 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-05-27 00:34-0400\n"
-"PO-Revision-Date: 2012-06-02 02:26+0200\n"
-"Last-Translator: Chris <cjl@laptop.org>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2025-05-23 12:15+0000\n"
+"Last-Translator: Aman Sharma <shasarita23@gmail.com>\n"
+"Language-Team: English (United Kingdom) <http://weblate.sugarlabs.org/"
+"projects/sugar-activities/story/en_GB/>\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.0.5\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.4.2\n"
 
 #: activity/activity.info:2
 msgid "Story"
@@ -61,3 +62,51 @@ msgstr "Stop recording"
 #, python-format
 msgid "audio note for %s"
 msgstr "audio note for %s"
+
+#: StoryActivity.py:50
+msgid "Write your story here."
+msgstr "Write your story here."
+
+#: StoryActivity.py:51
+msgid "Continue your story here."
+msgstr "Continue your story here."
+
+#: StoryActivity.py:314
+msgid "Load new images"
+msgstr "Load new images"
+
+#: StoryActivity.py:318
+msgid "View images all at once"
+msgstr "View images all at once"
+
+#: StoryActivity.py:322
+msgid "View images one at a time"
+msgstr "View images one at a time"
+
+#: StoryActivity.py:326 game.py:337
+msgid "Play"
+msgstr "Play"
+
+#: StoryActivity.py:336 StoryActivity.py:428
+msgid "Save as PDF"
+msgstr "Save as PDF"
+
+#: StoryActivity.py:350
+msgid "Pause"
+msgstr "Pause"
+
+#: StoryActivity.py:378
+msgid "You have done work on this story. Do you want to overwrite it?"
+msgstr "You have done work on this story. Do you want to overwrite it?"
+
+#: StoryActivity.py:441
+msgid "PDF"
+msgstr "PDF"
+
+#: activity/activity.info:3
+msgid "prompts learner to tell a story by displaying images at random"
+msgstr "prompts learner to tell a story by displaying images at random"
+
+#: StoryActivity.py:377
+msgid "Do you really want to load new images?"
+msgstr "Do you really want to load new images?"
