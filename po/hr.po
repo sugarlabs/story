@@ -1,0 +1,98 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-02-11 02:29+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: hr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: activity/activity.info:2
+msgid "Story"
+msgstr ""
+
+#: activity/activity.info:3
+msgid "Prompts learner to tell a story by displaying images at random."
+msgstr ""
+
+#: StoryActivity.py:52
+msgid "Write your story here."
+msgstr ""
+
+#: StoryActivity.py:53
+msgid "Begin your story here."
+msgstr ""
+
+#: StoryActivity.py:54
+msgid "Continue your story here."
+msgstr ""
+
+#: StoryActivity.py:342
+msgid "Load new images"
+msgstr ""
+
+#: StoryActivity.py:346
+msgid "View images all at once"
+msgstr ""
+
+#: StoryActivity.py:350
+msgid "View images one at a time"
+msgstr ""
+
+#: StoryActivity.py:354 game.py:345
+msgid "Play"
+msgstr ""
+
+#: StoryActivity.py:361 StoryActivity.py:491
+msgid "Save as image"
+msgstr ""
+
+#: StoryActivity.py:365 StoryActivity.py:464
+msgid "Save as PDF"
+msgstr ""
+
+#: StoryActivity.py:379
+msgid "Pause"
+msgstr ""
+
+#: StoryActivity.py:407
+msgid "Do you really want to load new images?"
+msgstr ""
+
+#: StoryActivity.py:408
+msgid "You have done work on this story. Do you want to overwrite it?"
+msgstr ""
+
+#: StoryActivity.py:478
+msgid "PDF"
+msgstr ""
+
+#: StoryActivity.py:510
+msgid "image"
+msgstr ""
+
+#: StoryActivity.py:577
+#, python-format
+msgid "audio note for %s"
+msgstr ""
+
+#: collabwrapper.py:197
+msgid "Joining activity..."
+msgstr ""
+
+#: collabwrapper.py:198 collabwrapper.py:210
+msgid "Please wait for the connection..."
+msgstr ""
+
+#: collabwrapper.py:209
+msgid "Resuming shared activity..."
+msgstr ""
